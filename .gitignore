@@ -1,0 +1,21 @@
+﻿# Dependencies
+node_modules/
+package-lock.json
+
+# Environment variables and API keys
+.env
+config.js
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build files
+dist/
+build/
