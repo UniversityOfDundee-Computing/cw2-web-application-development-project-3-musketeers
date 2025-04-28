@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Country Data Visualizer - World Data</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/components/header.css">
+    <link rel="stylesheet" href="../css/components/charts.css">
+    <link rel="stylesheet" href="../css/pages/world-data.css">
+    
+    <!-- Description for SEO -->
+    <meta name="description" content="Visualize global country data including population, languages, and more using interactive charts.">
+</head>
+<body>
+    <header>
+        <h1>Country Data Visualizer</h1>
+        <nav>
+            <button id="menu-toggle">☰</button>
+            <ul id="nav-links">
+                <li><a href="../pages/world-data.html" class="active">World Data</a></li>
+                <li><a href="../pages/random.html">Random Country</a></li>
+                <li>
+                    <select id="countrySelectNav">
+                        <option value="">Select a Country</option>
+                    </select>
+                </li>
+                <li><a href="../pages/compare.html">Compare Countries</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <!-- Chart containers with semantic IDs and ARIA labels -->
+            <div id="chartContainer" class="chart-container" aria-label="Population distribution chart">
+                <div class="chart-loading">Loading population data...</div>
+            </div>
+
+            <div id="chartContainer2" class="chart-container" aria-label="Continental population chart">
+                <div class="chart-loading">Loading continental data...</div>
+            </div>
+
+            <div id="chartContainer3" class="chart-container" aria-label="Regional distribution chart">
+                <div class="chart-loading">Loading regional data...</div>
+            </div>
+
+            <div id="chartContainer4" class="chart-container" aria-label="Currency usage chart">
+                <div class="chart-loading">Loading currency data...</div>
+            </div>
+
+            <div id="chartContainer5" class="chart-container" aria-label="Timezone distribution chart">
+                <div class="chart-loading">Loading timezone data...</div>
+            </div>
+
+            <div id="chartContainer6" class="chart-container" aria-label="Independence status chart">
+                <div class="chart-loading">Loading independence data...</div>
+            </div>
+
+            <div id="chartContainer7" class="chart-container" aria-label="Border statistics chart">
+                <div class="chart-loading">Loading border data...</div>
+            </div>
+
+            <div id="chartContainer8" class="chart-container" aria-label="Language distribution chart">
+                <div class="chart-loading">Loading language data...</div>
+            </div>
+
+            <div id="chartContainer9" class="chart-container" aria-label="Timezone analysis chart">
+                <div class="chart-loading">Loading timezone analysis...</div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Data provided by REST Countries API and visualized using QuickChart API</p>
+    </footer>
+
+    <!-- Error handling template -->
+    <template id="error-template">
+        <div class="chart-error">
+            <p>Failed to load chart</p>
+            <button onclick="this.closest('.chart-container').querySelector('.chart-loading').style.display='block';this.closest('.chart-error').remove();">Retry</button>
+        </div>
+    </template>
+
+    <!-- Loading template -->
+    <template id="loading-template">
+        <div class="chart-loading">
+            <div class="loading-spinner"></div>
+            <p>Loading data...</p>
+        </div>
+    </template>
+
+    <!-- JavaScript Modules -->
+    <script type="module" src="../js/pages/world-data/index.js"></script>
+</body>
+</html>
