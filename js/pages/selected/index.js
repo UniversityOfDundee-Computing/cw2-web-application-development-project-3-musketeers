@@ -21,7 +21,7 @@ class SelectedCountryPage {
         this.populationChart = document.getElementById('populationChart');
         this.languageChart = document.getElementById('languageChart');
         this.regionalChart = document.getElementById('regionalChart');
-        this.currencyChart = document.getElementById('currencyChart');
+        this.areaChart = document.getElementById('areaChart');
         this.mapView = document.getElementById('mapView');
         this.neighbors = document.getElementById('neighbors').querySelector('.neighbors-grid');
 
@@ -151,7 +151,7 @@ class SelectedCountryPage {
                 this.createPopulationChart(),
                 this.createLanguageChart(),
                 this.createRegionalChart(),
-                this.createCurrencyChart()
+                this.createAreaChart()
             ]);
         } catch (error) {
             console.error('Error creating visualizations:', error);
@@ -253,7 +253,7 @@ class SelectedCountryPage {
         });
 
         const chartConfig = {
-            type: 'pie',
+            type: 'doughnut',
             data: {
                 labels: Object.keys(languageStats),
                 datasets: [{
@@ -330,52 +330,109 @@ class SelectedCountryPage {
         const chartUrl = chartService.createChartUrl(chartConfig);
         chartUtils.displayChart('regionalChart', chartUrl, 'Regional context');
     }
+    
+    // /**
+    //  * Create currency usage chart
+    //  */
+    // async createCurrencyChart() {
+    //     if (!this.currentCountry.currencies) return;
+
+    //     const currencies = Object.keys(this.currentCountry.currencies);
+    //     const currencyStats = {};
+
+    //     this.allCountries.forEach(country => {
+    //         if (country.currencies) {
+    //             Object.keys(country.currencies).forEach(curr => {
+    //                 if (currencies.includes(curr)) {
+    //                     currencyStats[curr] = (currencyStats[curr] || 0) + 1;
+    //                 }
+    //             });
+    //         }
+    //     });
+
+    //     const chartConfig = {
+    //         type: 'doughnut',
+    //         data: {
+    //             labels: Object.keys(currencyStats),
+    //             datasets: [{
+    //                 data: Object.values(currencyStats),
+    //                 backgroundColor: [
+    //                     '#ff6384',
+    //                     '#36a2eb',
+    //                     '#ffcd56'
+    //                 ]
+    //             }]
+    //         },
+    //         options: {
+    //             plugins: {
+    //                 title: {
+    //                     display: true,
+    //                     text: 'Currency Usage',
+    //                     font: { size: 16, weight: 'bold' }
+    //                 }
+    //             }
+    //         }
+    //     };
+
+    //     const chartUrl = chartService.createChartUrl(chartConfig);
+    //     chartUtils.displayChart('currencyChart', chartUrl, 'Currency usage');
+    // }
 
     /**
-     * Create currency usage chart
+     * Create area comparison chart
      */
-    async createCurrencyChart() {
-        if (!this.currentCountry.currencies) return;
+    async createAreaChart() {
+        if (!this.currentCountry) return;
 
-        const currencies = Object.keys(this.currentCountry.currencies);
-        const currencyStats = {};
-
-        this.allCountries.forEach(country => {
-            if (country.currencies) {
-                Object.keys(country.currencies).forEach(curr => {
-                    if (currencies.includes(curr)) {
-                        currencyStats[curr] = (currencyStats[curr] || 0) + 1;
-                    }
-                });
-            }
-        });
+        const area = this.currentCountry.area; // Country area in km²
 
         const chartConfig = {
-            type: 'doughnut',
+            type: "bar",
             data: {
-                labels: Object.keys(currencyStats),
-                datasets: [{
-                    data: Object.values(currencyStats),
-                    backgroundColor: [
-                        '#ff6384',
-                        '#36a2eb',
-                        '#ffcd56'
-                    ]
-                }]
+                labels: [this.currentCountry.name.common, "World Max Area"],
+                datasets: [
+                    {
+                        label: "Country Area (in km²)",
+                        data: [area, 17098242],  // Russia's area
+                        backgroundColor: ["#2196F3", "#e0e0e0"],
+                        borderColor: ["#1976D2", "#b0b0b0"],
+                        borderWidth: 1,
+                        barThickness: 40
+                    }
+                ]
             },
             options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 18000000, // fixed maximum
+                        ticks: {
+                            stepSize: 2000000
+                        }
+                    }
+                },
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Currency Usage',
-                        font: { size: 16, weight: 'bold' }
+                        text: `${this.currentCountry.name.common} Area vs World Max Area`,
+                        font: {
+                            size: 16,
+                            weight: "bold"
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (tooltipItem) {
+                                return `Area: ${tooltipItem.raw.toLocaleString()} km²`;
+                            }
+                        }
                     }
                 }
             }
         };
 
         const chartUrl = chartService.createChartUrl(chartConfig);
-        chartUtils.displayChart('currencyChart', chartUrl, 'Currency usage');
+        chartUtils.displayChart('areaChart', chartUrl, 'Area comparison');
     }
 
     /**
