@@ -218,6 +218,12 @@ class SelectedCountryPage {
                         ticks: {
                             callback: value => dataProcessing.formatNumber(value)
                         }
+                    },
+                    x: {
+                        ticks: {
+                            minRotation: 0, // force no rotation
+                            maxRotation: 0 // force no rotation
+                        }
                     }
                 }
             }
