@@ -1,0 +1,199 @@
+/**
+ * Random Country Page Styles
+ * Specific styles for the random country visualization page
+ */
+
+/* Container modifications */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--spacing-large);
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-large);
+}
+
+/* Random country section */
+.random-country-section {
+    background: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: var(--spacing-large);
+}
+
+/* Controls */
+.controls {
+    text-align: center;
+    margin-bottom: var(--spacing-large);
+}
+
+.primary-button {
+    background-color: var(--primary-color);
+    color: var(--white);
+    padding: var(--spacing-medium) var(--spacing-large);
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-base);
+    cursor: pointer;
+    transition: background-color var(--transition-speed);
+}
+
+.primary-button:hover {
+    background-color: var(--success-color);
+}
+
+.primary-button:disabled {
+    background-color: var(--border-color);
+    cursor: not-allowed;
+}
+
+/* Country display */
+.country-info {
+    text-align: left;
+}
+
+.country-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-medium);
+    margin-bottom: var(--spacing-large);
+}
+
+.country-flag {
+    width: 120px;
+    height: auto;
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.country-name {
+    margin: 0;
+    color: var(--primary-color);
+    font-size: var(--font-size-large);
+}
+
+.country-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-medium);
+    margin-bottom: var(--spacing-large);
+}
+
+.country-details p {
+    margin: 0;
+    padding: var(--spacing-small);
+    background-color: #f8f9fa;
+    border-radius: var(--border-radius);
+}
+
+.country-links {
+    text-align: center;
+    margin-top: var(--spacing-large);
+}
+
+.maps-link {
+    display: inline-block;
+    padding: var(--spacing-small) var(--spacing-medium);
+    background-color: var(--primary-color);
+    color: var(--white);
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    transition: background-color var(--transition-speed);
+}
+
+.maps-link:hover {
+    background-color: var(--success-color);
+}
+
+/* Chart section */
+.chart-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-large);
+}
+
+.chart-container {
+    background: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: var(--spacing-large);
+    min-height: 300px;
+}
+
+/* Loading and error states */
+.loading-message {
+    text-align: center;
+    padding: var(--spacing-large);
+    color: var(--text-color);
+}
+
+.error-message {
+    text-align: center;
+    padding: var(--spacing-large);
+    color: var(--error-color);
+    background-color: #fff5f5;
+    border-radius: var(--border-radius);
+}
+
+.error-message button {
+    margin-top: var(--spacing-medium);
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .chart-section {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .country-info {
+        max-width: 100%;
+    }
+
+    .chart-container {
+        min-height: 280px;
+    }
+}
+
+@media (max-width: 768px) {
+    .chart-section {
+        grid-template-columns: 1fr;
+    }
+    .container {
+        padding: var(--spacing-medium);
+    }
+
+    .country-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .country-flag {
+        width: 100px;
+    }
+
+    .country-details {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-container {
+        min-height: 250px;
+    }
+}
+
+/* Print styles */
+@media print {
+    .controls,
+    .country-links {
+        display: none;
+    }
+
+    .country-info,
+    .chart-container {
+        break-inside: avoid;
+    }
+
+    .chart-container img {
+        max-width: 100%;
+        height: auto;
+    }
+}

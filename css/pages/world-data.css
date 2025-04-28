@@ -1,0 +1,162 @@
+/**
+ * World Data Page Styles
+ * Specific styles for the world data visualization page
+ */
+
+/* Page specific container modifications */
+.container {
+    max-width: 1400px; /* Slightly wider for data visualizations */
+    margin: 0 auto;
+    padding: var(--spacing-medium);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-large);
+}
+
+/* Specific chart container modifications */
+#chartContainer,
+#chartContainer2,
+#chartContainer3,
+#chartContainer4,
+#chartContainer5,
+#chartContainer6,
+#chartContainer7,
+#chartContainer8,
+#chartContainer9 {
+    position: relative;
+    background: linear-gradient(to bottom right, var(--white), #f8f9fa);
+    min-height: 350px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Population chart (larger for emphasis) */
+#chartContainer {
+    grid-column: span 2;
+    min-height: 400px;
+}
+
+/* Continental chart (doughnut needs more height) */
+#chartContainer2 {
+    min-height: 350px;
+}
+
+/* Currency radar chart needs specific dimensions */
+#chartContainer4 {
+    min-height: 400px;
+}
+
+/* Chart title enhancements */
+.chart-container h3 {
+    margin-bottom: var(--spacing-medium);
+    color: var(--primary-color);
+    font-size: 1.2em;
+}
+
+/* Chart metadata display */
+.chart-metadata {
+    font-size: var(--font-size-small);
+    color: var(--text-color);
+    margin-top: var(--spacing-small);
+    text-align: center;
+}
+
+/* Last updated timestamp */
+.last-updated {
+    font-size: var(--font-size-small);
+    color: var(--text-color);
+    text-align: right;
+    margin-top: var(--spacing-small);
+    font-style: italic;
+}
+
+/* Data source attribution */
+.data-source {
+    font-size: var(--font-size-small);
+    color: var(--text-color);
+    text-align: center;
+    margin-top: var(--spacing-medium);
+    padding-top: var(--spacing-small);
+    border-top: 1px solid var(--border-color);
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 1200px) {
+    .container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    #chartContainer {
+        grid-column: span 2; /* Span full width on tablet */
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .container {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-medium);
+    }
+
+    .chart-container {
+        min-height: 300px; /* Slightly shorter on mobile */
+    }
+
+    #chartContainer,
+    #chartContainer2,
+    #chartContainer4 {
+        min-height: 350px; /* Maintain minimum height for certain charts */
+        grid-column: span 1; /* Full width on mobile */
+    }
+
+    .chart-metadata {
+        font-size: calc(var(--font-size-small) - 1px);
+    }
+}
+
+/* Print styles */
+@media print {
+    .container {
+        display: block;
+    }
+
+    .chart-container {
+        page-break-inside: avoid;
+        margin-bottom: var(--spacing-large);
+        border: 1px solid var(--border-color);
+        box-shadow: none;
+    }
+
+    .chart-metadata,
+    .last-updated,
+    .data-source {
+        font-size: 8pt;
+    }
+}
+
+/* Loading state enhancements */
+.chart-container .chart-loading {
+    background: rgba(255, 255, 255, 0.9);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}
+
+/* Error state enhancements */
+.chart-container .chart-error {
+    background: rgba(255, 255, 255, 0.9);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+}

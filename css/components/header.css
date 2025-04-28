@@ -1,0 +1,148 @@
+/**
+ * Header Component Styles
+ * Styles for the navigation header shared across all pages
+ */
+
+/* Header container */
+header {
+    background-color: var(--primary-color);
+    padding: var(--spacing-large) 0;
+    text-align: center;
+    color: var(--white);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+    margin: 0 0 var(--spacing-medium);
+    color: var(--white);
+    font-size: var(--font-size-large);
+}
+
+/* Navigation */
+nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-large);
+}
+
+/* Links inside navbar */
+nav a {
+    text-decoration: none;
+    color: var(--white);
+    font-size: var(--font-size-base);
+    padding: var(--spacing-small) var(--spacing-medium);
+    border: 1px solid var(--white);
+    border-radius: var(--border-radius);
+    transition: all var(--transition-speed);
+}
+
+nav a:hover {
+    background-color: var(--white);
+    color: var(--primary-color);
+}
+
+nav a.active {
+    background-color: var(--white);
+    color: var(--primary-color);
+}
+
+/* Country select dropdown */
+nav select {
+    font-size: var(--font-size-base);
+    padding: var(--spacing-small) var(--spacing-medium);
+    border: 1px solid var(--white);
+    border-radius: var(--border-radius);
+    background-color: var(--primary-color);
+    color: var(--white);
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-align: center;
+    min-width: 200px;
+}
+
+nav select:focus {
+    outline: none;
+    border-color: var(--success-color);
+}
+
+nav select option {
+    background-color: var(--white);
+    color: var(--text-color);
+}
+
+/* Mobile menu toggle button */
+#menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: var(--white);
+    cursor: pointer;
+    padding: var(--spacing-small);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    nav ul {
+        flex-direction: column;
+        width: 100%;
+        display: none;
+    }
+
+    nav ul.show {
+        display: flex;
+    }
+
+    nav ul li {
+        width: 100%;
+        margin: var(--spacing-small) 0;
+    }
+
+    nav a {
+        display: block;
+        width: 100%;
+    }
+
+    nav select {
+        width: 100%;
+        max-width: none;
+    }
+
+    #menu-toggle {
+        display: block;
+        margin-bottom: var(--spacing-medium);
+    }
+
+    /* Show navigation when menu is toggled */
+    nav.show ul {
+        display: flex;
+    }
+}
+
+/* Animation for mobile menu */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+nav ul.show {
+    animation: slideDown var(--transition-speed) ease-out;
+}

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Country Data Visualizer - Random Country</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/components/header.css">
+    <link rel="stylesheet" href="../css/components/charts.css">
+    
+    <!-- Description for SEO -->
+    <meta name="description" content="Explore random country statistics and information through interactive visualizations.">
+</head>
+<body>
+    <header>
+        <h1>Country Data Visualizer</h1>
+        <nav>
+            <button id="menu-toggle">☰</button>
+            <ul id="nav-links">
+                <li><a href="world-data.html">World Data</a></li>
+                <li><a href="random.html" class="active">Random Country</a></li>
+                <li>
+                    <select id="countrySelectNav">
+                        <option value="">Select a Country</option>
+                    </select>
+                </li>
+                <li><a href="compare.html">Compare Countries</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <section class="random-country-section">
+                <div class="controls">
+                    <button id="randomizeBtn" class="primary-button">Get Random Country</button>
+                </div>
+                <div id="countryDisplay" class="country-display">
+                    <div class="loading-message">
+                        <p>Click the button to get a random country</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="chart-section">
+                <div id="populationChart" class="chart-container">
+                    <!-- Population comparison chart will go here -->
+                </div>
+                <div id="languageChart" class="chart-container">
+                    <!-- Language chart will go here -->
+                </div>
+                <div id="currencyChart" class="chart-container">
+                    <!-- Currency information will go here -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <p>Data provided by REST Countries API and visualized using QuickChart API</p>
+    </footer>
+
+    <!-- Templates -->
+    <template id="country-template">
+        <div class="country-info">
+            <div class="country-header">
+                <img src="" alt="Country flag" class="country-flag">
+                <h2 class="country-name"></h2>
+            </div>
+            <div class="country-details">
+                <p><strong>Capital:</strong> <span class="capital"></span></p>
+                <p><strong>Region:</strong> <span class="region"></span></p>
+                <p><strong>Population:</strong> <span class="population"></span></p>
+                <p><strong>Area:</strong> <span class="area"></span></p>
+                <p><strong>Languages:</strong> <span class="languages"></span></p>
+                <p><strong>Currencies:</strong> <span class="currencies"></span></p>
+                <p><strong>Timezones:</strong> <span class="timezones"></span></p>
+            </div>
+            <div class="country-links">
+                <a href="#" class="maps-link" target="_blank">View on Maps</a>
+            </div>
+        </div>
+    </template>
+
+    <!-- Error template -->
+    <template id="error-template">
+        <div class="error-message">
+            <p></p>
+            <button onclick="location.reload()">Retry</button>
+        </div>
+    </template>
+
+    <!-- JavaScript Modules -->
+    <script type="module" src="../js/pages/random/index.js"></script>
+</body>
+</html>
