@@ -36,7 +36,7 @@
 }
 
 /* Special chart layouts */
-#chartContainer {
+#chartContainer9 {
     grid-column: 1 / -1;
     aspect-ratio: 16/9;
     min-height: clamp(300px, 40vh, 500px);
@@ -93,7 +93,7 @@
         aspect-ratio: 3/2;
     }
     
-    #chartContainer {
+    #chartContainer9 {
         aspect-ratio: 3/2;
         min-height: clamp(250px, 35vh, 400px);
     }
@@ -111,7 +111,7 @@
         padding: 1rem;
     }
     
-    #chartContainer {
+    #chartContainer9 {
         aspect-ratio: 4/3;
         min-height: clamp(220px, 35vh, 350px);
     }
