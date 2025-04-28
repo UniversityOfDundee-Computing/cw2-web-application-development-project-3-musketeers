@@ -21,7 +21,7 @@ class SelectedCountryPage {
         this.populationChart = document.getElementById('populationChart');
         this.languageChart = document.getElementById('languageChart');
         this.regionalChart = document.getElementById('regionalChart');
-        this.currencyChart = document.getElementById('currencyChart');
+        this.areaChart = document.getElementById('areaChart');
         this.mapView = document.getElementById('mapView');
         this.neighbors = document.getElementById('neighbors').querySelector('.neighbors-grid');
 
@@ -151,7 +151,7 @@ class SelectedCountryPage {
                 this.createPopulationChart(),
                 this.createLanguageChart(),
                 this.createRegionalChart(),
-                this.createCurrencyChart()
+                this.createAreaChart()
             ]);
         } catch (error) {
             console.error('Error creating visualizations:', error);
@@ -163,22 +163,45 @@ class SelectedCountryPage {
      * Create population comparison chart
      */
     async createPopulationChart() {
-        // Get regional context
+        // // Get regional context
+        // const regionalCountries = this.allCountries
+        //     .filter(c => c.region === this.currentCountry.region)
+        //     .sort((a, b) => b.population - a.population)
+        //     .slice(0, 5);
+
+        // Get regional countries and sort them
         const regionalCountries = this.allCountries
-            .filter(c => c.region === this.currentCountry.region)
-            .sort((a, b) => b.population - a.population)
-            .slice(0, 5);
+        .filter(c => c.region === this.currentCountry.region)
+        .sort((a, b) => b.population - a.population);
+
+        // Find the index of the current country
+        const index = regionalCountries.findIndex(c => c.name.common === this.currentCountry.name.common);
+
+        // Select two before and two after (with boundaries checked)
+        const start = Math.max(index - 2, 0);
+        const end = Math.min(index + 3, regionalCountries.length); // +3 because slice end is exclusive
+
+        const selectedCountries = regionalCountries.slice(start, end);
+        const selectedCountryName = this.currentCountry.name.common;
+        const backgroundColors = selectedCountries.map(c => {
+            if (c.name.common === selectedCountryName) {
+                return '#ff6384'; // Highlight color
+            } else {
+                return '#36a2eb'; // Default color
+            }
+        });
 
         const chartConfig = {
             type: 'bar',
             data: {
-                labels: regionalCountries.map(c => c.name.common),
+                labels: selectedCountries.map(c => c.name.common),
                 datasets: [{
                     label: 'Population',
-                    data: regionalCountries.map(c => c.population),
-                    backgroundColor: regionalCountries.map(c => 
-                        c.name.common === this.currentCountry.name.common ? '#ff6384' : '#36a2eb'
-                    )
+                    data: selectedCountries.map(c => c.population),
+                    backgroundColor: backgroundColors
+                    // backgroundColor: regionalCountries.map(c => 
+                    //     c.name.common === this.currentCountry.name.common ? '#ff6384' : '#36a2eb'
+                    // )
                 }]
             },
             options: {
@@ -194,6 +217,12 @@ class SelectedCountryPage {
                         beginAtZero: true,
                         ticks: {
                             callback: value => dataProcessing.formatNumber(value)
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            minRotation: 0, // force no rotation
+                            maxRotation: 0 // force no rotation
                         }
                     }
                 }
@@ -224,7 +253,7 @@ class SelectedCountryPage {
         });
 
         const chartConfig = {
-            type: 'pie',
+            type: 'doughnut',
             data: {
                 labels: Object.keys(languageStats),
                 datasets: [{
@@ -301,53 +330,134 @@ class SelectedCountryPage {
         const chartUrl = chartService.createChartUrl(chartConfig);
         chartUtils.displayChart('regionalChart', chartUrl, 'Regional context');
     }
+    
+    // /**
+    //  * Create currency usage chart
+    //  */
+    // async createCurrencyChart() {
+    //     if (!this.currentCountry.currencies) return;
+
+    //     const currencies = Object.keys(this.currentCountry.currencies);
+    //     const currencyStats = {};
+
+    //     this.allCountries.forEach(country => {
+    //         if (country.currencies) {
+    //             Object.keys(country.currencies).forEach(curr => {
+    //                 if (currencies.includes(curr)) {
+    //                     currencyStats[curr] = (currencyStats[curr] || 0) + 1;
+    //                 }
+    //             });
+    //         }
+    //     });
+
+    //     const chartConfig = {
+    //         type: 'doughnut',
+    //         data: {
+    //             labels: Object.keys(currencyStats),
+    //             datasets: [{
+    //                 data: Object.values(currencyStats),
+    //                 backgroundColor: [
+    //                     '#ff6384',
+    //                     '#36a2eb',
+    //                     '#ffcd56'
+    //                 ]
+    //             }]
+    //         },
+    //         options: {
+    //             plugins: {
+    //                 title: {
+    //                     display: true,
+    //                     text: 'Currency Usage',
+    //                     font: { size: 16, weight: 'bold' }
+    //                 }
+    //             }
+    //         }
+    //     };
+
+    //     const chartUrl = chartService.createChartUrl(chartConfig);
+    //     chartUtils.displayChart('currencyChart', chartUrl, 'Currency usage');
+    // }
 
     /**
-     * Create currency usage chart
+     * Create area comparison chart
      */
-    async createCurrencyChart() {
-        if (!this.currentCountry.currencies) return;
+    /**
+     * Create area comparison chart
+     */
+    /**
+     * Create area comparison chart
+     */
+    async createAreaChart() {
+        if (!this.currentCountry) return;
 
-        const currencies = Object.keys(this.currentCountry.currencies);
-        const currencyStats = {};
+        // Get regional countries and sort them by area
+        const regionalCountries = this.allCountries
+            .filter(c => c.region === this.currentCountry.region)
+            .sort((a, b) => b.area - a.area); // Sorting by area in descending order
 
-        this.allCountries.forEach(country => {
-            if (country.currencies) {
-                Object.keys(country.currencies).forEach(curr => {
-                    if (currencies.includes(curr)) {
-                        currencyStats[curr] = (currencyStats[curr] || 0) + 1;
-                    }
-                });
+        // Find the index of the current country in the sorted array
+        const index = regionalCountries.findIndex(c => c.name.common === this.currentCountry.name.common);
+
+        // Select two countries before and two after the current country
+        const start = Math.max(index - 2, 0);
+        const end = Math.min(index + 3, regionalCountries.length); // +3 because slice end is exclusive
+
+        // Select the countries to display
+        const selectedCountries = regionalCountries.slice(start, end);
+        const selectedCountryName = this.currentCountry.name.common;
+
+        // Set background colors (highlight the current country)
+        const backgroundColors = selectedCountries.map(c => {
+            if (c.name.common === selectedCountryName) {
+                return '#ff6384'; // Highlight the current country
+            } else {
+                return '#36a2eb'; // Default color for others
             }
         });
 
+        // Create the chart configuration for horizontal bars
         const chartConfig = {
-            type: 'doughnut',
+            type: 'bar',
             data: {
-                labels: Object.keys(currencyStats),
+                labels: selectedCountries.map(c => c.name.common), // Country names as labels
                 datasets: [{
-                    data: Object.values(currencyStats),
-                    backgroundColor: [
-                        '#ff6384',
-                        '#36a2eb',
-                        '#ffcd56'
-                    ]
+                    label: 'Country Area (in km²)', // Label for the dataset
+                    data: selectedCountries.map(c => c.area), // Data for country area
+                    backgroundColor: backgroundColors
                 }]
             },
             options: {
+                indexAxis: 'y', // key change to make it horizontal
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Currency Usage',
+                        text: `Area Comparison - ${this.currentCountry.region}`, // Dynamic chart title
                         font: { size: 16, weight: 'bold' }
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true, // Ensure the x-axis starts at zero
+                        ticks: {
+                            callback: value => value.toLocaleString() + ' km²' // Format area with commas
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            minRotation: 0, // Ensure no rotation on the y-axis labels
+                            maxRotation: 0 // Ensure no rotation on the y-axis labels
+                        }
                     }
                 }
             }
         };
 
+        // Generate the chart URL and display it
         const chartUrl = chartService.createChartUrl(chartConfig);
-        chartUtils.displayChart('currencyChart', chartUrl, 'Currency usage');
+        chartUtils.displayChart('areaChart', chartUrl, 'Area comparison');
     }
+
+
 
     /**
      * Display neighboring countries
