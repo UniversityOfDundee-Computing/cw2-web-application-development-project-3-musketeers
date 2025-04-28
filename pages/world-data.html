@@ -36,39 +36,102 @@
         <div class="container">
             <!-- Chart containers with semantic IDs and ARIA labels -->
             <div id="chartContainer" class="chart-container" aria-label="Population distribution chart">
-                <div class="chart-loading">Loading population data...</div>
+                <div class="chart-wrapper">
+                    <h3 class="chart-title">Global Population Distribution</h3>
+                    <p class="chart-description">Population breakdown across continents and regions</p>
+                    <div class="chart-loading">
+                        <div class="loading-spinner"></div>
+                        <p>Loading population data...</p>
+                    </div>
+                </div>
             </div>
 
             <div id="chartContainer2" class="chart-container" aria-label="Continental population chart">
-                <div class="chart-loading">Loading continental data...</div>
+                <div class="chart-wrapper">
+                    <h3 class="chart-title">Continental Population</h3>
+                    <p class="chart-description">Population distribution by continent</p>
+                    <div class="chart-loading">
+                        <div class="loading-spinner"></div>
+                        <p>Loading continental data...</p>
+                    </div>
+                </div>
             </div>
 
             <div id="chartContainer3" class="chart-container" aria-label="Regional distribution chart">
-                <div class="chart-loading">Loading regional data...</div>
+                <div class="chart-wrapper">
+                    <h3 class="chart-title">Regional Distribution</h3>
+                    <p class="chart-description">Countries by geographical region</p>
+                    <div class="chart-loading">
+                        <div class="loading-spinner"></div>
+                        <p>Loading regional data...</p>
+                    </div>
+                </div>
             </div>
 
             <div id="chartContainer4" class="chart-container" aria-label="Currency usage chart">
-                <div class="chart-loading">Loading currency data...</div>
+                <div class="chart-wrapper">
+                    <h3 class="chart-title">Currency Usage</h3>
+                    <p class="chart-description">Most common currencies worldwide</p>
+                    <div class="chart-loading">
+                        <div class="loading-spinner"></div>
+                        <p>Loading currency data...</p>
+                    </div>
+                </div>
             </div>
 
             <div id="chartContainer5" class="chart-container" aria-label="Timezone distribution chart">
-                <div class="chart-loading">Loading timezone data...</div>
+                <div class="chart-wrapper">
+                    <h3 class="chart-title">Timezone Distribution</h3>
+                    <p class="chart-description">Countries by timezone zone</p>
+                    <div class="chart-loading">
+                        <div class="loading-spinner"></div>
+                        <p>Loading timezone data...</p>
+                    </div>
+                </div>
             </div>
 
             <div id="chartContainer6" class="chart-container" aria-label="Independence status chart">
-                <div class="chart-loading">Loading independence data...</div>
+                <div class="chart-wrapper">
+                    <h3 class="chart-title">Independence Status</h3>
+                    <p class="chart-description">Independent vs. Dependent territories</p>
+                    <div class="chart-loading">
+                        <div class="loading-spinner"></div>
+                        <p>Loading independence data...</p>
+                    </div>
+                </div>
             </div>
 
             <div id="chartContainer7" class="chart-container" aria-label="Border statistics chart">
-                <div class="chart-loading">Loading border data...</div>
+                <div class="chart-wrapper">
+                    <h3 class="chart-title">Border Statistics</h3>
+                    <p class="chart-description">Analysis of country borders</p>
+                    <div class="chart-loading">
+                        <div class="loading-spinner"></div>
+                        <p>Loading border data...</p>
+                    </div>
+                </div>
             </div>
 
             <div id="chartContainer8" class="chart-container" aria-label="Language distribution chart">
-                <div class="chart-loading">Loading language data...</div>
+                <div class="chart-wrapper">
+                    <h3 class="chart-title">Language Distribution</h3>
+                    <p class="chart-description">Most spoken languages globally</p>
+                    <div class="chart-loading">
+                        <div class="loading-spinner"></div>
+                        <p>Loading language data...</p>
+                    </div>
+                </div>
             </div>
 
             <div id="chartContainer9" class="chart-container" aria-label="Timezone analysis chart">
-                <div class="chart-loading">Loading timezone analysis...</div>
+                <div class="chart-wrapper">
+                    <h3 class="chart-title">Timezone Analysis</h3>
+                    <p class="chart-description">Detailed timezone statistics</p>
+                    <div class="chart-loading">
+                        <div class="loading-spinner"></div>
+                        <p>Loading timezone analysis...</p>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
@@ -78,17 +141,25 @@
     </footer>
 
     <!-- Error handling template -->
+    <!-- Error template -->
     <template id="error-template">
         <div class="chart-error">
+            <svg xmlns="http://www.w3.org/2000/svg" class="error-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+            </svg>
             <p>Failed to load chart</p>
-            <button onclick="this.closest('.chart-container').querySelector('.chart-loading').style.display='block';this.closest('.chart-error').remove();">Retry</button>
+            <button onclick="this.closest('.chart-container').querySelector('.chart-loading').style.display='block';this.closest('.chart-error').remove();" class="retry-button">
+                Retry
+            </button>
         </div>
     </template>
 
     <!-- Loading template -->
     <template id="loading-template">
         <div class="chart-loading">
-            <div class="loading-spinner"></div>
+            <div class="loading-spinner" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
             <p>Loading data...</p>
         </div>
     </template>

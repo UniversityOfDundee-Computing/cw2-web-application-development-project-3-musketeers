@@ -13,22 +13,30 @@ class RandomCountryPage {
     constructor() {
         this.navigation = null;
         this.currentCountry = null;
-        
-        // Cache DOM elements
-        this.randomizeBtn = document.getElementById('randomizeBtn');
-        this.countryDisplay = document.getElementById('countryDisplay');
+        this.allCountries = [];
+
+        // Cache DOM elements (updated for new structure)
+        this.countryOverview = document.getElementById('countryOverview');
+        this.quickFacts = document.getElementById('quickFacts').querySelector('.facts-grid');
         this.populationChart = document.getElementById('populationChart');
         this.languageChart = document.getElementById('languageChart');
+        this.regionalChart = document.getElementById('regionalChart');
         this.currencyChart = document.getElementById('currencyChart');
+        this.mapView = document.getElementById('mapView');
+        this.neighbors = document.getElementById('neighbors').querySelector('.neighbors-grid');
 
         // Templates
-        this.countryTemplate = document.getElementById('country-template');
+        this.overviewTemplate = document.getElementById('country-overview-template');
+        this.factTemplate = document.getElementById('fact-item-template');
+        this.neighborTemplate = document.getElementById('neighbor-template');
         this.errorTemplate = document.getElementById('error-template');
+        this.loadingTemplate = document.getElementById('loading-template');
 
         // Bind methods
         this.handleRandomize = this.handleRandomize.bind(this);
         this.displayCountryInfo = this.displayCountryInfo.bind(this);
         this.createCharts = this.createCharts.bind(this);
+        this.displayNeighbors = this.displayNeighbors.bind(this);
         this.handleError = this.handleError.bind(this);
     }
 
@@ -41,7 +49,11 @@ class RandomCountryPage {
             this.navigation = new Navigation();
 
             // Add event listeners
+            this.randomizeBtn = document.getElementById('randomizeBtn');
             this.randomizeBtn.addEventListener('click', this.handleRandomize);
+
+            // Fetch all countries once for reuse
+            this.allCountries = await countryService.getAllCountries();
 
             // Get initial random country
             await this.handleRandomize();
@@ -58,18 +70,22 @@ class RandomCountryPage {
     async handleRandomize() {
         try {
             // Show loading state
-            this.countryDisplay.innerHTML = '<div class="loading-message"><p>Loading random country...</p></div>';
+            this.countryOverview.innerHTML = '<div class="loading-message"><p>Loading random country...</p></div>';
+            this.quickFacts.innerHTML = '';
+            this.mapView.innerHTML = '';
+            this.neighbors.innerHTML = '';
             this.randomizeBtn.disabled = true;
 
-            // Get all countries and select one randomly
-            const countries = await countryService.getAllCountries();
+            // Pick a random country
+            const countries = this.allCountries;
             const randomCountry = countries[Math.floor(Math.random() * countries.length)];
             this.currentCountry = randomCountry;
 
-            // Display country info and create charts
+            // Display all sections
             await Promise.all([
                 this.displayCountryInfo(randomCountry),
-                this.createCharts(randomCountry, countries)
+                this.createCharts(randomCountry, countries),
+                this.displayNeighbors(randomCountry, countries)
             ]);
 
         } catch (error) {
@@ -85,41 +101,58 @@ class RandomCountryPage {
      * @param {Object} country - Country data
      */
     async displayCountryInfo(country) {
-        const countryInfo = this.countryTemplate.content.cloneNode(true);
-
-        // Update template content
-        countryInfo.querySelector('.country-flag').src = country.flags.svg;
-        countryInfo.querySelector('.country-flag').alt = `Flag of ${country.name.common}`;
-        countryInfo.querySelector('.country-name').textContent = country.name.common;
-        countryInfo.querySelector('.capital').textContent = country.capital?.[0] || 'N/A';
-        countryInfo.querySelector('.region').textContent = `${country.region} (${country.subregion || 'N/A'})`;
-        countryInfo.querySelector('.population').textContent = dataProcessing.formatNumber(country.population);
-        countryInfo.querySelector('.area').textContent = country.area ? `${dataProcessing.formatNumber(country.area)} km²` : 'N/A';
-        
-        // Languages
-        const languages = country.languages ? Object.values(country.languages).join(', ') : 'N/A';
-        countryInfo.querySelector('.languages').textContent = languages;
-
-        // Currencies
-        const currencies = country.currencies 
-            ? Object.values(country.currencies).map(c => `${c.name} (${c.symbol || 'N/A'})`).join(', ')
-            : 'N/A';
-        countryInfo.querySelector('.currencies').textContent = currencies;
-
-        // Timezones
-        countryInfo.querySelector('.timezones').textContent = country.timezones?.join(', ') || 'N/A';
-
+        // Overview
+        const overview = this.overviewTemplate.content.cloneNode(true);
+        overview.querySelector('.country-flag').src = country.flags.svg;
+        overview.querySelector('.country-flag').alt = `Flag of ${country.name.common}`;
+        overview.querySelector('.country-name').textContent = country.name.common;
+        overview.querySelector('.capital').textContent = `Capital: ${country.capital?.[0] || 'N/A'}`;
+        overview.querySelector('.region').textContent = `${country.region} (${country.subregion || 'N/A'})`;
         // Maps link
-        const mapsLink = countryInfo.querySelector('.maps-link');
-        if (country.maps?.googleMaps) {
-            mapsLink.href = country.maps.googleMaps;
-        } else {
-            mapsLink.style.display = 'none';
+        const mapsLink = overview.querySelector('.maps-link');
+        if (mapsLink) {
+            if (country.maps?.googleMaps) {
+                mapsLink.href = country.maps.googleMaps;
+            } else {
+                mapsLink.style.display = 'none';
+            }
         }
+        this.countryOverview.innerHTML = '';
+        this.countryOverview.appendChild(overview);
 
-        // Clear and add new content
-        this.countryDisplay.innerHTML = '';
-        this.countryDisplay.appendChild(countryInfo);
+        // Quick facts
+        const facts = [
+            { label: 'Population', value: dataProcessing.formatNumber(country.population) },
+            { label: 'Area', value: country.area ? `${dataProcessing.formatNumber(country.area)} km²` : 'N/A' },
+            { label: 'Languages', value: country.languages ? Object.values(country.languages).join(', ') : 'N/A' },
+            { label: 'Currencies', value: country.currencies ? Object.values(country.currencies).map(c => `${c.name} (${c.symbol || 'N/A'})`).join(', ') : 'N/A' },
+            { label: 'Time Zones', value: country.timezones?.join(', ') || 'N/A' },
+            { label: 'Driving Side', value: country.car?.side?.charAt(0).toUpperCase() + country.car?.side?.slice(1) || 'N/A' },
+            { label: 'Status', value: country.independent ? 'Independent' : 'Dependent' }
+        ];
+        this.quickFacts.innerHTML = '';
+        facts.forEach(fact => {
+            const factElement = this.factTemplate.content.cloneNode(true);
+            factElement.querySelector('.fact-label').textContent = fact.label;
+            factElement.querySelector('.fact-value').textContent = fact.value;
+            this.quickFacts.appendChild(factElement);
+        });
+
+        // Map
+        if (country.maps?.googleMaps) {
+            this.mapView.innerHTML = `
+                <iframe
+                    src="https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${encodeURIComponent(country.name.common)}"
+                    width="100%"
+                    height="400"
+                    style="border:0;border-radius:var(--border-radius);"
+                    allowfullscreen=""
+                    loading="lazy">
+                </iframe>
+            `;
+        } else {
+            this.mapView.innerHTML = '<p>Map not available.</p>';
+        }
     }
 
     /**
@@ -287,14 +320,39 @@ class RandomCountryPage {
     }
 
     /**
+     * Display neighboring countries
+     * @param {Object} country - Current country data
+     * @param {Array} allCountries - All countries data for comparison
+     */
+    async displayNeighbors(country, allCountries) {
+        if (!country.borders?.length) {
+            this.neighbors.innerHTML = '<p>No neighboring countries</p>';
+            return;
+        }
+        const neighboringCountries = allCountries.filter(
+            c => country.borders.includes(c.cca3)
+        );
+        this.neighbors.innerHTML = '';
+        neighboringCountries.forEach(c => {
+            const neighborElement = this.neighborTemplate.content.cloneNode(true);
+            const link = neighborElement.querySelector('a');
+            link.href = `?country=${encodeURIComponent(c.name.common)}`;
+            link.querySelector('img').src = c.flags.svg;
+            link.querySelector('img').alt = `Flag of ${c.name.common}`;
+            link.querySelector('.neighbor-name').textContent = c.name.common;
+            this.neighbors.appendChild(neighborElement);
+        });
+    }
+
+    /**
      * Handle errors
      * @param {Error} error - The error that occurred
      */
     handleError(error) {
         const errorElement = this.errorTemplate.content.cloneNode(true);
         errorElement.querySelector('p').textContent = error.message || 'An error occurred. Please try again.';
-        this.countryDisplay.innerHTML = '';
-        this.countryDisplay.appendChild(errorElement);
+        this.countryOverview.innerHTML = '';
+        this.countryOverview.appendChild(errorElement);
     }
 }
 

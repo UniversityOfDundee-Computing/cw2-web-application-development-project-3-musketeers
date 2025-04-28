@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="../css/components/header.css">
     <link rel="stylesheet" href="../css/components/charts.css">
+    <link rel="stylesheet" href="../css/pages/selected.css">
     
     <!-- Description for SEO -->
     <meta name="description" content="Explore random country statistics and information through interactive visualizations.">
@@ -33,26 +34,58 @@
 
     <main>
         <div class="container">
-            <section class="random-country-section">
-                <div class="controls">
-                    <button id="randomizeBtn" class="primary-button">Get Random Country</button>
-                </div>
-                <div id="countryDisplay" class="country-display">
+            <div class="controls" style="margin-bottom:2rem;">
+                <button id="randomizeBtn" class="primary-button">Get Random Country</button>
+            </div>
+            <section class="country-details-section">
+                <!-- Country overview -->
+                <div id="countryOverview" class="country-overview">
                     <div class="loading-message">
                         <p>Click the button to get a random country</p>
                     </div>
                 </div>
+
+                <!-- Quick facts -->
+                <div id="quickFacts" class="quick-facts">
+                    <h2>Quick Facts</h2>
+                    <div class="facts-grid">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </div>
             </section>
 
-            <section class="chart-section">
+            <section class="visualizations-section">
+                <!-- Population trends -->
                 <div id="populationChart" class="chart-container">
-                    <!-- Population comparison chart will go here -->
+                    <!-- Population comparison with region -->
                 </div>
+
+                <!-- Language breakdown -->
                 <div id="languageChart" class="chart-container">
-                    <!-- Language chart will go here -->
+                    <!-- Language distribution -->
                 </div>
+
+                <!-- Regional context (optional for random page) -->
+                <div id="regionalChart" class="chart-container" style="display:none;"></div>
+
+                <!-- Currency information -->
                 <div id="currencyChart" class="chart-container">
-                    <!-- Currency information will go here -->
+                    <!-- Currency usage -->
+                </div>
+            </section>
+
+            <section class="additional-info-section">
+                <!-- Map view -->
+                <div id="mapView" class="map-container">
+                    <!-- Map will be embedded here -->
+                </div>
+
+                <!-- Neighboring countries -->
+                <div id="neighbors" class="neighbors-container">
+                    <h2>Neighboring Countries</h2>
+                    <div class="neighbors-grid">
+                        <!-- Will be populated dynamically -->
+                    </div>
                 </div>
             </section>
         </div>
@@ -63,25 +96,34 @@
     </footer>
 
     <!-- Templates -->
-    <template id="country-template">
-        <div class="country-info">
-            <div class="country-header">
-                <img src="" alt="Country flag" class="country-flag">
+    <template id="country-overview-template">
+        <div class="country-header">
+            <img src="" alt="" class="country-flag">
+            <div class="country-info">
                 <h2 class="country-name"></h2>
-            </div>
-            <div class="country-details">
-                <p><strong>Capital:</strong> <span class="capital"></span></p>
-                <p><strong>Region:</strong> <span class="region"></span></p>
-                <p><strong>Population:</strong> <span class="population"></span></p>
-                <p><strong>Area:</strong> <span class="area"></span></p>
-                <p><strong>Languages:</strong> <span class="languages"></span></p>
-                <p><strong>Currencies:</strong> <span class="currencies"></span></p>
-                <p><strong>Timezones:</strong> <span class="timezones"></span></p>
-            </div>
-            <div class="country-links">
-                <a href="#" class="maps-link" target="_blank">View on Maps</a>
+                <div class="country-meta">
+                    <p class="capital"></p>
+                    <p class="region"></p>
+                </div>
             </div>
         </div>
+        <div class="country-stats">
+            <!-- Will be populated dynamically -->
+        </div>
+    </template>
+
+    <template id="fact-item-template">
+        <div class="fact-item">
+            <span class="fact-label"></span>
+            <span class="fact-value"></span>
+        </div>
+    </template>
+
+    <template id="neighbor-template">
+        <a href="#" class="neighbor-card">
+            <img src="" alt="" class="neighbor-flag">
+            <h3 class="neighbor-name"></h3>
+        </a>
     </template>
 
     <!-- Error template -->
@@ -89,6 +131,14 @@
         <div class="error-message">
             <p></p>
             <button onclick="location.reload()">Retry</button>
+        </div>
+    </template>
+
+    <!-- Loading template -->
+    <template id="loading-template">
+        <div class="loading-message">
+            <div class="loading-spinner"></div>
+            <p>Loading data...</p>
         </div>
     </template>
 
