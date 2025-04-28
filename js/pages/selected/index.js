@@ -131,12 +131,9 @@ class SelectedCountryPage {
             this.mapView.innerHTML = `
                 <iframe
                     src="https://www.google.com/maps?q=${encodeURIComponent(country.name.common)}&output=embed"
-                    width="100%"
-                    height="400"
-                    style="border:0;border-radius:var(--border-radius);"
                     allowfullscreen=""
-                    loading="lazy">
-                </iframe>
+                    loading="lazy"
+                ></iframe>
             `;
         }
 

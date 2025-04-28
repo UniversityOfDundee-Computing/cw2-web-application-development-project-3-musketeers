@@ -32,62 +32,47 @@
         </nav>
     </header>
 
+    
     <main>
-        <div class="container">
-            <section class="country-details-section">
-                <!-- Country overview -->
+        <div class="container"></div>
+        <!-- Top layout: Map and country info side by side -->
+        <section class="top-section">
+            <div class="map-container" id="mapView">
+              <!-- Map -->
+            </div>
+
+            <div class="info-container">
                 <div id="countryOverview" class="country-overview">
-                    <div class="loading-message">
-                        <p>Loading country information...</p>
-                    </div>
+                  <!-- Country overview content -->
                 </div>
-
-                <!-- Quick facts -->
                 <div id="quickFacts" class="quick-facts">
-                    <h2>Quick Facts</h2>
-                    <div class="facts-grid">
-                        <!-- Will be populated dynamically -->
-                    </div>
+                  <h2>Quick Facts</h2>
+                  <div class="facts-grid"></div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <section class="visualizations-section">
-                <!-- Population trends -->
-                <div id="populationChart" class="chart-container">
-                    <!-- Population comparison with region -->
-                </div>
+        <!-- Bottom layout: Charts and Neighbors -->
+        <section class="bottom-section">
+            <div class="visualizations-section">
+              <div id="populationChart" class="chart-container"></div>
+              <div id="languageChart" class="chart-container"></div>
+              <div id="areaChart" class="chart-container"></div>
+            </div>
+      
+            <div class="neighbors-container" id="neighbors">
+              <h2>Neighboring Countries</h2>
+              <div class="neighbors-grid"></div>
+            </div>
+        </section>
 
-                <!-- Language breakdown -->
-                <div id="languageChart" class="chart-container">
-                    <!-- Language distribution -->
-                </div>
-
-                <!-- Regional context -->
-                <!-- <div id="regionalChart" class="chart-container">
-                </div> -->
-                
-                <!-- Area information -->
-                <div id="areaChart" class="chart-container">
-                    <!-- area bar -->
-                </div>
-            </section>
-
-            <section class="additional-info-section">
-                <!-- Map view -->
-                <div id="mapView" class="map-container">
-                    <!-- Map will be embedded here -->
-                </div>
-
-                <!-- Neighboring countries -->
-                <div id="neighbors" class="neighbors-container">
-                    <h2>Neighboring Countries</h2>
-                    <div class="neighbors-grid">
-                        <!-- Will be populated dynamically -->
-                    </div>
-                </div>
-            </section>
         </div>
+
     </main>
+    
+    
+    
+    
 
     <footer>
         <p>Data provided by REST Countries API and visualized using QuickChart API</p>
