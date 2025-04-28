@@ -130,7 +130,7 @@ class SelectedCountryPage {
         if (country.maps?.googleMaps) {
             this.mapView.innerHTML = `
                 <iframe
-                    src="https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${encodeURIComponent(country.name.common)}"
+                    src="https://www.google.com/maps?q=${encodeURIComponent(country.name.common)}&output=embed"
                     width="100%"
                     height="400"
                     style="border:0;border-radius:var(--border-radius);"
@@ -139,6 +139,7 @@ class SelectedCountryPage {
                 </iframe>
             `;
         }
+
     }
 
     /**
