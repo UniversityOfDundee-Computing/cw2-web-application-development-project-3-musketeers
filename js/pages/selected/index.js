@@ -163,22 +163,45 @@ class SelectedCountryPage {
      * Create population comparison chart
      */
     async createPopulationChart() {
-        // Get regional context
+        // // Get regional context
+        // const regionalCountries = this.allCountries
+        //     .filter(c => c.region === this.currentCountry.region)
+        //     .sort((a, b) => b.population - a.population)
+        //     .slice(0, 5);
+
+        // Get regional countries and sort them
         const regionalCountries = this.allCountries
-            .filter(c => c.region === this.currentCountry.region)
-            .sort((a, b) => b.population - a.population)
-            .slice(0, 5);
+        .filter(c => c.region === this.currentCountry.region)
+        .sort((a, b) => b.population - a.population);
+
+        // Find the index of the current country
+        const index = regionalCountries.findIndex(c => c.name.common === this.currentCountry.name.common);
+
+        // Select two before and two after (with boundaries checked)
+        const start = Math.max(index - 2, 0);
+        const end = Math.min(index + 3, regionalCountries.length); // +3 because slice end is exclusive
+
+        const selectedCountries = regionalCountries.slice(start, end);
+        const selectedCountryName = this.currentCountry.name.common;
+        const backgroundColors = selectedCountries.map(c => {
+            if (c.name.common === selectedCountryName) {
+                return '#ff6384'; // Highlight color
+            } else {
+                return '#36a2eb'; // Default color
+            }
+        });
 
         const chartConfig = {
             type: 'bar',
             data: {
-                labels: regionalCountries.map(c => c.name.common),
+                labels: selectedCountries.map(c => c.name.common),
                 datasets: [{
                     label: 'Population',
-                    data: regionalCountries.map(c => c.population),
-                    backgroundColor: regionalCountries.map(c => 
-                        c.name.common === this.currentCountry.name.common ? '#ff6384' : '#36a2eb'
-                    )
+                    data: selectedCountries.map(c => c.population),
+                    backgroundColor: backgroundColors
+                    // backgroundColor: regionalCountries.map(c => 
+                    //     c.name.common === this.currentCountry.name.common ? '#ff6384' : '#36a2eb'
+                    // )
                 }]
             },
             options: {
