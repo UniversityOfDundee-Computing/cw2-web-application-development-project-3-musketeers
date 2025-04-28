@@ -88,6 +88,8 @@ class WorldDataPage {
                 type: LanguageChart,
                 options: { title: 'Most Common Official Languages' }
             }
+            // Removed chartContainer9 so we don't overwrite the World Stats at a Glance section
+            // This allows the inline script in the HTML to handle the stats display instead
         ];
 
         // Initialize each chart

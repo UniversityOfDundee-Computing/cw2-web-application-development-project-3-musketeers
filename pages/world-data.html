@@ -11,6 +11,11 @@
     <link rel="stylesheet" href="../css/components/charts.css">
     <link rel="stylesheet" href="../css/pages/world-data.css">
     
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <!-- Description for SEO -->
     <meta name="description" content="Visualize global country data including population, languages, and more using interactive charts.">
 </head>
@@ -34,205 +39,24 @@
 
     <main>
         <div class="container">
-            <!-- Chart containers with semantic IDs and ARIA labels -->
-            <div id="chartContainer9" class="chart-container" aria-label="global stats visualization" style="grid-column: 1 / -1;">
-                <div class="chart-wrapper" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
+            <!-- World Stats at a Glance - Premium Banner -->
+            <div id="chartContainer9" class="chart-container" aria-label="global stats visualization">
+                <div class="chart-wrapper">
                     <h3 class="chart-title">World Stats at a Glance</h3>
-                    <p class="chart-description">Fascinating global statistics</p>
-                    <div id="world-stats-container" style="width: 100%; height: 100%; padding: 0.5rem;">
-                        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; height: 100%;">
+                    <p class="chart-description">Fascinating global statistics from all countries around the world</p>
+                    <div id="world-stats-container">
+                        <div class="stats-grid">
                             <!-- Stats cards will be inserted here -->
                         </div>
                         <div class="chart-loading">
                             <div class="loading-spinner"></div>
-                            <p>Compiling global stats...</p>
+                            <p>Compiling global statistics...</p>
                         </div>
                     </div>
                 </div>
-                <script>
-                // World Stats at a Glance
-                (function() {
-                    // Initialize the stats container
-                    const statsContainer = document.querySelector('#chartContainer9 .chart-wrapper > div > div');
-                    
-                    // Fetch country data
-                    fetch('https://restcountries.com/v3.1/all')
-                        .then(response => response.json())
-                        .then(countries => {
-                            // Hide loading spinner
-                            document.querySelector('#world-stats-container .chart-loading').style.display = 'none';
-                            
-                            // Calculate global statistics
-                            const totalCountries = countries.length;
-                            const totalPopulation = countries.reduce((sum, country) => sum + (country.population || 0), 0);
-                            
-                            // Count unique languages, currencies, capitals
-                            const languages = new Set();
-                            const currencies = new Set();
-                            const capitals = new Set();
-                            
-                            countries.forEach(country => {
-                                // Count languages
-                                if (country.languages) {
-                                    Object.values(country.languages).forEach(lang => languages.add(lang));
-                                }
-                                
-                                // Count currencies
-                                if (country.currencies) {
-                                    Object.keys(country.currencies).forEach(curr => currencies.add(curr));
-                                }
-                                
-                                // Count capital cities
-                                if (country.capital && country.capital.length) {
-                                    country.capital.forEach(cap => capitals.add(cap));
-                                }
-                            });
-                            
-                            // Land area statistics
-                            const totalLandArea = countries.reduce((sum, country) => sum + (country.area || 0), 0);
-                            const largestCountry = countries.reduce((largest, country) => 
-                                (!largest || (country.area || 0) > largest.area) ? country : largest, null);
-                            
-                            // Find countries with most and least neighbors
-                            const mostBorders = countries.reduce((most, country) => 
-                                (!most || (country.borders?.length || 0) > (most.borders?.length || 0)) ? country : most, null);
-                            
-                            // Stats to display
-                            const stats = [
-                                {
-                                    title: "Total Countries",
-                                    value: totalCountries.toLocaleString(),
-                                    icon: "🗺️",
-                                    color: "#4285f4"
-                                },
-                                {
-                                    title: "Global Population",
-                                    value: formatNumber(totalPopulation),
-                                    icon: "👥",
-                                    color: "#ea4335"
-                                },
-                                {
-                                    title: "Languages Spoken",
-                                    value: languages.size.toLocaleString(),
-                                    icon: "🗣️",
-                                    color: "#fbbc05"
-                                },
-                                {
-                                    title: "Currencies Used",
-                                    value: currencies.size.toLocaleString(),
-                                    icon: "💰",
-                                    color: "#34a853"
-                                },
-                                {
-                                    title: "Capital Cities",
-                                    value: capitals.size.toLocaleString(),
-                                    icon: "🏙️",
-                                    color: "#ff6d01"
-                                },
-                                {
-                                    title: "Global Land Area",
-                                    value: formatArea(totalLandArea),
-                                    icon: "🌐",
-                                    color: "#46bdc6"
-                                },
-                                {
-                                    title: "Largest Country",
-                                    value: largestCountry?.name?.common || "N/A",
-                                    icon: "📏",
-                                    color: "#7e57c2"
-                                },
-                                {
-                                    title: "Most Borders",
-                                    value: `${mostBorders?.name?.common || "N/A"} (${mostBorders?.borders?.length || 0})`,
-                                    icon: "🤝",
-                                    color: "#ec407a"
-                                }
-                            ];
-                            
-                            // Create and append stat cards
-                            stats.forEach(stat => {
-                                const card = document.createElement('div');
-                                card.className = 'stat-card';
-                                card.style.cssText = `
-                                    background: linear-gradient(135deg, ${stat.color}, ${adjustColor(stat.color, -20)});
-                                    border-radius: 8px;
-                                    padding: 0.8rem;
-                                    color: white;
-                                    text-align: center;
-                                    flex: 1 0 calc(50% - 1rem);
-                                    max-width: calc(50% - 1rem);
-                                    display: flex;
-                                    flex-direction: column;
-                                    justify-content: center;
-                                    align-items: center;
-                                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                                    transition: transform 0.2s, box-shadow 0.2s;
-                                `;
-                                
-                                card.innerHTML = `
-                                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">${stat.icon}</div>
-                                    <div style="font-weight: bold; font-size: 1.5rem;">${stat.value}</div>
-                                    <div style="font-size: 0.9rem; opacity: 0.9;">${stat.title}</div>
-                                `;
-                                
-                                // Add hover effect
-                                card.addEventListener('mouseenter', () => {
-                                    card.style.transform = 'translateY(-5px)';
-                                    card.style.boxShadow = '0 5px 15px rgba(0,0,0,0.2)';
-                                });
-                                card.addEventListener('mouseleave', () => {
-                                    card.style.transform = 'translateY(0)';
-                                    card.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
-                                });
-                                
-                                statsContainer.appendChild(card);
-                            });
-                        })
-                        .catch(error => {
-                            console.error('Error fetching world stats:', error);
-                            document.querySelector('#world-stats-container .chart-loading').innerHTML = `
-                                <div style="color: #e74c3c; text-align: center;">
-                                    <p>Failed to load global statistics</p>
-                                    <button onclick="location.reload()" style="
-                                        background-color: #e74c3c;
-                                        color: white;
-                                        border: none;
-                                        padding: 0.5rem 1rem;
-                                        border-radius: 4px;
-                                        cursor: pointer;
-                                        margin-top: 0.5rem;">
-                                        Retry
-                                    </button>
-                                </div>
-                            `;
-                        });
-                    
-                    // Helper functions
-                    function formatNumber(num) {
-                        if (num >= 1000000000) {
-                            return (num / 1000000000).toFixed(1) + ' B';
-                        }
-                        if (num >= 1000000) {
-                            return (num / 1000000).toFixed(1) + ' M';
-                        }
-                        return num.toLocaleString();
-                    }
-                    
-                    function formatArea(area) {
-                        // Area is in square kilometers
-                        if (area >= 1000000) {
-                            return (area / 1000000).toFixed(1) + ' M km²';
-                        }
-                        return area.toLocaleString() + ' km²';
-                    }
-                    
-                    function adjustColor(color, amount) {
-                        return color;
-                    }
-                })();
-                </script>
             </div>
 
+            <!-- Standard charts -->
             <div id="chartContainer" class="chart-container" aria-label="Population distribution chart">
                 <div class="chart-wrapper">
                     <h3 class="chart-title">Global Population Distribution</h3>
@@ -325,10 +149,10 @@
 
     <footer>
         <p>Data provided by REST Countries API and visualized using QuickChart API</p>
+        <p>Country Data Visualizer &copy; 2025</p>
     </footer>
 
     <!-- Error handling template -->
-    <!-- Error template -->
     <template id="error-template">
         <div class="chart-error">
             <svg xmlns="http://www.w3.org/2000/svg" class="error-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -353,5 +177,6 @@
 
     <!-- JavaScript Modules -->
     <script type="module" src="../js/pages/world-data/index.js"></script>
+    <script src="../js/pages/world-data/world-stats.js"></script>
 </body>
 </html>

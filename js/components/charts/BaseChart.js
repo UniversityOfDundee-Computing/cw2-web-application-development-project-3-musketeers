@@ -33,42 +33,58 @@ export class BaseChart {
      * 5. Display the chart
      */
     async initialize() {
+        console.log(`[${this.containerId}] Initializing chart...`);
         try {
             // Show loading state
+            console.log(`[${this.containerId}] Displaying loading state.`);
             chartUtils.displayChartLoading(this.containerId);
 
             // 1. First API Call: Fetch country data
+            console.log(`[${this.containerId}] Fetching data...`);
             const countryData = await this.fetchData();
+            console.log(`[${this.containerId}] Data fetched successfully.`, countryData ? countryData.length : 0, 'items');
 
             // 2. Process and validate the data
+            console.log(`[${this.containerId}] Processing data...`);
             const processedData = await this.processData(countryData);
+            console.log(`[${this.containerId}] Data processed successfully.`, processedData);
             
             // Validate processed data
             if (!this.validateProcessedData(processedData)) {
-                throw new Error('Invalid data format');
+                console.error(`[${this.containerId}] Invalid processed data format.`, processedData);
+                throw new Error('Invalid data format after processing');
             }
+            console.log(`[${this.containerId}] Processed data validated.`);
 
             // 3. Create chart configuration
+            console.log(`[${this.containerId}] Creating chart config...`);
             const chartConfig = this.createChartConfig(processedData);
+            console.log(`[${this.containerId}] Chart config created.`, chartConfig);
 
             // Validate chart configuration
             if (!this.validateChartConfig(chartConfig)) {
+                console.error(`[${this.containerId}] Invalid chart configuration.`, chartConfig);
                 throw new Error('Invalid chart configuration');
             }
+            console.log(`[${this.containerId}] Chart config validated.`);
 
             // 4. Second API Call: Generate chart URL
+            console.log(`[${this.containerId}] Generating chart URL...`);
             const chartUrl = chartService.createChartUrl(chartConfig);
+            console.log(`[${this.containerId}] Chart URL generated:`, chartUrl);
 
             // 5. Display the chart
+            console.log(`[${this.containerId}] Displaying chart...`);
             chartUtils.displayChart(
                 this.containerId,
                 chartUrl,
                 this.options.title || 'Chart'
             );
+            console.log(`[${this.containerId}] Chart display initiated.`);
 
         } catch (error) {
-            console.error('Error initializing chart:', error);
-            chartUtils.displayChartError(this.containerId, 'Failed to load chart data');
+            console.error(`[${this.containerId}] Error initializing chart:`, error);
+            chartUtils.displayChartError(this.containerId, `Failed to load chart: ${error.message}`);
         }
     }
 
