@@ -120,10 +120,23 @@ footer {
 }
 
 /* Utility classes */
+/* Container styles */
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 var(--spacing-medium);
+    width: min(100% - 2rem, 1400px);
+    margin-inline: auto;
+    padding: var(--spacing-medium);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
+    gap: clamp(1rem, 2vw, 2rem);
+}
+
+/* Grid container modifiers */
+.container--narrow {
+    max-width: 1000px;
+}
+
+.container--wide {
+    max-width: 1600px;
 }
 
 .text-center {
