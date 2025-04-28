@@ -381,59 +381,83 @@ class SelectedCountryPage {
     /**
      * Create area comparison chart
      */
+    /**
+     * Create area comparison chart
+     */
+    /**
+     * Create area comparison chart
+     */
     async createAreaChart() {
         if (!this.currentCountry) return;
 
-        const area = this.currentCountry.area; // Country area in km²
+        // Get regional countries and sort them by area
+        const regionalCountries = this.allCountries
+            .filter(c => c.region === this.currentCountry.region)
+            .sort((a, b) => b.area - a.area); // Sorting by area in descending order
 
+        // Find the index of the current country in the sorted array
+        const index = regionalCountries.findIndex(c => c.name.common === this.currentCountry.name.common);
+
+        // Select two countries before and two after the current country
+        const start = Math.max(index - 2, 0);
+        const end = Math.min(index + 3, regionalCountries.length); // +3 because slice end is exclusive
+
+        // Select the countries to display
+        const selectedCountries = regionalCountries.slice(start, end);
+        const selectedCountryName = this.currentCountry.name.common;
+
+        // Set background colors (highlight the current country)
+        const backgroundColors = selectedCountries.map(c => {
+            if (c.name.common === selectedCountryName) {
+                return '#ff6384'; // Highlight the current country
+            } else {
+                return '#36a2eb'; // Default color for others
+            }
+        });
+
+        // Create the chart configuration for horizontal bars
         const chartConfig = {
-            type: "bar",
+            type: 'bar',
             data: {
-                labels: [this.currentCountry.name.common, "World Max Area"],
-                datasets: [
-                    {
-                        label: "Country Area (in km²)",
-                        data: [area, 17098242],  // Russia's area
-                        backgroundColor: ["#2196F3", "#e0e0e0"],
-                        borderColor: ["#1976D2", "#b0b0b0"],
-                        borderWidth: 1,
-                        barThickness: 40
-                    }
-                ]
+                labels: selectedCountries.map(c => c.name.common), // Country names as labels
+                datasets: [{
+                    label: 'Country Area (in km²)', // Label for the dataset
+                    data: selectedCountries.map(c => c.area), // Data for country area
+                    backgroundColor: backgroundColors
+                }]
             },
             options: {
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 18000000, // fixed maximum
-                        ticks: {
-                            stepSize: 2000000
-                        }
-                    }
-                },
+                indexAxis: 'y', // key change to make it horizontal
                 plugins: {
                     title: {
                         display: true,
-                        text: `${this.currentCountry.name.common} Area vs World Max Area`,
-                        font: {
-                            size: 16,
-                            weight: "bold"
+                        text: `Area Comparison - ${this.currentCountry.region}`, // Dynamic chart title
+                        font: { size: 16, weight: 'bold' }
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true, // Ensure the x-axis starts at zero
+                        ticks: {
+                            callback: value => value.toLocaleString() + ' km²' // Format area with commas
                         }
                     },
-                    tooltip: {
-                        callbacks: {
-                            label: function (tooltipItem) {
-                                return `Area: ${tooltipItem.raw.toLocaleString()} km²`;
-                            }
+                    y: {
+                        ticks: {
+                            minRotation: 0, // Ensure no rotation on the y-axis labels
+                            maxRotation: 0 // Ensure no rotation on the y-axis labels
                         }
                     }
                 }
             }
         };
 
+        // Generate the chart URL and display it
         const chartUrl = chartService.createChartUrl(chartConfig);
         chartUtils.displayChart('areaChart', chartUrl, 'Area comparison');
     }
+
+
 
     /**
      * Display neighboring countries
