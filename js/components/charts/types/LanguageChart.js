@@ -21,6 +21,8 @@ export class LanguageChart extends BaseChart {
             colorScheme: 'default',
             limit: 5,
             chartType: 'language', // Add chart type identifier for dynamic descriptions
+            sortBySpeakers: false, // New option to sort by speakers count instead of country count
+            sortByPopulation: false, // New option to sort by population
             ...options
         });
         
@@ -41,9 +43,10 @@ export class LanguageChart extends BaseChart {
             return { labels: [], values: [], formatted: [] };
         }
         
-        // Map to count languages
-        const languageCounts = {};
-        const languageCountries = {};
+        // Map to count languages - using let instead of const to allow reassignment
+        let languageCounts = {};
+        let languageCountries = {};
+        let languagePopulation = {}; // New map for population data
         
         // Count based on language type and continent filter
         data.forEach(country => {
@@ -59,6 +62,7 @@ export class LanguageChart extends BaseChart {
             
             // Get relevant language data based on type
             const languages = country.languages;
+            const population = country.population || 0;
             
             // We'll need to understand the structure better to implement native vs official
             // For now, we'll just use all languages
@@ -73,11 +77,18 @@ export class LanguageChart extends BaseChart {
                     if (!languageCounts[langName]) {
                         languageCounts[langName] = 0;
                         languageCountries[langName] = [];
+                        languagePopulation[langName] = 0;
                     }
                     
                     // Increment count and add country
                     languageCounts[langName]++;
                     languageCountries[langName].push(country.name.common);
+                    
+                    // For population, we'll estimate by dividing the country's population
+                    // by the number of official languages it has
+                    // This is a simplification but gives us an estimation based on API data only
+                    const languageCount = Object.keys(languages).length || 1;
+                    languagePopulation[langName] += Math.round(population / languageCount);
                 }
             }
         });
@@ -96,8 +107,9 @@ export class LanguageChart extends BaseChart {
                 'Turkic': ['Turkish', 'Azerbaijani', 'Uzbek', 'Kazakh', 'Kyrgyz']
             };
             
-            const groupedCounts = {};
-            const groupedCountries = {};
+            let groupedCounts = {};
+            let groupedCountries = {};
+            let groupedPopulation = {}; // Add population grouping
             
             // Group languages by family
             for (const lang in languageCounts) {
@@ -110,12 +122,14 @@ export class LanguageChart extends BaseChart {
                         if (!groupedCounts[family]) {
                             groupedCounts[family] = 0;
                             groupedCountries[family] = [];
+                            groupedPopulation[family] = 0;
                         }
                         groupedCounts[family] += languageCounts[lang];
                         groupedCountries[family] = [
                             ...groupedCountries[family],
                             ...languageCountries[lang]
                         ];
+                        groupedPopulation[family] += languagePopulation[lang];
                         familyFound = true;
                         break;
                     }
@@ -126,36 +140,54 @@ export class LanguageChart extends BaseChart {
                     if (!groupedCounts['Other']) {
                         groupedCounts['Other'] = 0;
                         groupedCountries['Other'] = [];
+                        groupedPopulation['Other'] = 0;
                     }
                     groupedCounts['Other'] += languageCounts[lang];
                     groupedCountries['Other'] = [
                         ...groupedCountries['Other'],
                         ...languageCountries[lang]
                     ];
+                    groupedPopulation['Other'] += languagePopulation[lang];
                 }
             }
             
             // Use grouped data
             languageCounts = groupedCounts;
             languageCountries = groupedCountries;
+            languagePopulation = groupedPopulation;
         }
         
         // Convert to arrays and sort
         let languageData = Object.entries(languageCounts).map(([language, count]) => ({
             language,
             count,
+            population: languagePopulation[language] || 0,
             countries: languageCountries[language]
         }));
         
-        // Sort based on sort order
-        switch (this.options.sort) {
-            case 'asc':
-                languageData.sort((a, b) => a.count - b.count);
-                break;
-            case 'desc':
-            default:
-                languageData.sort((a, b) => b.count - a.count);
-                break;
+        // Sort based on sort option
+        if (this.options.sortByPopulation) {
+            // Sort by estimated population
+            switch (this.options.sort) {
+                case 'asc':
+                    languageData.sort((a, b) => a.population - b.population);
+                    break;
+                case 'desc':
+                default:
+                    languageData.sort((a, b) => b.population - a.population);
+                    break;
+            }
+        } else {
+            // Sort by country count (default behavior)
+            switch (this.options.sort) {
+                case 'asc':
+                    languageData.sort((a, b) => a.count - b.count);
+                    break;
+                case 'desc':
+                default:
+                    languageData.sort((a, b) => b.count - a.count);
+                    break;
+            }
         }
         
         // Apply limit
@@ -165,15 +197,37 @@ export class LanguageChart extends BaseChart {
         // Format for chart
         return {
             labels: languageData.map(item => item.language),
-            values: languageData.map(item => item.count),
+            values: this.options.sortByPopulation ? 
+                languageData.map(item => item.population) : 
+                languageData.map(item => item.count),
             formatted: languageData.map(item => ({
                 language: item.language,
                 count: item.count,
+                population: item.population,
                 countries: item.countries,
                 uniqueCountries: [...new Set(item.countries)],
-                percentage: ((item.count / data.length) * 100).toFixed(2)
+                percentage: ((item.count / data.length) * 100).toFixed(2),
+                formattedPopulation: this.formatPopulation(item.population)
             }))
         };
+    }
+
+    /**
+     * Format population number for display
+     * @param {number} population - Raw population number
+     * @returns {string} Formatted population string
+     */
+    formatPopulation(population) {
+        if (population >= 1000000000) {
+            return `${(population / 1000000000).toFixed(2)} billion`;
+        }
+        if (population >= 1000000) {
+            return `${(population / 1000000).toFixed(2)} million`;
+        }
+        if (population >= 1000) {
+            return `${(population / 1000).toFixed(2)}k`;
+        }
+        return population.toString();
     }
 
     /**
@@ -252,6 +306,34 @@ export class LanguageChart extends BaseChart {
         familyCheck.appendChild(familyLabel);
         familyGroup.appendChild(familyCheck);
         this.chartControls.appendChild(familyGroup);
+        
+        // 3. Add population-based sorting toggle
+        const populationGroup = document.createElement('div');
+        populationGroup.className = 'form-group me-2 mb-2';
+        
+        const populationCheck = document.createElement('div');
+        populationCheck.className = 'form-check form-switch';
+        
+        const populationInput = document.createElement('input');
+        populationInput.className = 'form-check-input';
+        populationInput.type = 'checkbox';
+        populationInput.id = `${this.containerId}-population-toggle`;
+        populationInput.setAttribute('role', 'switch');
+        populationInput.checked = this.options.sortByPopulation || false;
+        
+        const populationLabel = document.createElement('label');
+        populationLabel.className = 'form-check-label ms-2';
+        populationLabel.htmlFor = `${this.containerId}-population-toggle`;
+        populationLabel.textContent = 'Sort by Speakers';
+        
+        populationInput.addEventListener('change', (e) => {
+            this.togglePopulationSorting(e.target.checked);
+        });
+        
+        populationCheck.appendChild(populationInput);
+        populationCheck.appendChild(populationLabel);
+        populationGroup.appendChild(populationCheck);
+        this.chartControls.appendChild(populationGroup);
     }
 
     /**
@@ -271,6 +353,20 @@ export class LanguageChart extends BaseChart {
             // Re-process data with continent filter
             this.processedData = await this.processData(this.rawData);
             
+            // Update title based on continent filter
+            let typeText = this.options.languageType === 'official' ? 'Official Languages' : 
+                          (this.options.languageType === 'native' ? 'Native Languages' : 'Languages');
+            
+            if (continent !== 'all') {
+                this.options.title = this.options.groupByFamily ? 
+                    `Language Families in ${continent}` : 
+                    `Most Common ${typeText} in ${continent}`;
+            } else {
+                this.options.title = this.options.groupByFamily ? 
+                    `World's Major Language Families` : 
+                    `Most Common ${typeText}`;
+            }
+            
             // Create new chart configuration
             const chartConfig = this.createChartConfig(this.processedData);
             
@@ -281,22 +377,12 @@ export class LanguageChart extends BaseChart {
             chartUtils.displayChart(
                 this.containerId,
                 chartUrl,
-                this.options.title || 'Chart'
+                this.options.title
             );
             
-            // Update descriptions
-            const descriptions = this.generateDescriptions(this.processedData);
+            // Generate descriptions that accurately reflect the current state
+            const descriptions = this.generateLanguageDescriptions(this.processedData);
             this.updateChartDescriptions(descriptions);
-            
-            // Update title based on continent filter
-            let typeText = this.options.languageType === 'official' ? 'Official Languages' : 
-                          (this.options.languageType === 'native' ? 'Native Languages' : 'Languages');
-            
-            if (continent !== 'all') {
-                this.options.title = `Most Common ${typeText} in ${continent}`;
-            } else {
-                this.options.title = `Most Common ${typeText}`;
-            }
             
             // Update the chart title in the DOM
             const titleElement = this.container.querySelector('.chart-title');
@@ -323,6 +409,18 @@ export class LanguageChart extends BaseChart {
             // Store language family grouping option
             this.options.groupByFamily = groupByFamily;
             
+            // Update title based on grouping option and current continent filter
+            const continent = this.options.continentFilter || 'all';
+            if (continent !== 'all') {
+                this.options.title = groupByFamily ? 
+                    `Language Families in ${continent}` : 
+                    `Most Common Languages in ${continent}`;
+            } else {
+                this.options.title = groupByFamily ? 
+                    `World's Major Language Families` : 
+                    `Most Common Official Languages`;
+            }
+            
             // Re-process data with language family grouping
             this.processedData = await this.processData(this.rawData);
             
@@ -336,21 +434,81 @@ export class LanguageChart extends BaseChart {
             chartUtils.displayChart(
                 this.containerId,
                 chartUrl,
-                this.options.title || 'Chart'
+                this.options.title
             );
             
-            // Update descriptions
-            const descriptions = this.generateDescriptions(this.processedData);
-            
-            // Add language family context to description
-            if (groupByFamily && descriptions.short) {
-                descriptions.short += ' Languages are grouped by major language families.';
-            }
-            
+            // Generate descriptions that accurately reflect the current state
+            const descriptions = this.generateLanguageDescriptions(this.processedData);
             this.updateChartDescriptions(descriptions);
+            
+            // Update the chart title in the DOM
+            const titleElement = this.container.querySelector('.chart-title');
+            if (titleElement) {
+                titleElement.textContent = this.options.title;
+            }
         } catch (error) {
             console.error(`[${this.containerId}] Error toggling language families:`, error);
             this.showError(`Failed to toggle language family grouping: ${error.message}`);
+        }
+    }
+
+    /**
+     * Toggle sorting by estimated speaker population
+     * @param {boolean} sortByPopulation - Whether to sort by population
+     */
+    async togglePopulationSorting(sortByPopulation) {
+        console.log(`[${this.containerId}] Toggling population sorting: ${sortByPopulation}`);
+        
+        // Show loading overlay
+        this.showLoading();
+        
+        try {
+            // Store population sorting option
+            this.options.sortByPopulation = sortByPopulation;
+            
+            // Update title based on grouping option and current continent filter
+            const continent = this.options.continentFilter || 'all';
+            const groupByFamily = this.options.groupByFamily || false;
+            const typeText = sortByPopulation ? 'Languages by Speakers' : 'Official Languages';
+            
+            if (continent !== 'all') {
+                this.options.title = groupByFamily ? 
+                    `${sortByPopulation ? 'Most Spoken' : ''} Language Families in ${continent}` : 
+                    `${sortByPopulation ? 'Most Spoken' : 'Most Common'} ${typeText} in ${continent}`;
+            } else {
+                this.options.title = groupByFamily ? 
+                    `${sortByPopulation ? 'Most Spoken' : ''} World's Major Language Families` : 
+                    `${sortByPopulation ? 'Most Spoken' : 'Most Common'} ${typeText}`;
+            }
+            
+            // Re-process data with population sorting option
+            this.processedData = await this.processData(this.rawData);
+            
+            // Create new chart configuration
+            const chartConfig = this.createChartConfig(this.processedData);
+            
+            // Generate chart URL
+            const chartUrl = chartService.createChartUrl(chartConfig);
+            
+            // Update the chart
+            chartUtils.displayChart(
+                this.containerId,
+                chartUrl,
+                this.options.title
+            );
+            
+            // Generate descriptions that accurately reflect the current state
+            const descriptions = this.generateLanguageDescriptions(this.processedData);
+            this.updateChartDescriptions(descriptions);
+            
+            // Update the chart title in the DOM
+            const titleElement = this.container.querySelector('.chart-title');
+            if (titleElement) {
+                titleElement.textContent = this.options.title;
+            }
+        } catch (error) {
+            console.error(`[${this.containerId}] Error toggling population sorting:`, error);
+            this.showError(`Failed to toggle population sorting: ${error.message}`);
         }
     }
 
@@ -401,12 +559,21 @@ export class LanguageChart extends BaseChart {
                                 
                                 const uniqueCountryCount = item.uniqueCountries.length;
                                 
-                                return [
-                                    `Language: ${item.language}`,
-                                    `Countries: ${uniqueCountryCount}`,
-                                    `Usage instances: ${item.count}`,
-                                    `Percentage: ${item.percentage}%`
-                                ];
+                                if (this.options.sortByPopulation) {
+                                    return [
+                                        `Language: ${item.language}`,
+                                        `Estimated Speakers: ${item.formattedPopulation}`,
+                                        `Countries: ${uniqueCountryCount}`,
+                                        `Usage instances: ${item.count}`
+                                    ];
+                                } else {
+                                    return [
+                                        `Language: ${item.language}`,
+                                        `Countries: ${uniqueCountryCount}`,
+                                        `Usage instances: ${item.count}`,
+                                        `Percentage: ${item.percentage}%`
+                                    ];
+                                }
                             }
                         }
                     }
@@ -416,7 +583,7 @@ export class LanguageChart extends BaseChart {
                         beginAtZero: true,
                         title: {
                             display: true,
-                            text: 'Number of Countries',
+                            text: this.options.sortByPopulation ? 'Estimated Number of Speakers' : 'Number of Countries',
                             font: {
                                 size: 12,
                                 weight: 'bold'
@@ -424,7 +591,13 @@ export class LanguageChart extends BaseChart {
                         },
                         ticks: {
                             color: "#444",
-                            font: { size: 12, weight: "bold" }
+                            font: { size: 12, weight: "bold" },
+                            callback: (value) => {
+                                if (this.options.sortByPopulation && value >= 1000000) {
+                                    return `${(value / 1000000).toFixed(1)}M`;
+                                }
+                                return value;
+                            }
                         },
                         grid: { color: "#eee" }
                     },
@@ -513,5 +686,164 @@ export class LanguageChart extends BaseChart {
             const hue = (lang.charCodeAt(0) * 7) % 360;
             return `hsl(${hue}, 70%, 60%)`;
         });
+    }
+
+    /**
+     * Generate language-specific chart descriptions that accurately reflect current chart state
+     * @param {Object} data - Processed chart data
+     * @returns {Object} Language-specific descriptions
+     */
+    generateLanguageDescriptions(data) {
+        const continentFilter = this.options.continentFilter || 'all';
+        const groupByFamily = this.options.groupByFamily || false;
+        const sortByPopulation = this.options.sortByPopulation || false;
+        const totalItems = data.labels ? data.labels.length : 0;
+        const sortOrder = this.options.sort || 'desc';
+        
+        // Most common language
+        const topLanguage = data.formatted && data.formatted.length > 0 ? data.formatted[0].language : '';
+        const topCount = data.formatted && data.formatted.length > 0 ? data.formatted[0].count : 0;
+        const topPopulation = data.formatted && data.formatted.length > 0 ? data.formatted[0].population : 0;
+        const topPopulationFormatted = data.formatted && data.formatted.length > 0 ? data.formatted[0].formattedPopulation : '';
+        
+        // Generate appropriate title
+        let title;
+        if (continentFilter !== 'all') {
+            if (groupByFamily) {
+                title = sortByPopulation ? 
+                    `Most Spoken Language Families in ${continentFilter}` : 
+                    `Language Families in ${continentFilter}`;
+            } else {
+                title = sortByPopulation ? 
+                    `Most Spoken Languages in ${continentFilter}` : 
+                    `Most Common Languages in ${continentFilter}`;
+            }
+        } else {
+            if (groupByFamily) {
+                title = sortByPopulation ? 
+                    `Most Spoken Language Families Globally` : 
+                    `World's Major Language Families`;
+            } else {
+                title = sortByPopulation ? 
+                    `Most Spoken Languages Globally` : 
+                    `Most Common Official Languages`;
+            }
+        }
+        
+        // Context description for filtering
+        const contextDesc = continentFilter !== 'all' ? `in ${continentFilter}` : 'globally';
+        
+        // Generate description based on grouping
+        const groupingDesc = groupByFamily ? 'language families' : 'individual languages';
+        const entityType = groupByFamily ? 'family' : 'language';
+        
+        // Chart type description
+        const chartTypeDesc = this.getChartTypeDescription();
+
+        // Create detailed insights based on current state
+        let insights = [];
+        
+        // Top language insight based on sort type
+        if (topLanguage) {
+            if (sortByPopulation) {
+                insights.push(`${topLanguage} is ${groupByFamily ? 'the most spoken language family' : 'the most spoken language'} ${contextDesc}, with an estimated ${topPopulationFormatted} speakers across ${topCount} ${topCount === 1 ? 'country' : 'countries'}.`);
+            } else {
+                insights.push(`${topLanguage} is ${groupByFamily ? 'the most common language family' : 'the most widely used language'} ${contextDesc}, used in ${topCount} ${topCount === 1 ? 'country' : 'countries'}.`);
+            }
+        }
+        
+        // Second language insight if available
+        if (data.formatted && data.formatted.length > 1) {
+            const secondLang = data.formatted[1];
+            if (sortByPopulation) {
+                insights.push(`${secondLang.language} is the second most spoken ${entityType} with approximately ${secondLang.formattedPopulation} speakers across ${secondLang.count} countries.`);
+            } else {
+                insights.push(`${secondLang.language} is the second most common ${entityType}, used in ${secondLang.count} countries.`);
+            }
+        }
+        
+        // Add appropriate insights based on grouping and sorting
+        if (groupByFamily) {
+            insights.push(`Grouping by language family reveals broader linguistic patterns and relationships that cross national boundaries.`);
+        }
+        
+        if (sortByPopulation) {
+            insights.push(`Sorting by estimated speakers provides a different perspective than sorting by number of countries, highlighting languages with large populations in fewer nations.`);
+        } else {
+            insights.push(`Individual language distribution reflects historical colonization, migration patterns, and cultural influence.`);
+        }
+        
+        // Continent-specific insight
+        if (continentFilter !== 'all') {
+            insights.push(`${continentFilter} shows distinct linguistic patterns compared to other continents.`);
+        } else if (!sortByPopulation) {
+            insights.push(`Language distribution globally reflects historical colonization, migration, and cultural exchange.`);
+        }
+        
+        // Create detailed description
+        let detailedDesc = `This chart displays the ${sortByPopulation ? 'most spoken' : 'most common'} ${groupingDesc} ${contextDesc}.`;
+        
+        if (topLanguage) {
+            if (sortByPopulation) {
+                detailedDesc += ` ${topLanguage} has the largest number of speakers with an estimated ${topPopulationFormatted}.`;
+            } else {
+                detailedDesc += ` ${topLanguage} is used in ${topCount} ${topCount === 1 ? 'country' : 'countries'}.`;
+            }
+        }
+        
+        // Add grouping and sorting context
+        if (groupByFamily) {
+            detailedDesc += ` Languages are grouped by major linguistic families rather than individual languages.`;
+        }
+        
+        if (sortByPopulation) {
+            detailedDesc += ` The chart sorts languages by estimated number of speakers rather than country count.`;
+        }
+        
+        // Analysis text based on sorting and grouping options
+        let analysisText;
+        if (sortByPopulation) {
+            analysisText = `Language distribution analysis shows that ${topLanguage} is ${groupByFamily ? 'the most spoken language family' : 'the most spoken language'} ${contextDesc} with approximately ${topPopulationFormatted} speakers.`;
+        } else {
+            analysisText = `Language distribution analysis shows that ${topLanguage} is ${groupByFamily ? 'the most common language family' : 'the most widely used language'} ${contextDesc}, found in ${topCount} ${topCount === 1 ? 'country' : 'countries'}.`;
+        }
+        
+        return {
+            title: title,
+            short: `This ${chartTypeDesc} shows the ${sortByPopulation ? 'most spoken' : 'distribution of'} ${groupingDesc} ${contextDesc}.`,
+            detailed: detailedDesc,
+            analysis: analysisText,
+            insights: insights.filter(insight => insight)
+        };
+    }
+
+    /**
+     * Override the base class generateDescriptions to ensure we use our specific implementation
+     * @param {Object} data - Processed chart data
+     * @returns {Object} Chart descriptions
+     */
+    generateDescriptions(data) {
+        return this.generateLanguageDescriptions(data);
+    }
+
+    /**
+     * Get a descriptive string for the current chart type
+     * @returns {string} Description of the chart type
+     */
+    getChartTypeDescription() {
+        switch (this.options.type) {
+            case 'bar':
+                return 'bar chart';
+            case 'horizontalBar':
+                return 'horizontal bar chart';
+            case 'pie':
+                return 'pie chart';
+            case 'doughnut':
+                return 'doughnut chart';
+            case 'line':
+                return 'line chart';
+            default:
+                return 'chart';
+        }
     }
 }

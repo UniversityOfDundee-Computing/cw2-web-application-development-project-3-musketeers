@@ -117,101 +117,93 @@ function displayChartContent(targetElement, chartUrl, altText) {
     const containerId = targetElement.closest('.chart-container')?.id || 'unknown-container';
     console.log(`[${containerId}] Creating image element for target:`, targetElement.tagName, targetElement.className);
     
-    // Create the new image element that will replace the existing one
+    // First, remove any existing chart images before even starting to load the new one
+    const existingImages = targetElement.querySelectorAll('.chart-image');
+    if (existingImages.length > 0) {
+        console.log(`[${containerId}] Found ${existingImages.length} existing chart images to remove.`);
+        existingImages.forEach(existingImage => {
+            existingImage.remove();
+        });
+    }
+    
+    // Create the new image element
     const img = new Image();
 
     img.onload = () => {
         console.log(`[${containerId}] Image loaded successfully.`);
         
-        // First, find all existing chart images and remove them to prevent stacking
-        const existingImages = targetElement.querySelectorAll('.chart-image');
-        if (existingImages.length > 0) {
-            console.log(`[${containerId}] Found ${existingImages.length} existing chart images to remove.`);
-            
-            // Fade out all existing images
-            existingImages.forEach(existingImage => {
-                existingImage.style.opacity = '0';
-                existingImage.style.transform = 'scale(0.96)';
+        // Double-check for any remaining chart images (in case more were added during loading)
+        const remainingImages = targetElement.querySelectorAll('.chart-image');
+        if (remainingImages.length > 0) {
+            console.log(`[${containerId}] Found ${remainingImages.length} remaining chart images to remove.`);
+            remainingImages.forEach(existingImage => {
+                existingImage.remove();
             });
-            
-            // Wait for transition to complete before removing
-            setTimeout(() => {
-                existingImages.forEach(existingImage => {
-                    if (existingImage.parentNode) {
-                        existingImage.remove();
-                    }
-                });
-                addNewImage();
-            }, 150);
-        } else {
-            addNewImage();
         }
         
-        function addNewImage() {
-            // Preserve chart controls if they exist
-            const chartControls = targetElement.querySelector('.chart-controls');
-            let controlsNode = null;
-            if (chartControls) {
-                controlsNode = chartControls.cloneNode(true);
-                if (chartControls.parentNode === targetElement) {
-                    chartControls.remove();
-                }
+        // Preserve chart controls if they exist
+        const chartControls = targetElement.querySelector('.chart-controls');
+        let controlsNode = null;
+        if (chartControls) {
+            controlsNode = chartControls.cloneNode(true);
+            if (chartControls.parentNode === targetElement) {
+                chartControls.remove();
             }
-            
-            // Preserve chart title and descriptions if they exist
-            const chartTitle = targetElement.querySelector('.chart-title');
-            const chartDescription = targetElement.querySelector('.chart-description');
-            let titleNode = null;
-            let descriptionNode = null;
-            
-            if (chartTitle) {
-                titleNode = chartTitle.cloneNode(true);
-                if (chartTitle.parentNode === targetElement) {
-                    chartTitle.remove();
-                }
+        }
+        
+        // Preserve chart title and descriptions if they exist
+        const chartTitle = targetElement.querySelector('.chart-title');
+        const chartDescription = targetElement.querySelector('.chart-description');
+        let titleNode = null;
+        let descriptionNode = null;
+        
+        if (chartTitle) {
+            titleNode = chartTitle.cloneNode(true);
+            if (chartTitle.parentNode === targetElement) {
+                chartTitle.remove();
             }
-            
-            if (chartDescription) {
-                descriptionNode = chartDescription.cloneNode(true);
-                if (chartDescription.parentNode === targetElement) {
-                    chartDescription.remove();
-                }
+        }
+        
+        if (chartDescription) {
+            descriptionNode = chartDescription.cloneNode(true);
+            if (chartDescription.parentNode === targetElement) {
+                chartDescription.remove();
             }
-            
-            // Append the new image to the target element with animation
-            img.style.opacity = '0';
-            img.style.transform = 'scale(0.96)';
-            
-            // Re-add controls, title, and descriptions in the correct order
-            if (controlsNode) {
-                targetElement.appendChild(controlsNode);
-            }
-            
-            if (titleNode) {
-                targetElement.appendChild(titleNode);
-            }
-            
-            if (descriptionNode) {
-                targetElement.appendChild(descriptionNode);
-            }
-            
-            targetElement.appendChild(img);
-            
-            // Trigger reflow to enable animation
-            img.offsetHeight;
-            
-            // Animate in the new image
-            img.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
-            img.style.opacity = '1';
-            img.style.transform = 'scale(1)';
-            
-            console.log(`[${containerId}] Image appended to target element.`);
-            
-            // Remove existing timestamp if present
-            const existingTimestamp = targetElement.querySelector('.chart-last-updated');
-            if (existingTimestamp) {
-                existingTimestamp.remove();
-            }
+        }
+        
+        // Append the new image to the target element with animation
+        img.style.opacity = '0';
+        img.style.transform = 'scale(0.96)';
+        
+        // Re-add controls, title, and descriptions in the correct order
+        if (controlsNode) {
+            targetElement.appendChild(controlsNode);
+        }
+        
+        if (titleNode) {
+            targetElement.appendChild(titleNode);
+        }
+        
+        if (descriptionNode) {
+            targetElement.appendChild(descriptionNode);
+        }
+        
+        targetElement.appendChild(img);
+        
+        // Trigger reflow to enable animation
+        img.offsetHeight;
+        
+        // Animate in the new image
+        img.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
+        img.style.opacity = '1';
+        img.style.transform = 'scale(1)';
+        
+        console.log(`[${containerId}] Image appended to target element.`);
+        
+        // Remove existing timestamp if present
+        const existingTimestamp = targetElement.querySelector('.chart-last-updated');
+        if (existingTimestamp) {
+            existingTimestamp.remove();
         }
     };
 
