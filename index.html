@@ -1,143 +1,76 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Country Data Visualizer - Explore and analyze global country statistics through interactive visualizations">
-  <title>Country Data Visualizer</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Country Data Visualizer - Explore and analyze global country statistics through interactive visualizations">
+    <title>Country Data Visualizer</title>
+    <style>
+        /* Minimal styling for loading screen */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #0d0d2a;
+            color: white;
+            text-align: center;
+        }
 
+        .loading-container {
+            padding: 20px;
+        }
 
-  <!-- Load Three.js and Globe.gl -->
-  <script src="https://unpkg.com/three"></script>
-  <script src="https://unpkg.com/globe.gl"></script>
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
 
-  <script type="module" src="./js/pages/homepage/hompage.js"></script>
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
 
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background-color: black; /* fully black for stars background */
-    }
+        .redirect-text {
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
 
-    #globeViz {
-     position: fixed;
-     top: 0;
-     left: 0;
-     width: 100vw;
-     height: 100vh;
-     z-index: 0; /* Send behind everything */
-     pointer-events: none; /* Allows right-click and UI clicks */
-    }
-
-     body {
-      position: relative;
-     z-index: 1;
-    }
-
-
-    .loading-container {
-      z-index: 1;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      color: white;
-      text-align: center;
-      font-family: Arial, sans-serif;
-    }
-
-    .loading-spinner {
-      width: 50px;
-      height: 50px;
-      border: 5px solid #f3f3f3;
-      border-top: 5px solid #3498db;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 20px auto;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .globeViz .globe-tooltip {
-     font-size: 20px; /* Make tooltip text bigger */
-     font-weight: bold;
-     color: gold; /* Optional: make the text golden! */
-    }
-
-    #globeViz .globe-label {
-     transition: opacity 0.5s ease;
-     pointer-events: none;
-     font-size: 18px;
-     font-weight: bold;
-     color: gold;
-     opacity: 1;
-     animation: fadeout 8s ease forwards;
-    }
-
-     @keyframes fadeout {
-     0% { opacity: 1; }
-     80% { opacity: 1; }
-     100% { opacity: 0; }
-    
-    }
-
-
-  </style>
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            .loading-spinner {
+                animation: none;
+            }
+        }
+    </style>
 </head>
-
 <body>
+    <div class="loading-container">
+        <h1>Country Data Visualizer</h1>
+        <div class="loading-spinner"></div>
+        <p class="redirect-text">Loading application...</p>
+    </div>
 
-  <!-- The Globe -->
-  <div id="globe-wrapper">
-    <div id="globeViz"></div>
-  </div>
-  
-  <!-- Loading Screen -->
-  <div class="loading-container" id="loading">
-    <h1>Country Data Visualizer</h1>
-    <div class="loading-spinner"></div>
-    <p>Loading application...</p>
-  </div>
-
-  <div id="country-info" class="hidden">
-    <span id="close-info">&times;</span>
-    <h2 id="country-name">Country Name</h2>
-  </div>
-  
-
-  <script>
-    window.addEventListener('DOMContentLoaded', () => {
-
-      const globe = Globe()
-        (document.getElementById('globeViz'))
-        .globeImageUrl('//unpkg.com/three-globe/example/img/earth-dark.jpg')
-        .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
-        .pointsData([]) // EMPTY points data for now
-        .pointAltitude('size')
-        .pointColor('color')
-        .pointLabel('label');
-
-      globe.controls().autoRotate = true;
-      globe.controls().autoRotateSpeed = 0.5;
-
-      // Hide loading spinner after small delay
-      setTimeout(() => {
-        const loadingContainer = document.getElementById('loading');
-        loadingContainer.style.opacity = '0';
-        loadingContainer.style.transition = 'opacity 1s ease';
-        setTimeout(() => {
-          loadingContainer.style.display = 'none';
-        }, 1000);
-      }, 1500);
-
-    });
-  </script>
-
+    <script>
+        // Redirect to world data page after a short delay
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                window.location.href = './pages/world-data.html';
+            }, 1000);
+        });
+    </script>
 </body>
 </html>
