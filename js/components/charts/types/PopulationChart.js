@@ -387,9 +387,12 @@ export class PopulationChart extends BaseChart {
         console.log(`[${this.containerId}] Filtering population by: ${filter}`);
         
         // Show loading overlay
-        this.showLoading();
+        this.showLoading('Filtering population data...');
         
         try {
+            // Clean up existing chart before updating
+            this.cleanupExistingChart();
+            
             // Store filter option
             this.options.populationFilter = filter;
             
@@ -420,6 +423,9 @@ export class PopulationChart extends BaseChart {
             // Update descriptions with dynamic data-driven descriptions
             const descriptions = this.generateDescriptions(this.processedData);
             this.updateChartDescriptions(descriptions);
+            
+            // Hide the loading indicator
+            this.hideLoading();
         } catch (error) {
             console.error(`[${this.containerId}] Error filtering population:`, error);
             this.showError(`Failed to filter population data: ${error.message}`);
@@ -434,9 +440,12 @@ export class PopulationChart extends BaseChart {
         console.log(`[${this.containerId}] Toggling density view: ${showDensity}`);
         
         // Show loading overlay
-        this.showLoading();
+        this.showLoading('Updating density view...');
         
         try {
+            // Clean up existing chart before updating
+            this.cleanupExistingChart();
+            
             // Store density option
             this.options.showDensity = showDensity;
             
@@ -467,6 +476,9 @@ export class PopulationChart extends BaseChart {
             // Update descriptions with dynamic data-driven descriptions
             const descriptions = this.generateDescriptions(this.processedData);
             this.updateChartDescriptions(descriptions);
+            
+            // Hide the loading indicator
+            this.hideLoading();
         } catch (error) {
             console.error(`[${this.containerId}] Error toggling density view:`, error);
             this.showError(`Failed to toggle density view: ${error.message}`);
@@ -517,12 +529,15 @@ export class PopulationChart extends BaseChart {
             console.log(`[${this.containerId}] Changing sort order to ${sortOrder}...`);
             
             // Show loading overlay
-            this.showLoading();
-            
-            // Update options
-            this.options.sort = sortOrder;
+            this.showLoading('Updating sort order...');
             
             try {
+                // Clean up existing chart before updating
+                this.cleanupExistingChart();
+                
+                // Update options
+                this.options.sort = sortOrder;
+                
                 // Re-process data with new sort order
                 if (this.rawData) {
                     this.processedData = await this.processData(this.rawData);
@@ -556,10 +571,123 @@ export class PopulationChart extends BaseChart {
                 const descriptions = this.generateDescriptions(this.processedData);
                 this.updateChartDescriptions(descriptions);
                 
+                // Hide the loading indicator
+                this.hideLoading();
+                
                 console.log(`[${this.containerId}] Sort order changed successfully to ${sortOrder}.`);
             } catch (error) {
                 console.error(`[${this.containerId}] Error changing sort order:`, error);
                 this.showError(`Failed to change sort order: ${error.message}`);
+            }
+        }
+    }
+
+    /**
+     * Override the base class method to ensure proper cleanup and loading states
+     * @param {string} newType - New chart type ('bar', 'pie', etc.)
+     */
+    async changeChartType(newType) {
+        if (this.supportedChartTypes.includes(newType)) {
+            console.log(`[${this.containerId}] Changing chart type to ${newType}...`);
+            
+            // Show loading overlay
+            this.showLoading(`Changing to ${newType} chart...`);
+            
+            try {
+                // Clean up existing chart before updating
+                this.cleanupExistingChart();
+                
+                // Update options
+                this.options.type = newType;
+                
+                // Store the original title to preserve it after chart type change
+                const originalTitle = this.options.title;
+                
+                // Re-process data to ensure correct formatting for the new chart type
+                if (this.rawData) {
+                    this.processedData = await this.processData(this.rawData);
+                }
+                
+                // Create new chart configuration that explicitly uses the new chart type
+                const chartConfig = this.createChartConfig(this.processedData);
+                
+                // Force the chart type to be the selected type
+                chartConfig.type = newType;
+                
+                // Generate chart URL
+                const chartUrl = chartService.createChartUrl(chartConfig);
+                
+                // Update the chart
+                const uiTitle = this.options.showDensity ? 'Global Population Density' : 'Global Population Distribution';
+                
+                chartUtils.displayChart(
+                    this.containerId,
+                    chartUrl,
+                    uiTitle
+                );
+                
+                // Update descriptions
+                const descriptions = this.generateDescriptions(this.processedData);
+                this.updateChartDescriptions(descriptions);
+                
+                // Hide the loading indicator
+                this.hideLoading();
+                
+                console.log(`[${this.containerId}] Chart type changed successfully to ${newType}.`);
+            } catch (error) {
+                console.error(`[${this.containerId}] Error changing chart type:`, error);
+                this.showError(`Failed to change chart type: ${error.message}`);
+            }
+        }
+    }
+
+    /**
+     * Override the base class method to ensure proper cleanup and loading states
+     * @param {number} limit - Number of items to display
+     */
+    async changeDataLimit(limit) {
+        if (!isNaN(limit) && limit > 0) {
+            console.log(`[${this.containerId}] Changing data limit to ${limit}...`);
+            
+            // Show loading overlay
+            this.showLoading('Updating data limit...');
+            
+            try {
+                // Clean up existing chart before updating
+                this.cleanupExistingChart();
+                
+                // Update options
+                this.options.limit = limit;
+                
+                // Re-process data with new limit
+                this.processedData = await this.processData(this.rawData);
+                
+                // Create new chart configuration
+                const chartConfig = this.createChartConfig(this.processedData);
+                
+                // Generate chart URL
+                const chartUrl = chartService.createChartUrl(chartConfig);
+                
+                // Update the chart
+                const uiTitle = this.options.showDensity ? 'Global Population Density' : 'Global Population Distribution';
+                
+                chartUtils.displayChart(
+                    this.containerId,
+                    chartUrl,
+                    uiTitle
+                );
+                
+                // Update descriptions
+                const descriptions = this.generateDescriptions(this.processedData);
+                this.updateChartDescriptions(descriptions);
+                
+                // Hide the loading indicator
+                this.hideLoading();
+                
+                console.log(`[${this.containerId}] Data limit changed successfully.`);
+            } catch (error) {
+                console.error(`[${this.containerId}] Error changing data limit:`, error);
+                this.showError(`Failed to change data limit: ${error.message}`);
             }
         }
     }

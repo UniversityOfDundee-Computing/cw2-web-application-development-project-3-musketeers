@@ -5,7 +5,7 @@
     // Run immediately - don't wait for DOMContentLoaded
     // Find the required DOM elements
     const statsGrid = document.querySelector('#chartContainer9 .stats-grid');
-    const loadingElement = document.querySelector('#world-stats-container .chart-loading');
+    const loadingElement = document.querySelector('#world-stats-loading');
     const statsWrapper = document.querySelector('#world-stats-container');
     const descriptionElement = document.querySelector('#chartContainer9 .chart-description');
     
@@ -13,10 +13,14 @@
     const autoRefreshInterval = 60000; // Refresh every 1 minute
     let refreshTimer = null;
     
-    // Initialize loading element state
-    loadingElement.style.visibility = 'visible';
-    loadingElement.style.opacity = '1';
-    loadingElement.style.display = 'flex';
+    // Initialize loading element state if it exists
+    if (loadingElement) {
+        loadingElement.style.visibility = 'visible';
+        loadingElement.style.opacity = '1';
+        loadingElement.style.display = 'flex';
+        // Track creation time to ensure minimum display duration
+        loadingElement.dataset.creationTime = Date.now().toString();
+    }
     
     // Log element status for debugging
     if (!statsGrid) {
@@ -33,6 +37,9 @@
     }
 
     console.log('[chartContainer9] DOM elements found, preparing to fetch data...');
+    
+    // Create a variable for the timeout ID in the proper scope
+    let globalTimeoutId = null;
     
     /**
      * Generate dynamic description for world stats based on data
@@ -125,10 +132,15 @@
      * Show error notification when fetch fails
      */
     function showErrorNotification() {
-        // Hide the loading indicator with proper state management
-        loadingElement.style.visibility = 'hidden';
-        loadingElement.style.opacity = '0';
-        loadingElement.style.display = 'none';
+        console.log('[chartContainer9] Showing error notification');
+        
+        // Hide the loading indicator immediately
+        if (loadingElement) {
+            loadingElement.style.visibility = 'hidden';
+            loadingElement.style.opacity = '0';
+            loadingElement.style.display = 'none';
+            loadingElement.style.zIndex = '-1';
+        }
         
         // Show error in the stats grid
         statsGrid.innerHTML = `
@@ -145,13 +157,72 @@
     }
     
     /**
+     * Hide loading indicator safely with more aggressive DOM manipulation to ensure it disappears
+     */
+    function hideLoading() {
+        if (!loadingElement) return;
+        
+        console.log('[chartContainer9] Forcibly hiding loading indicator...');
+        
+        // Calculate how long the loading has been visible
+        const creationTime = parseInt(loadingElement.dataset.creationTime || '0');
+        const currentTime = Date.now();
+        const elapsedTime = currentTime - creationTime;
+        
+        // Ensure loading shows for at least 800ms to avoid flickering
+        const minDisplayTime = 800; 
+        const remainingTime = Math.max(0, minDisplayTime - elapsedTime);
+        
+        setTimeout(() => {
+            // First set of immediate style changes
+            loadingElement.style.visibility = 'hidden';
+            loadingElement.style.opacity = '0';
+            loadingElement.style.zIndex = '-1';
+            
+            // After a transition period, completely remove from display
+            setTimeout(() => {
+                loadingElement.style.display = 'none';
+                
+                // Verify it's actually hidden
+                if (getComputedStyle(loadingElement).display !== 'none') {
+                    console.warn('[chartContainer9] Loading still visible after initial hiding, forcing removal');
+                    
+                    // Force remove with direct parent manipulation
+                    try {
+                        // Clone and replace parent to ensure loading is removed
+                        const statsContainer = document.getElementById('world-stats-container');
+                        if (statsContainer) {
+                            const clone = statsContainer.cloneNode(true);
+                            const loadingInClone = clone.querySelector('#world-stats-loading');
+                            if (loadingInClone) {
+                                loadingInClone.remove();
+                                if (statsContainer.parentNode) {
+                                    statsContainer.parentNode.replaceChild(clone, statsContainer);
+                                    console.log('[chartContainer9] Replaced entire container to force remove loading');
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        console.error('[chartContainer9] Error during forced removal:', e);
+                    }
+                }
+                
+                console.log('[chartContainer9] Loading indicator hidden completely');
+            }, 300);
+        }, remainingTime);
+    }
+    
+    /**
      * Set a timeout to prevent infinite loading
      */
-    const globalTimeoutId = setTimeout(() => {
-        if (loadingElement.style.display !== 'none') {
-            console.warn('[chartContainer9] API request timed out, showing error state');
-            showErrorNotification();
+    globalTimeoutId = setTimeout(() => {
+        console.warn('[chartContainer9] API request timed out, showing error state');
+        // Clear any existing refresh timer to prevent background retries
+        if (refreshTimer) {
+            clearInterval(refreshTimer);
+            refreshTimer = null;
         }
+        showErrorNotification();
     }, 10000); // 10 second timeout
     
     /**
@@ -185,10 +256,13 @@
      */
     async function fetchWorldStats() {
         // Only proceed if loading state is available
-        if (loadingElement.style.visibility === 'hidden') {
+        if (loadingElement) {
             loadingElement.style.visibility = 'visible';
-            loadingElement.style.opacity = '0.3'; // Semi-transparent during refresh
+            loadingElement.style.opacity = '1';
             loadingElement.style.display = 'flex';
+            loadingElement.style.zIndex = '1000'; 
+            // Update creation time for minimum display time calculation
+            loadingElement.dataset.creationTime = Date.now().toString();
         }
         
         console.log('[chartContainer9] Starting API request...');
@@ -309,12 +383,13 @@
             console.log('[chartContainer9] Data processed successfully');
             
             // Clear the global timeout
-            clearTimeout(globalTimeoutId);
+            if (globalTimeoutId) {
+                clearTimeout(globalTimeoutId);
+                globalTimeoutId = null;
+            }
             
             // Hide loading indicator with proper state management
-            loadingElement.style.visibility = 'hidden';
-            loadingElement.style.opacity = '0';
-            loadingElement.style.display = 'none';
+            hideLoading();
             
             // Render the stats
             renderStats(stats);
@@ -326,6 +401,12 @@
             
         } catch (error) {
             console.error('[chartContainer9] Error fetching or processing data:', error);
+            
+            // Clear the global timeout to prevent duplicate error handling
+            if (globalTimeoutId) {
+                clearTimeout(globalTimeoutId);
+                globalTimeoutId = null;
+            }
             
             // Show error notification
             showErrorNotification();

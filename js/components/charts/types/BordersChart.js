@@ -540,6 +540,9 @@ export class BordersChart extends BaseChart {
         this.showLoading();
         
         try {
+            // Clean up existing chart before updating
+            this.cleanupExistingChart();
+            
             // Store border range option
             this.options.borderRange = range;
             
@@ -572,11 +575,6 @@ export class BordersChart extends BaseChart {
                 this.options.title += ' (Fewest First)';
             } else if (this.options.sort === 'desc') {
                 this.options.title += ' (Most First)';
-            }
-            
-            // Update metric type in title if showing density
-            if (this.options.showBorderDensity) {
-                this.options.title = this.options.title.replace('Border Count', 'Border Density');
             }
             
             // Create new chart configuration
@@ -618,6 +616,9 @@ export class BordersChart extends BaseChart {
         this.showLoading();
         
         try {
+            // Clean up existing chart before updating
+            this.cleanupExistingChart();
+            
             // Store highlighting option
             this.options.highlightContinents = highlight;
             
@@ -723,6 +724,9 @@ export class BordersChart extends BaseChart {
         this.showLoading();
         
         try {
+            // Clean up existing chart before updating
+            this.cleanupExistingChart();
+            
             // Store sort option
             this.options.sort = sortOrder;
             
@@ -781,6 +785,9 @@ export class BordersChart extends BaseChart {
         this.showLoading();
         
         try {
+            // Clean up existing chart before updating
+            this.cleanupExistingChart();
+            
             // Store new limit option
             this.options.limit = limit;
             
@@ -1084,6 +1091,12 @@ export class BordersChart extends BaseChart {
      */
     async updateChart() {
         try {
+            // Show loading state
+            this.showLoading();
+            
+            // Clean up existing chart elements before updating
+            this.cleanupExistingChart();
+            
             // Re-process data with current options
             this.processedData = await this.processData(this.rawData);
             

@@ -30,6 +30,10 @@
     transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
     border: 1px solid rgba(230, 232, 236, 0.8);
     overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
 }
 
 .chart-container::before {
@@ -50,6 +54,8 @@
         0 8px 30px rgba(0, 0, 0, 0.08),
         0 12px 24px -10px rgba(0, 0, 0, 0.12),
         inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
 /* Chart detail overlay styles - fixed visibility issues */
@@ -93,6 +99,8 @@
     aspect-ratio: 21/9;
     min-height: clamp(350px, 45vh, 550px);
     background: linear-gradient(145deg, #ffffff, #f0f5ff);
+    z-index: 10; /* Higher z-index to prevent being covered */
+    position: relative;
 }
 
 /* All chart containers should have consistent aspect ratio and sizing */
@@ -148,6 +156,10 @@
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 15px;
     width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
 }
 
 /* Stat card styling */
@@ -175,6 +187,14 @@
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     display: flex;
     flex-direction: column;
+    background: linear-gradient(145deg, var(--card-bg-start, #ffffff) 0%, var(--card-bg-end, #f8f9fa) 100%);
+    border-radius: 10px;
+    padding: 1.25rem;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .stat-card::after {
@@ -195,6 +215,8 @@
         0 6px 12px rgba(0, 0, 0, 0.1);
     transform: translateY(-5px);
     box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
 }
 
 .stat-card-icon {
@@ -234,6 +256,58 @@
     font-size: 0.8rem;
     color: #6c757d;
     margin-top: auto;
+}
+
+.stat-card .card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #343a40;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+}
+
+.stat-card .card-title i {
+    margin-right: 0.5rem;
+    color: var(--card-accent, #0d6efd);
+}
+
+.stat-card .card-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--card-accent, #0d6efd);
+    margin-bottom: 0.5rem;
+}
+
+.stat-card .card-subtitle {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-bottom: 0;
+}
+
+/* Card color variants */
+.stat-card.population {
+    --card-bg-start: #ebf5ff;
+    --card-bg-end: #f5faff;
+    --card-accent: #2b6cb0;
+}
+
+.stat-card.geography {
+    --card-bg-start: #f0fff4;
+    --card-bg-end: #f7fcf9;
+    --card-accent: #2f855a;
+}
+
+.stat-card.economic {
+    --card-bg-start: #fff5f5;
+    --card-bg-end: #fcf8f8;
+    --card-accent: #c53030;
+}
+
+.stat-card.political {
+    --card-bg-start: #faf5ff;
+    --card-bg-end: #fcfaff;
+    --card-accent: #6b46c1;
 }
 
 /* Chart wrapper internal styling - improved for consistent spacing and alignment */
@@ -312,6 +386,13 @@
     pointer-events: none;
     visibility: hidden;
     border-radius: clamp(0.75rem, 1.5vw, 1.25rem);
+    z-index: 1000 !important; /* Ensure loading spinner is above all other content */
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: flex !important;
+    position: absolute !important;
+    inset: 0 !important; /* Cover the entire container */
+    background-color: rgba(255, 255, 255, 0.9) !important;
 }
 
 .loading-spinner {
@@ -517,6 +598,11 @@
         font-size: 0.85rem;
         margin-bottom: 1rem;
     }
+    
+    .chart-container {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
 }
 
 @media screen and (max-width: 640px) {
@@ -671,6 +757,7 @@
 
 .chart-wrapper img.chart-image {
     animation: chartUpdate 0.3s ease-out forwards;
+    margin: 0 auto !important;
 }
 
 /* Last updated indicator styling */
@@ -680,4 +767,52 @@
     margin-top: 0.5rem;
     text-align: right;
     font-style: italic;
+}
+
+/* Improve tooltip visibility */
+.chart-tooltip {
+    background-color: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 0.75rem 1rem;
+    z-index: 100;
+}
+
+/* Fix for the blurred card overlay issue */
+/* When any chart is expanded, other charts should be blurred EXCEPT the world stats */
+.container:has(.chart-container.expanded) .chart-container:not(.expanded):not(#chartContainer9) {
+    filter: blur(4px);
+    pointer-events: none;
+    transform: scale(0.95);
+    opacity: 0.7;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Fix to prevent random blur effects from affecting the world stats card */
+.chart-container.expanded ~ .chart-container:not(#chartContainer9) {
+    opacity: 0.5;
+    transform: scale(0.95);
+    filter: blur(2px);
+}
+
+/* Ensure the world stats card isn't affected by the blur when other cards are expanded */
+#chartContainer9.chart-container {
+    filter: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+}
+
+/* Make sure the chart backdrop doesn't interfere with the world stats card */
+.chart-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 950;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
 }
