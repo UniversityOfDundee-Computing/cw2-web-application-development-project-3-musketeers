@@ -5,26 +5,39 @@
 
 :root {
     /* Color system */
-    --primary-color: #2563eb;
-    --primary-dark: #1d4ed8;
-    --primary-light: #60a5fa;
-    --surface: #ffffff;
-    --background: #f8fafc;
-    --text-primary: #1e293b;
-    --text-secondary: #64748b;
-    --border-color: #e2e8f0;
-    --error-color: #ef4444;
-    --success-color: #22c55e;
+    --primary-color: #89B99A; /* accent color, buttons, graphs, icons */
+    --primary-dark: #877BFB; /* gradient dark side - graphs, buttons */ 
+    --primary-light: #5489EC; /* gradient light side - graphs, buttons */
+    --surface: #F3F3F3; /* background for containers */
+    --background: #FFFFFF; /* background color and for text on dark bg */
+    --text-primary: #23221f; /* title color - button background */
+    --text-secondary: #84868A; /* text color for body and subtitles  */
+    --border-color: #E0E0E0; /* border color */
+    --error-color: #AD4954; /* for errors */
+    --success-color: #89B99A; /* for success */
     --white: #ffffff;
+    --primary-gradient: linear-gradient(to right, var(--primary-dark), var(--primary-light));
+
 
     /* Typography */
-    --font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-family: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
     --font-size-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
     --font-size-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
     --font-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
     --font-size-lg: clamp(1.125rem, 1.1rem + 0.25vw, 1.25rem);
     --font-size-xl: clamp(1.25rem, 1.2rem + 0.25vw, 1.5rem);
     --font-size-2xl: clamp(1.5rem, 1.4rem + 0.5vw, 2rem);
+
+    /* Border radius */
+    --radius-sm: 0.25rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(124, 124, 124, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(84, 84, 84, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(95, 95, 95, 0.1);
     
     /* Line heights */
     --line-height-tight: 1.2;
@@ -38,17 +51,6 @@
     --space-4: clamp(1rem, 0.9rem + 0.5vw, 1.5rem);
     --space-6: clamp(1.5rem, 1.4rem + 0.5vw, 2rem);
     --space-8: clamp(2rem, 1.8rem + 1vw, 3rem);
-
-    /* Border radius */
-    --radius-sm: 0.25rem;
-    --radius-md: 0.375rem;
-    --radius-lg: 0.5rem;
-    --radius-xl: 1rem;
-
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
 
     /* Transitions */
     --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -68,7 +70,7 @@ body {
     font-size: var(--font-size-base);
     line-height: 1.6;
     color: var(--text-color);
-    background-color: var(--background-color);
+    background-color: var(--white);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -82,7 +84,7 @@ main {
 /* Typography */
 h1, h2, h3, h4, h5, h6 {
     margin-bottom: var(--spacing-medium);
-    color: var(--primary-color);
+    color: var(--text-primary);
 }
 
 a {
@@ -96,15 +98,14 @@ a:hover {
 }
 
 /* Button styles */
-/* Button styles */
 button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     padding: var(--space-3) var(--space-6);
-    border: 2px solid var(--primary-color);
+    border: 2px solid var(--border-color);
     border-radius: var(--radius-lg);
-    background-color: var(--primary-color);
+    background-color: var(--primary-gradient);
     color: var(--white);
     font-size: var(--font-size-sm);
     font-weight: 600;
@@ -205,26 +206,26 @@ button.large {
 footer {
     text-align: center;
     padding: var(--spacing-medium);
-    background-color: var(--primary-color);
+    background-color: var(--text-primary);
     color: var(--white);
 }
 
 /* Utility classes */
 /* Container styles */
-.container {
+/* .container {
     width: min(100% - 2rem, 1400px);
     margin-inline: auto;
     padding: var(--spacing-medium);
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
     gap: clamp(1rem, 2vw, 2rem);
-}
+} */
 
 /* Grid container modifiers */
-.container--narrow {
+/* .container--narrow {
     max-width: 1000px;
-}
-
+} */
+/* 
 .container--wide {
     max-width: 1600px;
 }
@@ -235,7 +236,7 @@ footer {
 
 .hidden {
     display: none;
-}
+} */
 
 /* Responsive typography */
 @media (max-width: 768px) {

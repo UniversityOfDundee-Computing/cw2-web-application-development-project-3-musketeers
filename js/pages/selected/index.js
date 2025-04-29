@@ -9,6 +9,151 @@ import { chartService } from '../../services/chartService.js';
 import * as dataProcessing from '../../utils/dataProcessing.js';
 import * as chartUtils from '../../utils/chartUtils.js';
 
+// Get the root styles
+const styles = getComputedStyle(document.documentElement);
+const COLORS = {
+    primary: styles.getPropertyValue('--primary-color').trim(),
+    primaryDark: styles.getPropertyValue('--primary-dark').trim(),
+    primaryLight: styles.getPropertyValue('--primary-light').trim(),
+    textPrimary: styles.getPropertyValue('--text-primary').trim(),
+    textSecondary: styles.getPropertyValue('--text-secondary').trim(),
+};
+
+    function hexToRgba(hex, alpha = 1) {
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    // function generateDarkShades(baseHex, numberOfShades) {
+    //     const hexToHsl = (H) => {
+    //         let r = parseInt(H.slice(1, 3), 16) / 255;
+    //         let g = parseInt(H.slice(3, 5), 16) / 255;
+    //         let b = parseInt(H.slice(5, 7), 16) / 255;
+    
+    //         const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    //         let h, s, l = (max + min) / 2;
+    
+    //         if (max === min) {
+    //             h = s = 0;
+    //         } else {
+    //             const d = max - min;
+    //             s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    //             switch (max) {
+    //                 case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+    //                 case g: h = (b - r) / d + 2; break;
+    //                 case b: h = (r - g) / d + 4; break;
+    //             }
+    //             h /= 6;
+    //         }
+    
+    //         return { h, s, l };
+    //     };
+    
+    //     const hslToHex = ({ h, s, l }) => {
+    //         const hue2rgb = (p, q, t) => {
+    //             if (t < 0) t += 1;
+    //             if (t > 1) t -= 1;
+    //             if (t < 1 / 6) return p + (q - p) * 6 * t;
+    //             if (t < 1 / 2) return q;
+    //             if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+    //             return p;
+    //         };
+    
+    //         let r, g, b;
+    //         if (s === 0) {
+    //             r = g = b = l;
+    //         } else {
+    //             const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    //             const p = 2 * l - q;
+    //             r = hue2rgb(p, q, h + 1 / 3);
+    //             g = hue2rgb(p, q, h);
+    //             b = hue2rgb(p, q, h - 1 / 3);
+    //         }
+    
+    //         const toHex = x => {
+    //             const hex = Math.round(x * 255).toString(16);
+    //             return hex.length === 1 ? '0' + hex : hex;
+    //         };
+    
+    //         return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+    //     };
+    
+    //     const baseHSL = hexToHsl(baseHex);
+    //     const shades = [];
+    
+    //     const step = 0.5 / numberOfShades; // go from base down to darker
+    //     for (let i = 0; i < numberOfShades; i++) {
+    //         const adjustedL = Math.max(0.1, baseHSL.l - (i * step));
+    //         shades.push(hslToHex({ h: baseHSL.h, s: baseHSL.s, l: adjustedL }));
+    //     }
+    
+    //     return shades;
+    // }
+
+    function generateHueVariants(baseHex, numberOfVariants) {
+        const hexToHsl = (hex) => {
+            let r = parseInt(hex.slice(1, 3), 16) / 255;
+            let g = parseInt(hex.slice(3, 5), 16) / 255;
+            let b = parseInt(hex.slice(5, 7), 16) / 255;
+    
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+    
+            if (max === min) {
+                h = s = 0;
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                h /= 6;
+            }
+    
+            return { h, s, l };
+        };
+    
+        const hslToHex = ({ h, s, l }) => {
+            const hue2rgb = (p, q, t) => {
+                if (t < 0) t += 1;
+                if (t > 1) t -= 1;
+                if (t < 1 / 6) return p + (q - p) * 6 * t;
+                if (t < 1 / 2) return q;
+                if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+                return p;
+            };
+    
+            const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+            const p = 2 * l - q;
+            const r = hue2rgb(p, q, h + 1 / 3);
+            const g = hue2rgb(p, q, h);
+            const b = hue2rgb(p, q, h - 1 / 3);
+    
+            const toHex = x => {
+                const hex = Math.round(x * 255).toString(16);
+                return hex.length === 1 ? '0' + hex : hex;
+            };
+    
+            return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+        };
+    
+        const baseHSL = hexToHsl(baseHex);
+        const variants = [];
+    
+        const step = 1 / numberOfVariants;
+        for (let i = 0; i < numberOfVariants; i++) {
+            let newHue = (baseHSL.h + i * step) % 1;
+            variants.push(hslToHex({ h: newHue, s: baseHSL.s, l: baseHSL.l }));
+        }
+    
+        return variants;
+    }
+
+
 class SelectedCountryPage {
     constructor() {
         this.navigation = null;
@@ -180,13 +325,30 @@ class SelectedCountryPage {
 
         const selectedCountries = regionalCountries.slice(start, end);
         const selectedCountryName = this.currentCountry.name.common;
-        const backgroundColors = selectedCountries.map(c => {
-            if (c.name.common === selectedCountryName) {
-                return '#6F88EB'; // Highlight color
-            } else {
-                return '#A5CCB8'; // Default color
-            }
-        });
+        
+            // Background colors based on selection
+        const backgroundColors = selectedCountries.map(c =>
+            c.name.common === selectedCountryName ? hexToRgba(COLORS.primaryLight, 0.75) : COLORS.primary
+        );
+
+        // Define border colors: darker shade for the borders
+        const borderColors = selectedCountries.map(c =>
+            c.name.common === selectedCountryName ? hexToRgba(COLORS.primaryLight, 1) : hexToRgba(COLORS.primary, 1)
+        );
+
+         // Round the borders and apply border width
+        const borderWidths = selectedCountries.map(c =>
+            c.name.common === selectedCountryName ? 3 : 1
+        );
+
+
+        // const backgroundColors = selectedCountries.map(c => {
+        //     if (c.name.common === selectedCountryName) {
+        //         return '#6F88EB'; // Highlight color
+        //     } else {
+        //         return '#A5CCB8'; // Default color
+        //     }
+        // });
 
         const chartConfig = {
             type: 'bar',
@@ -195,7 +357,10 @@ class SelectedCountryPage {
                 datasets: [{
                     label: 'Population',
                     data: selectedCountries.map(c => c.population),
-                    backgroundColor: backgroundColors
+                    backgroundColor: backgroundColors,
+                    borderColor: borderColors,
+                    borderWidth: borderWidths,
+                    borderRadius: 12
                     // backgroundColor: regionalCountries.map(c => 
                     //     c.name.common === this.currentCountry.name.common ? '#ff6384' : '#36a2eb'
                     // )
@@ -206,21 +371,49 @@ class SelectedCountryPage {
                     title: {
                         display: true,
                         text: `Population Comparison - ${this.currentCountry.region}`,
-                        font: { size: 24, weight: 'bold' },
-                        padding: {bottom: 30}
+                        font: {size: 24, family: 'Roboto, sans-serif', weight: 600},
+                        color: COLORS.textPrimary,
+                        padding: {bottom: 24}
+                    },
+                    legend: {
+                        display: false,
+                        labels: {
+                            font: {size: 14, family: 'Roboto, sans-serif'},
+                        }
                     }
                 },
+                // legend: {
+                //     labels: {
+                //         font: {
+                //             family: 'Roboto, sans-serif',  // Use the correct font family
+                //             size: 14,                     // Set font size
+                //             weight: 'normal'              // Optional: Set font weight if you want (e.g., 'bold', 'normal')
+                //         },
+                //         color: COLORS.primaryLight  // Set the color to the desired color (using primaryLight)
+                //     }
+                // },
+                // legend: {
+                //     display: true,
+                //     labels: {
+                //         fontSize: 18,
+                //         fontFamily: 'Roboto, sans-serif'
+                //     }
+                // },
                 scales: {
                     y: {
                         beginAtZero: true,
                         ticks: {
-                            callback: value => dataProcessing.formatNumber(value)
+                            callback: value => dataProcessing.formatNumber(value),
+                            color: COLORS.textSecondary,
+                            font: {size: 14, family: 'Roboto, sans-serif'}
                         }
                     },
                     x: {
                         ticks: {
-                            minRotation: 0, // force no rotation
-                            maxRotation: 0 // force no rotation
+                            // minRotation: 0, // force no rotation
+                            // maxRotation: 0, // force no rotation
+                            color: COLORS.textSecondary,
+                            font: {size: 14, family: 'Roboto, sans-serif'}
                         }
                     }
                 }
@@ -235,7 +428,11 @@ class SelectedCountryPage {
      * Create language distribution chart
      */
     async createLanguageChart() {
-        if (!this.currentCountry.languages) return;
+
+        if (!this.currentCountry.languages) {
+            this.languageChart.innerHTML = '<p>No official languages</p>';
+            return;
+        }
 
         const languages = Object.values(this.currentCountry.languages);
         const languageStats = {};
@@ -256,13 +453,7 @@ class SelectedCountryPage {
                 labels: Object.keys(languageStats),
                 datasets: [{
                     data: Object.values(languageStats),
-                    backgroundColor: [
-                        '#6F88EB',
-                        '#6F88CC',
-                        '#6F88EE',
-                        '#4bc0c0',
-                        '#9966ff'
-                    ]
+                    backgroundColor: generateHueVariants(COLORS.primary, Object.keys(languageStats).length)
                 }]
             },
             options: {
@@ -270,8 +461,15 @@ class SelectedCountryPage {
                     title: {
                         display: true,
                         text: 'Language Distribution',
-                        font: { size: 24, weight: 'bold' },
-                        padding: {bottom: 30}
+                        font: {size: 24, family: 'Roboto, sans-serif', weight: 600},
+                        color: COLORS.textPrimary,
+                        padding: {bottom: 24}
+                    },
+                    legend: {
+                        display: true,
+                        labels: {
+                            font: {size: 14, family: 'Roboto, sans-serif'},
+                        }
                     }
                 }
             }
@@ -405,14 +603,20 @@ class SelectedCountryPage {
         const selectedCountries = regionalCountries.slice(start, end);
         const selectedCountryName = this.currentCountry.name.common;
 
-        // Set background colors (highlight the current country)
-        const backgroundColors = selectedCountries.map(c => {
-            if (c.name.common === selectedCountryName) {
-                return '#6F88EB'; // Highlight the current country
-            } else {
-                return '#A5CCB8'; // Default color for others
-            }
-        });
+        // Background colors based on selection
+        const backgroundColors = selectedCountries.map(c =>
+            c.name.common === selectedCountryName ? hexToRgba(COLORS.primaryLight, 0.75) : COLORS.primary
+        );
+
+        // Define border colors: darker shade for the borders
+        const borderColors = selectedCountries.map(c =>
+            c.name.common === selectedCountryName ? hexToRgba(COLORS.primaryLight, 1) : hexToRgba(COLORS.primary, 1)
+        );
+
+         // Round the borders and apply border width
+        const borderWidths = selectedCountries.map(c =>
+            c.name.common === selectedCountryName ? 3 : 1
+        );
 
         // Create the chart configuration for horizontal bars
         const chartConfig = {
@@ -422,7 +626,10 @@ class SelectedCountryPage {
                 datasets: [{
                     label: 'Country Area (in km²)', // Label for the dataset
                     data: selectedCountries.map(c => c.area), // Data for country area
-                    backgroundColor: backgroundColors
+                    backgroundColor: backgroundColors,
+                    borderColor: borderColors,
+                    borderWidth: borderWidths,
+                    borderRadius: 8
                 }]
             },
             options: {
@@ -430,22 +637,33 @@ class SelectedCountryPage {
                 plugins: {
                     title: {
                         display: true,
-                        text: `Area Comparison - ${this.currentCountry.region}`, // Dynamic chart title
-                        font: { size: 24, weight: 'bold' },
-                        padding: {bottom: 30}
-                    }
+                        text: `Area Comparison - ${this.currentCountry.region} (km²)`, // Dynamic chart title
+                        font: {size: 24, family: 'Roboto, sans-serif', weight: 600},
+                        color: COLORS.textPrimary,
+                        padding: {bottom: 24}
+                    },
+                    legend: {
+                        display: false,
+                        labels: {
+                            font: {size: 14, family: 'Roboto, sans-serif'},
+                        }
+                    },
                 },
                 scales: {
                     x: {
                         beginAtZero: true, // Ensure the x-axis starts at zero
                         ticks: {
-                            callback: value => value.toLocaleString() + ' km²' // Format area with commas
+                            // minRotation: 0, // force no rotation
+                            // maxRotation: 0, // force no rotation
+                            color: COLORS.textSecondary,
+                            font: {size: 14, family: 'Roboto, sans-serif'}
                         }
                     },
                     y: {
                         ticks: {
-                            minRotation: 0, // Ensure no rotation on the y-axis labels
-                            maxRotation: 0 // Ensure no rotation on the y-axis labels
+                            callback: value => dataProcessing.formatNumber(value),
+                            color: COLORS.textSecondary,
+                            font: {size: 14, family: 'Roboto, sans-serif'}
                         }
                     }
                 }
@@ -456,7 +674,6 @@ class SelectedCountryPage {
         const chartUrl = chartService.createChartUrl(chartConfig);
         chartUtils.displayChart('areaChart', chartUrl, 'Area comparison');
     }
-
 
 
     /**
