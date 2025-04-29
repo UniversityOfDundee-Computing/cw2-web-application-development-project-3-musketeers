@@ -16,7 +16,7 @@ export class IndependenceChart extends BaseChart {
         super(containerId, {
             title: 'Independent vs Non-Independent States',
             type: 'pie',
-            colorScheme: 'default',
+            chartType: 'independence', // Add chart type identifier for dynamic descriptions
             ...options
         });
     }

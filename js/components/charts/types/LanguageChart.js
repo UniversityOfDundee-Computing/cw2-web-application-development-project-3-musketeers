@@ -18,6 +18,7 @@ export class LanguageChart extends BaseChart {
             type: 'bar',
             colorScheme: 'default',
             limit: 5,
+            chartType: 'language', // Add chart type identifier for dynamic descriptions
             ...options
         });
     }

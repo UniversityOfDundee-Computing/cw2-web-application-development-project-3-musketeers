@@ -17,6 +17,7 @@ export class ContinentChart extends BaseChart {
             title: 'World Population by Continent',
             type: 'doughnut',
             colorScheme: 'default',
+            chartType: 'continent', // Add chart type identifier for dynamic descriptions
             ...options
         });
     }

@@ -18,6 +18,7 @@ export class TimezoneChart extends BaseChart {
             type: 'bar', // Changed from line to bar for more reliable rendering
             colorScheme: 'blue',
             limit: 5,
+            chartType: 'timezone', // Add chart type identifier for dynamic descriptions
             ...options
         });
     }

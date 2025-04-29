@@ -103,6 +103,7 @@ export function displayChart(containerId, chartUrl, altText) {
          }
     }
 
+    // Display the chart without overwriting other content in the wrapper
     displayChartContent(wrapper, chartUrl, altText);
 }
 
@@ -120,22 +121,47 @@ function displayChartContent(targetElement, chartUrl, altText) {
 
     img.onload = () => {
         console.log(`[${containerId}] Image loaded successfully.`);
-        // Clear only the target element's content before adding the image
-        targetElement.innerHTML = ''; 
+        
+        // Instead of clearing the entire targetElement's content, only replace the chart image if it exists
+        // This preserves the dynamic descriptions that have been added
+        const existingImage = targetElement.querySelector('.chart-image');
+        if (existingImage) {
+            existingImage.remove();
+        }
+        
+        // Append the new image to the target element
         targetElement.appendChild(img);
         console.log(`[${containerId}] Image appended to target element.`);
     };
 
     img.onerror = () => {
         console.error(`[${containerId}] Failed to load image from URL:`, chartUrl);
-        // Display error inside the target element
-        targetElement.innerHTML = `
-            <div class="chart-error" style="position: relative; inset: auto; animation: none; opacity: 1;"> 
-                <p>Error: Failed to load chart image.</p>
-                <p style="word-break: break-all;">URL: <a href="${chartUrl}" target="_blank" rel="noopener noreferrer">View Chart URL</a></p>
-                <button onclick="location.reload()">Retry</button>
-            </div>
+        
+        // Create error element
+        const errorElement = document.createElement('div');
+        errorElement.className = 'chart-error';
+        errorElement.style.position = 'relative';
+        errorElement.style.inset = 'auto';
+        errorElement.style.animation = 'none';
+        errorElement.style.opacity = '1';
+        errorElement.innerHTML = `
+            <p>Error: Failed to load chart image.</p>
+            <p style="word-break: break-all;">URL: <a href="${chartUrl}" target="_blank" rel="noopener noreferrer">View Chart URL</a></p>
+            <button onclick="location.reload()">Retry</button>
         `;
+        
+        // Find and remove any existing error message or image
+        const existingError = targetElement.querySelector('.chart-error');
+        if (existingError) {
+            existingError.remove();
+        }
+        const existingImage = targetElement.querySelector('.chart-image');
+        if (existingImage) {
+            existingImage.remove();
+        }
+        
+        // Append the error element
+        targetElement.appendChild(errorElement);
         console.log(`[${containerId}] Error message displayed in target element.`);
     };
 

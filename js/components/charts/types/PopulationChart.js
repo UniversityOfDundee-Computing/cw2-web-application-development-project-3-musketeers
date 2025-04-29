@@ -18,6 +18,7 @@ export class PopulationChart extends BaseChart {
             type: 'bar',
             colorScheme: 'default',
             limit: 5,
+            chartType: 'population', // Add chart type identifier for dynamic descriptions
             ...options
         });
     }

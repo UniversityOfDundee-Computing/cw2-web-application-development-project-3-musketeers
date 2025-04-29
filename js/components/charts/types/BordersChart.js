@@ -18,6 +18,7 @@ export class BordersChart extends BaseChart {
             type: 'bar',
             colorScheme: 'default',
             limit: 5,
+            chartType: 'borders', // Add chart type identifier for dynamic descriptions
             ...options
         });
     }

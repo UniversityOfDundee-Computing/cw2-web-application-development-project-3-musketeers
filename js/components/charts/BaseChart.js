@@ -17,6 +17,9 @@ export class BaseChart {
         this.containerId = containerId;
         this.options = options;
         this.container = document.getElementById(containerId);
+        this.chartType = options.chartType || 'default';
+        this.autoRefreshInterval = options.autoRefreshInterval || 60000; // Default to 1 minute
+        this.refreshTimer = null;
         
         if (!this.container) {
             throw new Error(`Container element with ID '${containerId}' not found`);
@@ -68,12 +71,22 @@ export class BaseChart {
             }
             console.log(`[${this.containerId}] Chart config validated.`);
 
-            // 4. Second API Call: Generate chart URL
+            // 4. Generate dynamic descriptions based on the processed data
+            console.log(`[${this.containerId}] Generating dynamic descriptions...`);
+            const descriptions = this.generateDescriptions(processedData);
+            console.log(`[${this.containerId}] Descriptions generated:`, descriptions);
+
+            // 5. Update chart descriptions in the DOM before displaying the chart
+            console.log(`[${this.containerId}] Updating chart descriptions...`);
+            this.updateChartDescriptions(descriptions);
+            console.log(`[${this.containerId}] Chart descriptions updated.`);
+
+            // 6. Second API Call: Generate chart URL
             console.log(`[${this.containerId}] Generating chart URL...`);
             const chartUrl = chartService.createChartUrl(chartConfig);
             console.log(`[${this.containerId}] Chart URL generated:`, chartUrl);
-
-            // 5. Display the chart
+            
+            // 7. Display the chart
             console.log(`[${this.containerId}] Displaying chart...`);
             chartUtils.displayChart(
                 this.containerId,
@@ -81,10 +94,72 @@ export class BaseChart {
                 this.options.title || 'Chart'
             );
             console.log(`[${this.containerId}] Chart display initiated.`);
+            
+            // 8. Set up auto-refresh for live updates
+            this.setupAutoRefresh();
 
         } catch (error) {
             console.error(`[${this.containerId}] Error initializing chart:`, error);
             chartUtils.displayChartError(this.containerId, `Failed to load chart: ${error.message}`);
+        }
+    }
+    
+    /**
+     * Set up auto-refresh for live updates of chart data and descriptions
+     */
+    setupAutoRefresh() {
+        // Clear any existing timer
+        if (this.refreshTimer) {
+            clearInterval(this.refreshTimer);
+        }
+        
+        // Set up a new timer to periodically refresh the chart
+        this.refreshTimer = setInterval(async () => {
+            console.log(`[${this.containerId}] Auto-refreshing chart data...`);
+            try {
+                // Fetch fresh data
+                const freshData = await this.fetchData();
+                
+                // Process the data
+                const processedData = await this.processData(freshData);
+                
+                // Generate new descriptions
+                const descriptions = this.generateDescriptions(processedData);
+                
+                // Update descriptions in the DOM
+                this.updateChartDescriptions(descriptions);
+                
+                console.log(`[${this.containerId}] Chart descriptions auto-refreshed.`);
+                
+                // Create new chart configuration and update the chart if needed
+                const chartConfig = this.createChartConfig(processedData);
+                const chartUrl = chartService.createChartUrl(chartConfig);
+                
+                // Update the chart image
+                chartUtils.displayChart(
+                    this.containerId,
+                    chartUrl,
+                    this.options.title || 'Chart'
+                );
+                
+            } catch (error) {
+                console.error(`[${this.containerId}] Error during auto-refresh:`, error);
+                // Don't show error to user, just log it - auto-refresh should be non-intrusive
+            }
+        }, this.autoRefreshInterval);
+        
+        console.log(`[${this.containerId}] Auto-refresh set up with interval of ${this.autoRefreshInterval}ms`);
+    }
+    
+    /**
+     * Clean up resources when the chart is no longer needed
+     */
+    destroy() {
+        // Clear auto-refresh timer
+        if (this.refreshTimer) {
+            clearInterval(this.refreshTimer);
+            this.refreshTimer = null;
+            console.log(`[${this.containerId}] Auto-refresh timer cleared.`);
         }
     }
 
@@ -115,6 +190,85 @@ export class BaseChart {
      */
     createChartConfig(data) {
         throw new Error('createChartConfig method must be implemented by child class');
+    }
+    
+    /**
+     * Generate dynamic descriptions based on the chart data
+     * @param {Object} data - Processed chart data
+     * @returns {Object} Object containing various description elements
+     */
+    generateDescriptions(data) {
+        // Default implementation uses the dataProcessing utility
+        return dataProcessing.generateChartDescription(this.chartType, data, this.options);
+    }
+    
+    /**
+     * Update chart descriptions in the DOM
+     * @param {Object} descriptions - Description object with various text elements
+     */
+    updateChartDescriptions(descriptions) {
+        const container = document.getElementById(this.containerId);
+        if (!container) return;
+        
+        // Update basic description
+        const descElem = container.querySelector('.chart-description');
+        if (descElem && descriptions.short) {
+            descElem.textContent = descriptions.short;
+        }
+        
+        // Update detailed analysis
+        const analysisElem = container.querySelector('.chart-detail-analysis');
+        if (analysisElem) {
+            // Update heading
+            const heading = analysisElem.querySelector('h4');
+            if (heading) {
+                heading.textContent = `${this.options.title || 'Chart'} Analysis`;
+            }
+            
+            // Update full description
+            const fullDesc = analysisElem.querySelector('p');
+            if (fullDesc && descriptions.full) {
+                fullDesc.textContent = descriptions.full;
+            }
+            
+            // Update insights
+            const insightsList = analysisElem.querySelector('.analysis-data ul');
+            if (insightsList && descriptions.insights && Array.isArray(descriptions.insights)) {
+                insightsList.innerHTML = '';
+                descriptions.insights.forEach(insight => {
+                    const li = document.createElement('li');
+                    li.textContent = insight;
+                    insightsList.appendChild(li);
+                });
+            }
+            
+            // Update related metrics
+            const relatedMetrics = analysisElem.querySelector('.analysis-data p:not(:first-child)');
+            if (relatedMetrics && descriptions.relatedMetrics) {
+                relatedMetrics.textContent = descriptions.relatedMetrics;
+            }
+            
+            // Update source
+            const source = analysisElem.querySelector('.data-source');
+            if (source && descriptions.source) {
+                source.textContent = `Data sources: ${descriptions.source}`;
+            }
+        }
+        
+        // Update hover overlay
+        const overlayElem = container.querySelector('.chart-detail-overlay');
+        if (overlayElem) {
+            const overlayDesc = overlayElem.querySelector('p');
+            if (overlayDesc && descriptions.full) {
+                overlayDesc.textContent = descriptions.full;
+            }
+        }
+        
+        // Remove any existing last-updated timestamp
+        const existingTimestamp = container.querySelector('.last-updated');
+        if (existingTimestamp) {
+            existingTimestamp.remove();
+        }
     }
 
     /**
@@ -164,6 +318,12 @@ export class BaseChart {
             const processedData = await this.processData(newData);
             const chartConfig = this.createChartConfig(processedData);
             const chartUrl = chartService.createChartUrl(chartConfig);
+            
+            // Generate new descriptions
+            const descriptions = this.generateDescriptions(processedData);
+            
+            // Update descriptions in the DOM
+            this.updateChartDescriptions(descriptions);
             
             chartUtils.displayChart(
                 this.containerId,

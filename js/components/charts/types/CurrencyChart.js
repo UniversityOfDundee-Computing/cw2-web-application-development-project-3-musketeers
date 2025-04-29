@@ -18,6 +18,7 @@ export class CurrencyChart extends BaseChart {
             type: 'radar',
             colorScheme: 'blue',
             limit: 5,
+            chartType: 'currency', // Add chart type identifier for dynamic descriptions
             ...options
         });
     }

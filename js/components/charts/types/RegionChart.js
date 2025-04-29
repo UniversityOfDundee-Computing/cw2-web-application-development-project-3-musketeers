@@ -15,8 +15,9 @@ export class RegionChart extends BaseChart {
     constructor(containerId, options = {}) {
         super(containerId, {
             title: 'Number of Countries per Region',
-            type: 'bar',
-            colorScheme: 'default',
+            type: 'polarArea',
+            limit: 10,
+            chartType: 'region', // Add chart type identifier for dynamic descriptions
             ...options
         });
     }
