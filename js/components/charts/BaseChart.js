@@ -49,9 +49,18 @@ export class BaseChart {
     async initialize() {
         console.log(`[${this.containerId}] Initializing chart...`);
         try {
-            // Show loading state
-            console.log(`[${this.containerId}] Displaying loading state.`);
-            chartUtils.displayChartLoading(this.containerId);
+            // Check if loading indicator already exists in the HTML
+            const container = document.getElementById(this.containerId);
+            const wrapper = container.querySelector('.chart-wrapper');
+            const existingLoadingIndicator = container.querySelector('.chart-loading') || (wrapper && wrapper.querySelector('.chart-loading'));
+            
+            if (!existingLoadingIndicator) {
+                // Only show loading state if not already present in the HTML
+                console.log(`[${this.containerId}] Displaying loading state.`);
+                chartUtils.displayChartLoading(this.containerId);
+            } else {
+                console.log(`[${this.containerId}] Using existing loading indicator in HTML.`);
+            }
 
             // 1. First API Call: Fetch country data
             console.log(`[${this.containerId}] Fetching data...`);
@@ -322,13 +331,24 @@ export class BaseChart {
         if (this.supportedChartTypes.includes(newType)) {
             console.log(`[${this.containerId}] Changing chart type to ${newType}...`);
             
-            // Show loading overlay
-            chartUtils.displayChartLoading(this.containerId);
+            // First remove existing images so loading indicator is visible
+            const container = document.getElementById(this.containerId);
+            const wrapper = container.querySelector('.chart-wrapper');
+            const images = wrapper ? wrapper.querySelectorAll('.chart-image') : [];
+            
+            // Remove images immediately to prevent them from covering the loading indicator
+            images.forEach(img => img.remove());
+                
+            // Show loading overlay with clear visibility
+            chartUtils.displayChartLoading(this.containerId, `Switching to ${newType} chart...`);
             
             // Update options
             this.options.type = newType;
             
             try {
+                // Add a small delay to ensure the loading animation is visible
+                await new Promise(resolve => setTimeout(resolve, 150));
+                
                 // Store the original title to preserve it after chart type change
                 const originalTitle = this.options.title;
                 
@@ -354,7 +374,7 @@ export class BaseChart {
                 // Generate chart URL
                 const chartUrl = chartService.createChartUrl(chartConfig);
                 
-                // Update the chart
+                // Update the chart - loading indicator will be hidden after image loads
                 chartUtils.displayChart(
                     this.containerId,
                     chartUrl,
@@ -441,13 +461,24 @@ export class BaseChart {
         if (!isNaN(limit) && limit > 0) {
             console.log(`[${this.containerId}] Changing data limit to ${limit}...`);
             
-            // Show loading overlay
-            chartUtils.displayChartLoading(this.containerId);
+            // First remove existing images so loading indicator is visible
+            const container = document.getElementById(this.containerId);
+            const wrapper = container.querySelector('.chart-wrapper');
+            const images = wrapper ? wrapper.querySelectorAll('.chart-image') : [];
+            
+            // Remove images immediately to prevent them from covering the loading indicator
+            images.forEach(img => img.remove());
+            
+            // Show loading overlay with clear visibility
+            chartUtils.displayChartLoading(this.containerId, `Updating to show ${limit} items...`);
             
             // Update options
             this.options.limit = limit;
             
             try {
+                // Add a small delay to ensure the loading animation is visible
+                await new Promise(resolve => setTimeout(resolve, 150));
+                
                 // Re-process data with new limit
                 this.processedData = await this.processData(this.rawData);
                 
@@ -460,7 +491,7 @@ export class BaseChart {
                 // Generate chart URL
                 const chartUrl = chartService.createChartUrl(chartConfig);
                 
-                // Update the chart
+                // Update the chart - loading indicator will be hidden after image loads
                 chartUtils.displayChart(
                     this.containerId,
                     chartUrl,
@@ -544,13 +575,24 @@ export class BaseChart {
         if (['asc', 'desc'].includes(sortOrder)) {
             console.log(`[${this.containerId}] Changing sort order to ${sortOrder}...`);
             
-            // Show loading overlay
-            chartUtils.displayChartLoading(this.containerId);
+            // First remove existing images so loading indicator is visible
+            const container = document.getElementById(this.containerId);
+            const wrapper = container.querySelector('.chart-wrapper');
+            const images = wrapper ? wrapper.querySelectorAll('.chart-image') : [];
+            
+            // Remove images immediately to prevent them from covering the loading indicator
+            images.forEach(img => img.remove());
+            
+            // Show loading overlay with clear visibility
+            chartUtils.displayChartLoading(this.containerId, `Sorting data ${sortOrder === 'asc' ? 'lowest to highest' : 'highest to lowest'}...`);
             
             // Update options
             this.options.sort = sortOrder;
             
             try {
+                // Add a small delay to ensure the loading animation is visible
+                await new Promise(resolve => setTimeout(resolve, 150));
+                
                 // Re-process data with new sort order
                 if (this.rawData) {
                     this.processedData = await this.processData(this.rawData);
@@ -568,7 +610,7 @@ export class BaseChart {
                 // Generate chart URL
                 const chartUrl = chartService.createChartUrl(chartConfig);
                 
-                // Update the chart
+                // Update the chart - loading indicator will be hidden after image loads
                 chartUtils.displayChart(
                     this.containerId,
                     chartUrl,
@@ -1441,6 +1483,73 @@ export class BaseChart {
     }
 
     /**
+     * Clean up existing chart elements to prevent stacking
+     * This should be called before rendering a new chart
+     */
+    cleanupExistingChart() {
+        console.log(`[${this.containerId}] Cleaning up existing chart elements...`);
+        
+        if (!this.container) {
+            console.error(`[${this.containerId}] Container not found during cleanup`);
+            return;
+        }
+        
+        // Find the chart wrapper
+        const chartWrapper = this.container.querySelector('.chart-wrapper');
+        if (!chartWrapper) {
+            console.error(`[${this.containerId}] Chart wrapper not found during cleanup`);
+            return;
+        }
+        
+        // Remove any existing chart images with a fade-out effect
+        const existingImages = chartWrapper.querySelectorAll('.chart-image');
+        if (existingImages.length > 0) {
+            console.log(`[${this.containerId}] Removing ${existingImages.length} existing chart images`);
+            existingImages.forEach(image => {
+                // Apply fade-out transition
+                image.style.transition = 'opacity 0.3s ease';
+                image.style.opacity = '0';
+                
+                // Remove after transition completes
+                setTimeout(() => {
+                    if (image.parentNode) {
+                        image.parentNode.removeChild(image);
+                    }
+                }, 300);
+            });
+        }
+        
+        // Remove any existing error messages
+        const existingErrors = chartWrapper.querySelectorAll('.chart-error');
+        if (existingErrors.length > 0) {
+            console.log(`[${this.containerId}] Removing ${existingErrors.length} existing error messages`);
+            existingErrors.forEach(error => {
+                error.remove();
+            });
+        }
+        
+        // Remove any existing loading indicators
+        const existingLoading = chartWrapper.querySelectorAll('.chart-loading');
+        if (existingLoading.length > 0) {
+            console.log(`[${this.containerId}] Removing ${existingLoading.length} existing loading indicators`);
+            existingLoading.forEach(loading => {
+                loading.remove();
+            });
+        }
+        
+        // If we have a chart instance, properly dispose of it
+        if (this.chartInstance) {
+            console.log(`[${this.containerId}] Destroying chart instance`);
+            if (typeof this.chartInstance.destroy === 'function') {
+                this.chartInstance.destroy();
+            }
+            this.chartInstance = null;
+        }
+        
+        console.log(`[${this.containerId}] Chart cleanup completed`);
+    }
+
+    /**
      * Set a timer that will be automatically cleared when the chart is destroyed
      * @param {function} callback Function to execute
      * @param {number} delay Delay in milliseconds
@@ -1457,6 +1566,95 @@ export class BaseChart {
      */
     clearTimers() {
         this.timers.forEach(timerId => clearTimeout(timerId));
+        this.timers = [];
+    }
+
+    /**
+     * Show a loading animation over the chart
+     * @param {string} [message] Optional loading message
+     */
+    showLoading(message = 'Loading chart...') {
+        if (!this.container) return;
+        
+        console.log(`[${this.containerId}] Showing loading animation`);
+        this.isLoading = true;
+        
+        // Use the chartUtils method to show loading
+        chartUtils.displayChartLoading(this.containerId, message);
+    }
+    
+    /**
+     * Hide loading animation
+     */
+    hideLoading() {
+        if (!this.container) return;
+        
+        console.log(`[${this.containerId}] Hiding loading animation`);
+        this.isLoading = false;
+        
+        // Use the improved helper function from chartUtils
+        chartUtils.hideLoadingIndicator(this.containerId);
+    }
+    
+    /**
+     * Show an error message
+     * @param {string} message Error message to display
+     */
+    showError(message) {
+        if (!this.container) return;
+        
+        console.error(`[${this.containerId}] Chart error: ${message}`);
+        
+        // Use the chartUtils method to show an error
+        chartUtils.displayChartError(this.containerId, message);
+    }
+    
+    /**
+     * Clean up existing chart resources to prepare for update
+     * This should be called before updating a chart to prevent memory leaks
+     */
+    cleanupExistingChart() {
+        // Remove any existing chart instance
+        if (this.chartInstance) {
+            console.log(`[${this.containerId}] Destroying existing chart instance`);
+            this.chartInstance.destroy();
+            this.chartInstance = null;
+        }
+        
+        // Remove any existing chart images
+        const chartImages = this.container.querySelectorAll('.chart-image');
+        if (chartImages.length > 0) {
+            console.log(`[${this.containerId}] Removing ${chartImages.length} chart images`);
+            chartImages.forEach(img => {
+                img.style.transition = 'opacity 0.2s ease-out';
+                img.style.opacity = '0';
+                
+                setTimeout(() => {
+                    if (img.parentNode) {
+                        img.parentNode.removeChild(img);
+                    }
+                }, 200);
+            });
+        }
+        
+        // Clear any associated timers
+        this.clearTimers();
+    }
+    
+    /**
+     * Clear all timers associated with this chart
+     */
+    clearTimers() {
+        // Clear refresh timer
+        if (this.refreshTimer) {
+            clearInterval(this.refreshTimer);
+            this.refreshTimer = null;
+        }
+        
+        // Clear any other saved timers
+        this.timers.forEach(timerId => {
+            clearTimeout(timerId);
+        });
         this.timers = [];
     }
 }

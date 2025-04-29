@@ -89,22 +89,59 @@ export function displayChart(containerId, chartUrl, altText) {
         return;
     }
 
-    // Find and remove any existing loading indicator inside the wrapper
-    const existingLoading = wrapper.querySelector('.chart-loading');
-    if (existingLoading) {
-        console.log(`[${containerId}] Removing existing loading indicator from wrapper.`);
-        existingLoading.remove();
-    } else {
-         // Also check in container just in case structure was already modified
-         const containerLoading = container.querySelector('.chart-loading');
-         if (containerLoading) {
-            console.log(`[${containerId}] Removing existing loading indicator from container.`);
-            containerLoading.remove();
-         }
-    }
+    // DO NOT hide loading here - moved to image.onload in displayChartContent
+    // Let the loading indicator remain visible until the image loads
 
     // Display the chart without overwriting other content in the wrapper
     displayChartContent(wrapper, chartUrl, altText);
+}
+
+/**
+ * Hide loading indicator by properly removing it from the DOM
+ * @param {string} containerId The ID of the container element
+ * @param {boolean} [animate=true] Whether to animate the removal
+ * @param {number} [minDisplayTime=800] Minimum time in ms the loading indicator should be shown
+ */
+export function hideLoadingIndicator(containerId, animate = true, minDisplayTime = 800) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    // Check both in wrapper and container
+    const wrapper = container.querySelector('.chart-wrapper');
+    const targetElements = [wrapper, container].filter(Boolean);
+    
+    targetElements.forEach(element => {
+        const loadingEl = element.querySelector('.chart-loading');
+        if (loadingEl) {
+            // Store when the loading indicator was created/shown
+            const creationTime = parseInt(loadingEl.dataset.creationTime || '0');
+            const currentTime = Date.now();
+            const elapsedTime = currentTime - creationTime;
+            
+            // Calculate remaining time to ensure minimum display duration
+            const remainingTime = Math.max(0, minDisplayTime - elapsedTime);
+            
+            setTimeout(() => {
+                if (animate) {
+                    // Fade out animation with improved timing
+                    loadingEl.style.transition = 'opacity 0.5s cubic-bezier(0.23, 1, 0.32, 1)';
+                    loadingEl.style.opacity = '0';
+                    
+                    // Remove after transition completes
+                    setTimeout(() => {
+                        if (loadingEl.parentNode) {
+                            loadingEl.parentNode.removeChild(loadingEl);
+                        }
+                    }, 500); // Match the transition duration
+                } else {
+                    // Remove immediately without animation
+                    if (loadingEl.parentNode) {
+                        loadingEl.parentNode.removeChild(loadingEl);
+                    }
+                }
+            }, remainingTime);
+        }
+    });
 }
 
 /**
@@ -117,136 +154,186 @@ function displayChartContent(targetElement, chartUrl, altText) {
     const containerId = targetElement.closest('.chart-container')?.id || 'unknown-container';
     console.log(`[${containerId}] Creating image element for target:`, targetElement.tagName, targetElement.className);
     
-    // First, remove any existing chart images before even starting to load the new one
+    // First, fade out any existing chart images before removing them
     const existingImages = targetElement.querySelectorAll('.chart-image');
     if (existingImages.length > 0) {
-        console.log(`[${containerId}] Found ${existingImages.length} existing chart images to remove.`);
-        existingImages.forEach(existingImage => {
-            existingImage.remove();
+        console.log(`[${containerId}] Found ${existingImages.length} existing chart images to clean up.`);
+        
+        // Create a promise that resolves when all images have faded out or after a timeout
+        const fadeOutPromise = new Promise((resolve) => {
+            let imagesRemaining = existingImages.length;
+            
+            // Set a maximum timeout in case transitions fail
+            const timeoutId = setTimeout(() => {
+                console.log(`[${containerId}] Fade-out timeout reached, proceeding with cleanup.`);
+                resolve();
+            }, 300); // 300ms matches our CSS transition time
+            
+            existingImages.forEach(image => {
+                // Start fade-out animation
+                image.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
+                image.style.opacity = '0';
+                image.style.transform = 'scale(0.96)';
+                
+                // Listen for transition end and remove the image
+                image.addEventListener('transitionend', function handleTransitionEnd() {
+                    image.removeEventListener('transitionend', handleTransitionEnd);
+                    imagesRemaining--;
+                    
+                    if (imagesRemaining === 0) {
+                        clearTimeout(timeoutId);
+                        resolve();
+                    }
+                });
+            });
+        });
+        
+        // After fade-out, remove images and continue loading the new one
+        fadeOutPromise.then(() => {
+            existingImages.forEach(image => {
+                image.remove();
+            });
+            loadAndDisplayNewImage();
+        });
+    } else {
+        // No existing images to clean up, proceed directly
+        loadAndDisplayNewImage();
+    }
+    
+    // Clean up any existing error messages
+    const existingErrors = targetElement.querySelectorAll('.chart-error');
+    if (existingErrors.length > 0) {
+        existingErrors.forEach(error => {
+            error.remove();
         });
     }
     
-    // Create the new image element
-    const img = new Image();
+    function loadAndDisplayNewImage() {
+        // Create the new image element
+        const img = new Image();
 
-    img.onload = () => {
-        console.log(`[${containerId}] Image loaded successfully.`);
-        
-        // Double-check for any remaining chart images (in case more were added during loading)
-        const remainingImages = targetElement.querySelectorAll('.chart-image');
-        if (remainingImages.length > 0) {
-            console.log(`[${containerId}] Found ${remainingImages.length} remaining chart images to remove.`);
-            remainingImages.forEach(existingImage => {
+        img.onload = () => {
+            console.log(`[${containerId}] Image loaded successfully.`);
+            
+            // Double-check for any remaining chart images (in case more were added during loading)
+            const remainingImages = targetElement.querySelectorAll('.chart-image');
+            if (remainingImages.length > 0) {
+                console.log(`[${containerId}] Found ${remainingImages.length} remaining chart images to remove.`);
+                remainingImages.forEach(existingImage => {
+                    existingImage.remove();
+                });
+            }
+            
+            // Preserve chart controls if they exist
+            const chartControls = targetElement.querySelector('.chart-controls');
+            let controlsNode = null;
+            if (chartControls) {
+                controlsNode = chartControls.cloneNode(true);
+                if (chartControls.parentNode === targetElement) {
+                    chartControls.remove();
+                }
+            }
+            
+            // Preserve chart title and descriptions if they exist
+            const chartTitle = targetElement.querySelector('.chart-title');
+            const chartDescription = targetElement.querySelector('.chart-description');
+            let titleNode = null;
+            let descriptionNode = null;
+            
+            if (chartTitle) {
+                titleNode = chartTitle.cloneNode(true);
+                if (chartTitle.parentNode === targetElement) {
+                    chartTitle.remove();
+                }
+            }
+            
+            if (chartDescription) {
+                descriptionNode = chartDescription.cloneNode(true);
+                if (chartDescription.parentNode === targetElement) {
+                    chartDescription.remove();
+                }
+            }
+            
+            // Append the new image to the target element with animation
+            img.style.opacity = '0';
+            img.style.transform = 'scale(0.96)';
+            
+            // Re-add controls, title, and descriptions in the correct order
+            if (controlsNode) {
+                targetElement.appendChild(controlsNode);
+            }
+            
+            if (titleNode) {
+                targetElement.appendChild(titleNode);
+            }
+            
+            if (descriptionNode) {
+                targetElement.appendChild(descriptionNode);
+            }
+            
+            targetElement.appendChild(img);
+            
+            // Trigger reflow to enable animation
+            img.offsetHeight;
+            
+            // Animate in the new image
+            img.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
+            img.style.opacity = '1';
+            img.style.transform = 'scale(1)';
+            
+            console.log(`[${containerId}] Image appended to target element.`);
+            
+            // Remove existing timestamp if present
+            const existingTimestamp = targetElement.querySelector('.chart-last-updated');
+            if (existingTimestamp) {
+                existingTimestamp.remove();
+            }
+
+            // Hide loading indicator after image is fully loaded
+            hideLoadingIndicator(containerId);
+        };
+
+        img.onerror = () => {
+            console.error(`[${containerId}] Failed to load image from URL:`, chartUrl);
+            
+            // Create error element
+            const errorElement = document.createElement('div');
+            errorElement.className = 'chart-error';
+            errorElement.style.position = 'relative';
+            errorElement.style.inset = 'auto';
+            errorElement.style.animation = 'none';
+            errorElement.style.opacity = '1';
+            errorElement.innerHTML = `
+                <p>Error: Failed to load chart image.</p>
+                <p style="word-break: break-all;">URL: <a href="${chartUrl}" target="_blank" rel="noopener noreferrer">View Chart URL</a></p>
+                <button onclick="location.reload()">Retry</button>
+            `;
+            
+            // Find and remove any existing error message or image
+            const existingError = targetElement.querySelector('.chart-error');
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            // Remove all existing chart images
+            const existingImages = targetElement.querySelectorAll('.chart-image');
+            existingImages.forEach(existingImage => {
                 existingImage.remove();
             });
-        }
-        
-        // Preserve chart controls if they exist
-        const chartControls = targetElement.querySelector('.chart-controls');
-        let controlsNode = null;
-        if (chartControls) {
-            controlsNode = chartControls.cloneNode(true);
-            if (chartControls.parentNode === targetElement) {
-                chartControls.remove();
-            }
-        }
-        
-        // Preserve chart title and descriptions if they exist
-        const chartTitle = targetElement.querySelector('.chart-title');
-        const chartDescription = targetElement.querySelector('.chart-description');
-        let titleNode = null;
-        let descriptionNode = null;
-        
-        if (chartTitle) {
-            titleNode = chartTitle.cloneNode(true);
-            if (chartTitle.parentNode === targetElement) {
-                chartTitle.remove();
-            }
-        }
-        
-        if (chartDescription) {
-            descriptionNode = chartDescription.cloneNode(true);
-            if (chartDescription.parentNode === targetElement) {
-                chartDescription.remove();
-            }
-        }
-        
-        // Append the new image to the target element with animation
-        img.style.opacity = '0';
-        img.style.transform = 'scale(0.96)';
-        
-        // Re-add controls, title, and descriptions in the correct order
-        if (controlsNode) {
-            targetElement.appendChild(controlsNode);
-        }
-        
-        if (titleNode) {
-            targetElement.appendChild(titleNode);
-        }
-        
-        if (descriptionNode) {
-            targetElement.appendChild(descriptionNode);
-        }
-        
-        targetElement.appendChild(img);
-        
-        // Trigger reflow to enable animation
-        img.offsetHeight;
-        
-        // Animate in the new image
-        img.style.transition = 'opacity 0.3s ease-out, transform 0.3s ease-out';
-        img.style.opacity = '1';
-        img.style.transform = 'scale(1)';
-        
-        console.log(`[${containerId}] Image appended to target element.`);
-        
-        // Remove existing timestamp if present
-        const existingTimestamp = targetElement.querySelector('.chart-last-updated');
-        if (existingTimestamp) {
-            existingTimestamp.remove();
-        }
-    };
+            
+            // Append the error element
+            targetElement.appendChild(errorElement);
+            console.log(`[${containerId}] Error message displayed in target element.`);
+        };
 
-    img.onerror = () => {
-        console.error(`[${containerId}] Failed to load image from URL:`, chartUrl);
-        
-        // Create error element
-        const errorElement = document.createElement('div');
-        errorElement.className = 'chart-error';
-        errorElement.style.position = 'relative';
-        errorElement.style.inset = 'auto';
-        errorElement.style.animation = 'none';
-        errorElement.style.opacity = '1';
-        errorElement.innerHTML = `
-            <p>Error: Failed to load chart image.</p>
-            <p style="word-break: break-all;">URL: <a href="${chartUrl}" target="_blank" rel="noopener noreferrer">View Chart URL</a></p>
-            <button onclick="location.reload()">Retry</button>
-        `;
-        
-        // Find and remove any existing error message or image
-        const existingError = targetElement.querySelector('.chart-error');
-        if (existingError) {
-            existingError.remove();
-        }
-        
-        // Remove all existing chart images
-        const existingImages = targetElement.querySelectorAll('.chart-image');
-        existingImages.forEach(existingImage => {
-            existingImage.remove();
-        });
-        
-        // Append the error element
-        targetElement.appendChild(errorElement);
-        console.log(`[${containerId}] Error message displayed in target element.`);
-    };
-
-    img.src = chartUrl;
-    console.log(`[${containerId}] Image src set. Browser will now attempt to load.`);
-    img.alt = altText;
-    img.style.maxWidth = "100%";
-    img.style.height = "auto";
-    // Add the chart-image class for styling consistency
-    img.classList.add('chart-image'); 
+        img.src = chartUrl;
+        console.log(`[${containerId}] Image src set. Browser will now attempt to load.`);
+        img.alt = altText;
+        img.style.maxWidth = "100%";
+        img.style.height = "auto";
+        // Add the chart-image class for styling consistency
+        img.classList.add('chart-image'); 
+    }
 }
 
 /**
@@ -295,52 +382,91 @@ export function displayChartError(containerId, message) {
  * @param {string} [message] Optional custom loading message
  */
 export function displayChartLoading(containerId, message = 'Loading chart...') {
-    console.log(`[${containerId}] displayChartLoading called.`);
+    console.log(`[${containerId}] displayChartLoading called with message: ${message}`);
     const container = document.getElementById(containerId);
-    if (!container) return;
+    if (!container) {
+        console.error(`[${containerId}] Container element not found.`);
+        return;
+    }
 
     const wrapper = container.querySelector('.chart-wrapper');
     const targetElement = wrapper || container; // Use wrapper if found, else container
-
-    // Ensure only one loading indicator exists within the target
-    const existingLoading = targetElement.querySelector('.chart-loading');
-    if (!existingLoading) {
-        // Create a loading element that preserves existing content
-        const loadingElement = document.createElement('div');
-        loadingElement.className = 'chart-loading';
-        loadingElement.style.display = 'flex';
-        loadingElement.style.alignItems = 'center';
-        loadingElement.style.justifyContent = 'center';
-        loadingElement.style.position = 'absolute';
-        loadingElement.style.inset = '0';
-        loadingElement.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
-        loadingElement.style.zIndex = '5';
+    
+    // Check if there's already a loading indicator in the HTML
+    const existingLoadingIndicator = container.querySelector('.chart-loading') || 
+        (wrapper && wrapper.querySelector('.chart-loading'));
+    
+    if (existingLoadingIndicator) {
+        console.log(`[${containerId}] Found existing loading indicator, updating message.`);
         
-        loadingElement.innerHTML = `
-            <div style="text-align: center;">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-                <p class="mt-2">${message}</p>
+        // Update the existing loading indicator with the enhanced design
+        existingLoadingIndicator.style.opacity = '1';
+        existingLoadingIndicator.style.visibility = 'visible';
+        existingLoadingIndicator.style.display = 'flex';
+        existingLoadingIndicator.style.zIndex = '1000';
+        
+        // Create a more professional HTML structure for the existing indicator
+        existingLoadingIndicator.innerHTML = `
+            <div class="spinner-container">
+                <div class="spinner-border" role="status"></div>
+                <div class="spinner-core"></div>
+            </div>
+            <p>${message}</p>
+            <div class="loading-progress">
+                <div class="loading-progress-bar"></div>
             </div>
         `;
         
-        targetElement.style.position = 'relative';
-        targetElement.appendChild(loadingElement);
-        
-        // Make loading indicator visible with animation
-        setTimeout(() => {
-            loadingElement.style.opacity = '1';
-        }, 10);
-    } else {
-        console.log(`[${containerId}] Loading indicator already present in target.`);
-        
-        // Update the message if provided
-        const messageElement = existingLoading.querySelector('p');
-        if (messageElement && message) {
-            messageElement.textContent = message;
-        }
+        return;
     }
+    
+    // Create a new loading element with enhanced professional design
+    console.log(`[${containerId}] Creating new professional loading indicator.`);
+    const loadingElement = document.createElement('div');
+    loadingElement.className = 'chart-loading';
+    
+    // Ensure proper styling directly on the element for visibility
+    loadingElement.style.position = 'absolute';
+    loadingElement.style.top = '0';
+    loadingElement.style.left = '0';
+    loadingElement.style.right = '0';
+    loadingElement.style.bottom = '0';
+    loadingElement.style.display = 'flex';
+    loadingElement.style.flexDirection = 'column';
+    loadingElement.style.alignItems = 'center';
+    loadingElement.style.justifyContent = 'center';
+    loadingElement.style.backgroundColor = 'rgba(255, 255, 255, 0.92)';
+    loadingElement.style.backdropFilter = 'blur(4px)';
+    loadingElement.style.zIndex = '1000'; // Higher z-index to ensure visibility
+    loadingElement.style.borderRadius = '10px';
+    loadingElement.style.visibility = 'visible'; // Ensure it's visible
+    
+    // Start with opacity 0 for fade-in effect
+    loadingElement.style.opacity = '0';
+    
+    // Create the enhanced spinner and elements
+    loadingElement.innerHTML = `
+        <div class="spinner-container">
+            <div class="spinner-border" role="status"></div>
+            <div class="spinner-core"></div>
+        </div>
+        <p>${message}</p>
+        <div class="loading-progress">
+            <div class="loading-progress-bar"></div>
+        </div>
+    `;
+    
+    // Add the loading element to the target
+    targetElement.appendChild(loadingElement);
+    
+    // Force a reflow before setting opacity for animation
+    void loadingElement.offsetHeight;
+    
+    // Fade in the loading indicator with a smoother curve
+    loadingElement.style.transition = 'opacity 0.4s cubic-bezier(0.165, 0.84, 0.44, 1)';
+    loadingElement.style.opacity = '1';
+    
+    console.log(`[${containerId}] Enhanced loading indicator appended and visible.`);
 }
 
 /**

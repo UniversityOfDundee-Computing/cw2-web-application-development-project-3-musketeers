@@ -143,11 +143,179 @@
     transform: scale(0.95);
 }
 
-/* Loading state */
+/* Loading state - Enhanced professional styling */
 .chart-loading {
-    transition: opacity 0.4s ease;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    opacity: 1;
+    transition: opacity 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+    border-radius: 10px;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
 }
 
+/* Custom spinner animation */
+.chart-loading .spinner-container {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    margin-bottom: 1rem;
+}
+
+.chart-loading .spinner-border {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-width: 0.25rem;
+    border-color: rgba(13, 110, 253, 0.15);
+    border-right-color: #0d6efd;
+    animation: spin 1.2s cubic-bezier(0.5, 0.1, 0.5, 0.9) infinite;
+    box-shadow: 0 0 10px rgba(13, 110, 253, 0.1);
+}
+
+/* Pulsating inner circle */
+.chart-loading .spinner-core {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    background-color: rgba(13, 110, 253, 0.8);
+    border-radius: 50%;
+    animation: pulse 1.5s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+}
+
+/* Loading text styling */
+.chart-loading p {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #495057;
+    margin-top: 1rem;
+    text-align: center;
+    max-width: 80%;
+    animation: fadeInOut 2s ease-in-out infinite;
+    letter-spacing: 0.01em;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* Progress indicator */
+.chart-loading .loading-progress {
+    width: 120px;
+    height: 4px;
+    background-color: rgba(13, 110, 253, 0.1);
+    border-radius: 2px;
+    margin-top: 1rem;
+    overflow: hidden;
+}
+
+.chart-loading .loading-progress-bar {
+    height: 100%;
+    width: 0;
+    background-color: #0d6efd;
+    border-radius: 2px;
+    animation: progress 2s cubic-bezier(0.645, 0.045, 0.355, 1) infinite;
+}
+
+/* Animation keyframes */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 0.5;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInOut {
+    0%, 100% {
+        opacity: 0.7;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+@keyframes progress {
+    0% {
+        width: 0%;
+        opacity: 0.8;
+    }
+    50% {
+        width: 70%;
+        opacity: 1;
+    }
+    100% {
+        width: 100%;
+        opacity: 0.8;
+    }
+}
+
+/* Responsive adjustments for loading state */
+@media screen and (max-width: 768px) {
+    .chart-loading .spinner-container {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .chart-loading .spinner-border {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+    
+    .chart-loading .spinner-core {
+        width: 15px;
+        height: 15px;
+    }
+    
+    .chart-loading p {
+        font-size: 0.9rem;
+    }
+    
+    .chart-loading .loading-progress {
+        width: 100px;
+    }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .chart-loading .spinner-border,
+    .chart-loading .spinner-core,
+    .chart-loading p,
+    .chart-loading .loading-progress-bar {
+        animation-duration: 10s;
+    }
+}
+
+/* Loading state */
 .chart-loading {
     position: absolute;
     top: 0;
@@ -160,12 +328,27 @@
     justify-content: center;
     background-color: rgba(255, 255, 255, 0.9);
     z-index: 5;
+    opacity: 1;
+    transition: opacity 0.4s ease;
+    border-radius: 8px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
 }
 
 .chart-loading .spinner-border {
     width: 3rem;
     height: 3rem;
     margin-bottom: 1rem;
+    border-width: 0.25rem;
+    color: #0d6efd; /* Bootstrap primary color */
+    animation: spin 1s linear infinite;
+}
+
+.chart-loading p {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #495057;
+    margin: 0;
+    text-align: center;
 }
 
 /* Add spacing between chart rows */
@@ -289,7 +472,10 @@
 }
 
 @keyframes spin {
-    to {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
         transform: rotate(360deg);
     }
 }

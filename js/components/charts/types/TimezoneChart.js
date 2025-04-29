@@ -418,7 +418,7 @@ export class TimezoneChart extends BaseChart {
             // Store range option
             this.options.tzRange = range;
             
-            // Clean up existing chart elements
+            // Use base class cleanupExistingChart method
             this.cleanupExistingChart();
             
             // Re-process data with the new range filter
@@ -478,7 +478,7 @@ export class TimezoneChart extends BaseChart {
             // Store grouping option
             this.options.tzGrouping = grouping;
             
-            // Clean up existing chart elements
+            // Use base class cleanupExistingChart method
             this.cleanupExistingChart();
             
             // Re-process data with the new grouping
@@ -538,7 +538,7 @@ export class TimezoneChart extends BaseChart {
             // Store business hours option
             this.options.showBusinessHours = show;
             
-            // Clean up existing chart elements
+            // Use base class cleanupExistingChart method
             this.cleanupExistingChart();
             
             // Create new chart configuration with business hours overlay
@@ -594,7 +594,7 @@ export class TimezoneChart extends BaseChart {
                 // Update options
                 this.options.type = chartType;
                 
-                // Clean up existing chart elements
+                // Use base class cleanupExistingChart method
                 this.cleanupExistingChart();
                 
                 // Create new chart configuration
@@ -622,54 +622,6 @@ export class TimezoneChart extends BaseChart {
         }
     }
     
-    /**
-     * Clean up existing chart elements to prevent stacking
-     */
-    cleanupExistingChart() {
-        console.log(`[${this.containerId}] Cleaning up existing chart elements...`);
-        
-        if (!this.container) {
-            console.error(`[${this.containerId}] Container not found during cleanup`);
-            return;
-        }
-        
-        // Find the chart wrapper
-        const chartWrapper = this.container.querySelector('.chart-wrapper');
-        if (!chartWrapper) {
-            console.error(`[${this.containerId}] Chart wrapper not found during cleanup`);
-            return;
-        }
-        
-        // Remove any existing chart images
-        const existingImages = chartWrapper.querySelectorAll('.chart-image');
-        if (existingImages.length > 0) {
-            console.log(`[${this.containerId}] Removing ${existingImages.length} existing chart images`);
-            existingImages.forEach(image => {
-                image.remove();
-            });
-        }
-        
-        // Remove any existing error messages
-        const existingErrors = chartWrapper.querySelectorAll('.chart-error');
-        if (existingErrors.length > 0) {
-            console.log(`[${this.containerId}] Removing ${existingErrors.length} existing error messages`);
-            existingErrors.forEach(error => {
-                error.remove();
-            });
-        }
-        
-        // If we have a chart instance, properly dispose of it
-        if (this.chartInstance) {
-            console.log(`[${this.containerId}] Destroying chart instance`);
-            if (typeof this.chartInstance.destroy === 'function') {
-                this.chartInstance.destroy();
-            }
-            this.chartInstance = null;
-        }
-        
-        console.log(`[${this.containerId}] Chart cleanup completed`);
-    }
-
     /**
      * Generate dynamic data-driven descriptions based on the actual chart data
      * @param {Object} data - Processed chart data

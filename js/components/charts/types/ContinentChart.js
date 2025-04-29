@@ -356,6 +356,9 @@ export class ContinentChart extends BaseChart {
         this.showLoading();
         
         try {
+            // Clean up existing chart before updating
+            this.cleanupExistingChart();
+            
             // Store view option
             this.options.dataView = view;
             
@@ -404,6 +407,9 @@ export class ContinentChart extends BaseChart {
         this.showLoading();
         
         try {
+            // Clean up existing chart before updating
+            this.cleanupExistingChart();
+            
             // Store percentage view option
             this.options.showPercentage = showPercentage;
             
@@ -490,10 +496,13 @@ export class ContinentChart extends BaseChart {
             // Show loading overlay
             this.showLoading();
             
-            // Update options
-            this.options.sort = sortOrder;
-            
             try {
+                // Clean up existing chart before updating
+                this.cleanupExistingChart();
+                
+                // Update options
+                this.options.sort = sortOrder;
+                
                 // Re-process data with new sort order
                 if (this.rawData) {
                     this.processedData = await this.processData(this.rawData);
@@ -536,6 +545,115 @@ export class ContinentChart extends BaseChart {
         }
     }
     
+    /**
+     * Override the base class method to ensure chart type changes include cleanup
+     * @param {string} newType - New chart type ('bar', 'pie', etc.)
+     */
+    async changeChartType(newType) {
+        if (this.supportedChartTypes.includes(newType)) {
+            console.log(`[${this.containerId}] Changing chart type to ${newType}...`);
+            
+            // Show loading overlay
+            this.showLoading();
+            
+            try {
+                // Clean up existing chart before updating
+                this.cleanupExistingChart();
+                
+                // Update options
+                this.options.type = newType;
+                
+                // Store the original title to preserve it after chart type change
+                const originalTitle = this.options.title;
+                
+                // Re-process data to ensure correct formatting for the new chart type
+                if (this.rawData) {
+                    this.processedData = await this.processData(this.rawData);
+                }
+                
+                // Update title based on the new chart type
+                this.options.title = this.getTitleBasedOnSortOrder();
+                
+                // Create new chart configuration
+                const chartConfig = this.createChartConfig(this.processedData);
+                
+                // Force the chart type to be the selected type
+                chartConfig.type = newType;
+                
+                // Generate chart URL
+                const chartUrl = chartService.createChartUrl(chartConfig);
+                
+                // Update the chart
+                chartUtils.displayChart(
+                    this.containerId,
+                    chartUrl,
+                    this.options.title
+                );
+                
+                // Update descriptions
+                const descriptions = this.generateDescriptions(this.processedData);
+                this.updateChartDescriptions(descriptions);
+                
+                // Update the chart title in the DOM
+                const titleElement = this.container.querySelector('.chart-title');
+                if (titleElement) {
+                    titleElement.textContent = this.options.title;
+                }
+                
+                console.log(`[${this.containerId}] Chart type changed successfully to ${newType}.`);
+            } catch (error) {
+                console.error(`[${this.containerId}] Error changing chart type:`, error);
+                this.showError(`Failed to change chart type: ${error.message}`);
+            }
+        }
+    }
+    
+    /**
+     * Override the base class method to ensure data limits include cleanup
+     * @param {number} limit - Number of items to display
+     */
+    async changeDataLimit(limit) {
+        if (!isNaN(limit) && limit > 0) {
+            console.log(`[${this.containerId}] Changing data limit to ${limit}...`);
+            
+            // Show loading overlay
+            this.showLoading();
+            
+            try {
+                // Clean up existing chart before updating
+                this.cleanupExistingChart();
+                
+                // Update options
+                this.options.limit = limit;
+                
+                // Re-process data with new limit
+                this.processedData = await this.processData(this.rawData);
+                
+                // Create new chart configuration
+                const chartConfig = this.createChartConfig(this.processedData);
+                
+                // Generate chart URL
+                const chartUrl = chartService.createChartUrl(chartConfig);
+                
+                // Update the chart
+                chartUtils.displayChart(
+                    this.containerId,
+                    chartUrl,
+                    this.options.title || 'Chart'
+                );
+                
+                // Update descriptions
+                const descriptions = this.generateDescriptions(this.processedData);
+                this.updateChartDescriptions(descriptions);
+                
+                console.log(`[${this.containerId}] Data limit changed successfully.`);
+            } catch (error) {
+                console.error(`[${this.containerId}] Error changing data limit:`, error);
+                this.showError(`Failed to change data limit: ${error.message}`);
+            }
+        }
+    }
+
     /**
      * Generate continent-specific descriptions
      * Override the base class method to ensure descriptions match the current sort order
