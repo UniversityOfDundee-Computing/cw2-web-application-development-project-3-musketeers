@@ -20,7 +20,7 @@
 
 
     /* Typography */
-    --font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-family: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
     --font-size-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
     --font-size-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
     --font-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
@@ -70,7 +70,7 @@ body {
     font-size: var(--font-size-base);
     line-height: 1.6;
     color: var(--text-color);
-    background-color: var(--background-color);
+    background-color: var(--white);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -84,7 +84,7 @@ main {
 /* Typography */
 h1, h2, h3, h4, h5, h6 {
     margin-bottom: var(--spacing-medium);
-    color: var(--primary-color);
+    color: var(--text-primary);
 }
 
 a {
@@ -98,15 +98,14 @@ a:hover {
 }
 
 /* Button styles */
-/* Button styles */
 button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     padding: var(--space-3) var(--space-6);
-    border: 2px solid var(--primary-color);
+    border: 2px solid var(--border-color);
     border-radius: var(--radius-lg);
-    background-color: var(--primary-color);
+    background-color: var(--primary-gradient);
     color: var(--white);
     font-size: var(--font-size-sm);
     font-weight: 600;
@@ -207,26 +206,26 @@ button.large {
 footer {
     text-align: center;
     padding: var(--spacing-medium);
-    background-color: var(--primary-color);
+    background-color: var(--text-primary);
     color: var(--white);
 }
 
 /* Utility classes */
 /* Container styles */
-.container {
+/* .container {
     width: min(100% - 2rem, 1400px);
     margin-inline: auto;
     padding: var(--spacing-medium);
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
     gap: clamp(1rem, 2vw, 2rem);
-}
+} */
 
 /* Grid container modifiers */
-.container--narrow {
+/* .container--narrow {
     max-width: 1000px;
-}
-
+} */
+/* 
 .container--wide {
     max-width: 1600px;
 }
@@ -237,7 +236,7 @@ footer {
 
 .hidden {
     display: none;
-}
+} */
 
 /* Responsive typography */
 @media (max-width: 768px) {
