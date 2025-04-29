@@ -2,10 +2,39 @@
  * Charts Component Styles with Bootstrap Integration
  */
 
+/* Chart container grid layout */
+.container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    padding: 1rem;
+}
+
 /* Chart interactions */
 .chart-container {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
+    position: relative;
+    aspect-ratio: 1/1; /* Consistent square aspect ratio */
+    min-height: clamp(320px, 40vh, 480px); /* Consistent height range */
+}
+
+/* Chart content wrapper for consistent internal spacing */
+.chart-wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding: clamp(1rem, 1.5vw, 1.5rem);
+}
+
+/* Chart content inside wrapper */
+.chart-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .chart-container:hover {
@@ -13,9 +42,33 @@
     box-shadow: var(--bs-box-shadow-lg) !important;
 }
 
+/* When any chart is expanded */
+.container:has(.chart-container.expanded) .chart-container:not(.expanded) {
+    transform: scale(0.95);
+    filter: blur(2px);
+    opacity: 0.7;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .chart-container.expanded {
-    transform: scale(1.05);
-    z-index: 1030; /* Higher than Bootstrap's default navbar z-index */
+    transform: scale(1.15);
+    z-index: 1030;
+    margin: 2rem;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Push adjacent charts */
+.chart-container.expanded ~ .chart-container {
+    transform: translate(2rem, 4rem) scale(0.95);
+}
+
+.chart-container.expanded:not(:first-child) {
+    margin-top: -2rem;
+}
+
+/* Push previous charts */
+.chart-container.expanded:has(~ .chart-container) {
+    transform: translate(-2rem, 4rem) scale(1.15);
 }
 
 /* Chart image styles */
@@ -23,24 +76,40 @@
     max-width: 100%;
     height: auto;
     opacity: 0;
-    animation: fadeIn 0.3s ease forwards;
+    animation: fadeIn 0.4s ease forwards;
 }
 
 /* Detail overlay transitions */
 .chart-detail-overlay {
     transform: translateY(100%);
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+    pointer-events: none;
 }
 
 .chart-container:hover .chart-detail-overlay,
 .chart-container.expanded .chart-detail-overlay {
     transform: translateY(0);
-    opacity: 1 !important;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Blur effect for all charts when one is expanded */
+.chart-container.sibling-expanded {
+    filter: blur(2px);
+    opacity: 0.6;
+    transform: scale(0.95);
 }
 
 /* Loading state */
 .chart-loading {
-    transition: opacity 0.3s ease;
+    transition: opacity 0.4s ease;
+}
+
+/* Add spacing between chart rows */
+.chart-container:not(:first-child) {
+    margin-top: 1rem;
 }
 
 .chart-error {

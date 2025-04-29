@@ -25,8 +25,8 @@
     padding: clamp(1.5rem, 2.5vw, 2.5rem);
     display: grid;
     place-items: center;
-    min-height: clamp(300px, 35vh, 450px);
-    aspect-ratio: 4/3;
+    min-height: clamp(300px, 40vh, 450px);
+    aspect-ratio: 1/1; /* Make all chart containers square by default */
     transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
     border: 1px solid rgba(230, 232, 236, 0.8);
     overflow: hidden;
@@ -52,6 +52,41 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
+/* Chart detail overlay styles - fixed visibility issues */
+.chart-detail-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 1rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    transform: translateY(100%);
+    opacity: 0;
+    transition: transform 0.4s ease, opacity 0.3s ease;
+    z-index: 10; /* Increased z-index to ensure it's above other elements */
+    pointer-events: auto;
+    visibility: hidden; /* Start hidden */
+}
+
+.chart-container:hover .chart-detail-overlay {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+}
+
+.chart-container.expanded .chart-detail-overlay {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+}
+
+.chart-container.hover .chart-detail-overlay {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+}
+
 /* Special chart layouts */
 #chartContainer9 {
     grid-column: 1 / -1;
@@ -60,6 +95,18 @@
     background: linear-gradient(145deg, #ffffff, #f0f5ff);
 }
 
+/* All chart containers should have consistent aspect ratio and sizing */
+#chartContainer1,
+#chartContainer3,
+#chartContainer5,
+#chartContainer6,
+#chartContainer7,
+#chartContainer8 {
+    aspect-ratio: 1/1;
+    min-height: clamp(320px, 40vh, 480px);
+}
+
+/* These already have the correct styling, no change needed */
 #chartContainer2,
 #chartContainer4 {
     aspect-ratio: 1/1;
@@ -151,13 +198,17 @@
     letter-spacing: 0.02em;
 }
 
-/* Chart wrapper internal styling */
+/* Chart wrapper internal styling - improved for consistent spacing and alignment */
 .chart-wrapper {
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
     z-index: 2;
+    position: relative;
+    padding: clamp(0.75rem, 1.5vw, 1.5rem);
+    justify-content: center;
+    align-items: center;
 }
 
 /* Chart title & description enhancements */
@@ -334,6 +385,18 @@
     color: #718096;
     font-style: italic;
     opacity: 0.8;
+}
+
+/* Fix for Bootstrap card-body that might be causing z-index issues */
+.card-body {
+    position: relative;
+    z-index: 2;
+    overflow: visible !important; /* Ensures overlay can be seen */
+}
+
+/* Ensure card isn't hiding overflow */
+.card {
+    overflow: visible !important;
 }
 
 /* Loading and error state animations */

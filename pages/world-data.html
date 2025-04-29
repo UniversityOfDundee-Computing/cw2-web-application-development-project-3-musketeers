@@ -21,6 +21,191 @@
     
     <!-- Description for SEO -->
     <meta name="description" content="Visualize global country data including population, languages, and more using interactive charts.">
+    
+    <!-- Updated styles for full-width chart expansion with analysis on the right -->
+    <style>
+        /* Basic chart styling */
+        .chart-container {
+            position: relative !important;
+            overflow: hidden !important;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.215, 0.610, 0.355, 1.000) !important;
+            z-index: 1;
+            max-width: 100% !important; /* Ensure chart container doesn't exceed viewport width */
+        }
+        
+        .card-body {
+            position: relative !important;
+            overflow: hidden !important;
+            padding: 1.25rem !important; /* Ensure consistent padding */
+        }
+        
+        /* Fix for the first chart's content overflow */
+        .chart-content {
+            width: 100% !important;
+            overflow: hidden !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+        
+        .chart-wrapper {
+            width: 100% !important;
+            height: auto !important;
+            position: relative !important;
+            z-index: 2;
+            overflow: hidden !important; /* Prevent chart content from overflowing */
+        }
+        
+        /* Fix for chart images */
+        .chart-container img {
+            max-width: 100% !important;
+            height: auto !important;
+            display: block !important;
+            transition: all 0.4s cubic-bezier(0.215, 0.610, 0.355, 1.000) !important;
+            object-fit: contain !important; /* Ensure image maintains aspect ratio */
+        }
+        
+        /* Modal-like overlay when a chart is expanded */
+        .chart-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 950;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        
+        body:has(.chart-container.expanded) .chart-backdrop {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        /* Expanded chart styling - fixed blur issue */
+        .chart-container.expanded {
+            position: fixed !important;
+            z-index: 1000 !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            width: 90vw !important;
+            max-width: 1400px !important;
+            max-height: 90vh !important;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+            overflow: hidden !important;
+            display: flex !important;
+            flex-direction: row !important;
+            border-radius: 8px !important;
+            filter: none !important; /* Ensure expanded chart is not blurred */
+            background-color: white !important; /* Ensure background is white */
+        }
+        
+        /* Adjust layout of expanded chart to show analysis on right */
+        .chart-container.expanded .card-body {
+            display: grid !important;
+            grid-template-columns: 60% 40% !important;
+            grid-gap: 1rem !important;
+            padding: 1.5rem !important;
+            overflow-y: auto !important;
+            max-height: 90vh !important;
+        }
+        
+        /* Position the chart content on the left */
+        .chart-container.expanded .card-body .chart-content {
+            grid-column: 1 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            overflow-y: auto !important;
+            max-height: calc(90vh - 3rem) !important;
+        }
+        
+        /* Style for the detailed analysis on the right */
+        .chart-container.expanded .chart-detail-analysis {
+            grid-column: 2 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            padding: 1rem !important;
+            background-color: rgba(248, 250, 252, 0.9) !important;
+            border-radius: 8px !important;
+            border-left: 1px solid rgba(0, 0, 0, 0.1) !important;
+            transform: none !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            position: relative !important;
+            height: auto !important;
+            max-height: calc(90vh - 3rem) !important;
+            overflow-y: auto !important;
+        }
+        
+        /* Hide the bottom overlay for expanded charts */
+        .chart-container.expanded .chart-detail-overlay {
+            display: none !important;
+        }
+        
+        /* Close button for expanded chart - FIX: only show in expanded state */
+        .chart-close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            opacity: 0; /* Hidden by default */
+            transition: opacity 0.3s ease;
+            pointer-events: none; /* No interaction when hidden */
+        }
+        
+        /* FIXED: Only show close button in expanded state, not on hover */
+        .chart-container.expanded .chart-close-btn {
+            opacity: 1;
+            pointer-events: auto; /* Enable interaction */
+        }
+        
+        /* Adjust container when a chart is expanded - blur OTHER charts */
+        .container:has(.chart-container.expanded) .chart-container:not(.expanded) {
+            filter: blur(4px);
+            pointer-events: none;
+        }
+        
+        /* When any chart is expanded, dim and push back other charts */
+        .chart-container.expanded ~ .chart-container {
+            opacity: 0.5;
+            transform: scale(0.95);
+            filter: blur(2px);
+        }
+        
+        /* Ensure detailed analysis is hidden by default */
+        .chart-detail-analysis {
+            display: none !important;
+        }
+        
+        .chart-container.expanded .chart-detail-analysis {
+            display: flex !important;
+        }
+
+        /* Analysis data container with proper spacing */
+        .analysis-data {
+            padding-right: 0.5rem !important; /* Give some space for scrollbar */
+            overflow-y: auto !important;
+        }
+
+        /* Fix for text overflow in chart description */
+        .chart-description {
+            overflow-wrap: break-word !important;
+            word-wrap: break-word !important;
+            max-width: 100% !important;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -61,33 +246,83 @@
                 </div>
             </div>
 
-            <!-- Standard charts -->
+            <!-- Standard charts with updated structure -->
             <div id="chartContainer" class="chart-container card shadow-sm mb-4 position-relative"
                  aria-label="Population distribution chart" tabindex="0">
                 <div class="card-body">
-                    <h3 class="chart-title h5 mb-3">Global Population Distribution</h3>
-                    <p class="chart-description text-muted">Population breakdown across continents and regions</p>
+                    <div class="chart-content">
+                        <h3 class="chart-title h5 mb-3">Global Population Distribution</h3>
+                        <p class="chart-description text-muted">Population breakdown across continents and regions</p>
+                        <div class="chart-wrapper" style="width: 100%; height: 100%; position: relative;">
+                            <!-- Chart will be rendered here -->
+                        </div>
+                    </div>
+                    <div class="chart-detail-analysis">
+                        <h4 class="h5 mb-3">Population Distribution Analysis</h4>
+                        <p>Population distribution showing the world's most populous nations, urban vs rural splits, and demographic trends from 2000-present.</p>
+                        <div class="analysis-data mt-4">
+                            <h5 class="h6 mb-2">Key Insights</h5>
+                            <ul>
+                                <li>Asia accounts for over 60% of the world's population, with China and India being the most populous countries.</li>
+                                <li>Population growth rates are highest in Africa, with urbanization increasing globally.</li>
+                                <li>Europe is experiencing population decline in several countries.</li>
+                                <li>North America has stable population growth primarily driven by immigration.</li>
+                            </ul>
+                            <h5 class="h6 my-3">Related Metrics</h5>
+                            <p>Population density, birth rates, mortality rates, and migration patterns all contribute to these distributions.</p>
+                            <div class="data-source small text-muted mt-4">
+                                Data sources: UN Population Division, World Bank
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Loading state -->
                     <div class="chart-loading position-absolute top-50 start-50 translate-middle w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-90">
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
                         <p class="ms-3 mb-0">Loading population data...</p>
                     </div>
+                    <!-- Original overlay for hover state -->
                     <div class="chart-detail-overlay position-absolute bottom-0 start-0 end-0 bg-white bg-opacity-95 p-3 rounded-bottom border-top opacity-0">
                         <h4 class="h6 mb-2">Detailed Analysis</h4>
                         <p class="small mb-0">Population distribution showing the world's most populous nations, urban vs rural splits, and demographic trends from 2000-present.</p>
                     </div>
+                    <!-- Close button -->
+                    <div class="chart-close-btn">✕</div>
                 </div>
             </div>
 
             <div id="chartContainer2" class="chart-container card shadow-sm mb-4 position-relative"
                  aria-label="Continental population chart" tabindex="0">
                 <div class="card-body">
-                    <h3 class="chart-title h5 mb-3">Continental Population</h3>
-                    <p class="chart-description text-muted">Population distribution by continent</p>
+                    <div class="chart-content">
+                        <h3 class="chart-title h5 mb-3">Continental Population</h3>
+                        <p class="chart-description text-muted">Population distribution by continent</p>
+                        <div class="chart-wrapper" style="width: 100%; height: 100%; position: relative;">
+                            <!-- Chart will be rendered here -->
+                        </div>
+                    </div>
+                    <div class="chart-detail-analysis">
+                        <h4 class="h5 mb-3">Continental Population Analysis</h4>
+                        <p>Analysis of continental population patterns showing population density, growth rates, and urbanization trends across continents.</p>
+                        <div class="analysis-data mt-4">
+                            <h5 class="h6 mb-2">Key Insights</h5>
+                            <ul>
+                                <li>Asia contains approximately 60% of the world population, with Eastern Asia being the most densely populated region.</li>
+                                <li>Africa has the highest population growth rate at 2.7% annually.</li>
+                                <li>Europe has the lowest growth rate and is experiencing population decline in many countries.</li>
+                                <li>Oceania has the smallest population but high urbanization rates.</li>
+                            </ul>
+                            <h5 class="h6 my-3">Related Metrics</h5>
+                            <p>Urbanization rates, age distribution, and migration patterns vary significantly between continents.</p>
+                            <div class="data-source small text-muted mt-4">
+                                Data sources: UN Population Division, World Bank
+                            </div>
+                        </div>
+                    </div>
                     <div class="chart-loading position-absolute top-50 start-50 translate-middle w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-90">
                         <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
+                            <span class="visually-hidden">Loading continental data...</span>
                         </div>
                         <p class="ms-3 mb-0">Loading continental data...</p>
                     </div>
@@ -95,17 +330,41 @@
                         <h4 class="h6 mb-2">Detailed Analysis</h4>
                         <p class="small mb-0">Analysis of continental population patterns showing population density, growth rates, and urbanization trends across continents.</p>
                     </div>
+                    <div class="chart-close-btn">✕</div>
                 </div>
             </div>
 
             <div id="chartContainer3" class="chart-container card shadow-sm mb-4 position-relative"
                  aria-label="Regional distribution chart" tabindex="0">
                 <div class="card-body">
-                    <h3 class="chart-title h5 mb-3">Regional Distribution</h3>
-                    <p class="chart-description text-muted">Countries by geographical region</p>
+                    <div class="chart-content">
+                        <h3 class="chart-title h5 mb-3">Regional Distribution</h3>
+                        <p class="chart-description text-muted">Countries by geographical region</p>
+                        <div class="chart-wrapper" style="width: 100%; height: 100%; position: relative;">
+                            <!-- Chart will be rendered here -->
+                        </div>
+                    </div>
+                    <div class="chart-detail-analysis">
+                        <h4 class="h5 mb-3">Regional Distribution Analysis</h4>
+                        <p>Breakdown of UN-defined geographical regions showing economic indicators and cross-region migration patterns.</p>
+                        <div class="analysis-data mt-4">
+                            <h5 class="h6 mb-2">Key Insights</h5>
+                            <ul>
+                                <li>Africa contains the most countries with 54 sovereign states, followed by Europe with 44.</li>
+                                <li>Eastern Europe has the highest number of landlocked countries.</li>
+                                <li>Caribbean region has the most island nations proportional to total countries.</li>
+                                <li>Western Europe has the highest GDP per capita among all regions.</li>
+                            </ul>
+                            <h5 class="h6 my-3">Related Metrics</h5>
+                            <p>Regional cooperation agreements, trade blocs, and cultural similarities affect migration and economic patterns.</p>
+                            <div class="data-source small text-muted mt-4">
+                                Data sources: United Nations, World Bank, IMF
+                            </div>
+                        </div>
+                    </div>
                     <div class="chart-loading position-absolute top-50 start-50 translate-middle w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-90">
                         <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
+                            <span class="visually-hidden">Loading regional data...</span>
                         </div>
                         <p class="ms-3 mb-0">Loading regional data...</p>
                     </div>
@@ -113,17 +372,41 @@
                         <h4 class="h6 mb-2">Detailed Analysis</h4>
                         <p class="small mb-0">Breakdown of UN-defined geographical regions showing economic indicators and cross-region migration patterns.</p>
                     </div>
+                    <div class="chart-close-btn">✕</div>
                 </div>
             </div>
 
             <div id="chartContainer4" class="chart-container card shadow-sm mb-4 position-relative"
                  aria-label="Currency usage chart" tabindex="0">
                 <div class="card-body">
-                    <h3 class="chart-title h5 mb-3">Currency Usage</h3>
-                    <p class="chart-description text-muted">Most common currencies worldwide</p>
+                    <div class="chart-content">
+                        <h3 class="chart-title h5 mb-3">Currency Usage</h3>
+                        <p class="chart-description text-muted">Most common currencies worldwide</p>
+                        <div class="chart-wrapper" style="width: 100%; height: 100%; position: relative;">
+                            <!-- Chart will be rendered here -->
+                        </div>
+                    </div>
+                    <div class="chart-detail-analysis">
+                        <h4 class="h5 mb-3">Currency Usage Analysis</h4>
+                        <p>Analysis of global currency usage including stability metrics, trade volumes, and digital currency adoption rates.</p>
+                        <div class="analysis-data mt-4">
+                            <h5 class="h6 mb-2">Key Insights</h5>
+                            <ul>
+                                <li>The US Dollar is the most widely used currency for international trade.</li>
+                                <li>The Euro is the second most traded currency globally.</li>
+                                <li>Cryptocurrencies are gaining popularity, with Bitcoin leading the market.</li>
+                                <li>Several countries have adopted digital currencies as legal tender.</li>
+                            </ul>
+                            <h5 class="h6 my-3">Related Metrics</h5>
+                            <p>Exchange rates, inflation rates, and monetary policies impact currency usage and stability.</p>
+                            <div class="data-source small text-muted mt-4">
+                                Data sources: IMF, World Bank, BIS
+                            </div>
+                        </div>
+                    </div>
                     <div class="chart-loading position-absolute top-50 start-50 translate-middle w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-90">
                         <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
+                            <span class="visually-hidden">Loading currency data...</span>
                         </div>
                         <p class="ms-3 mb-0">Loading currency data...</p>
                     </div>
@@ -131,17 +414,41 @@
                         <h4 class="h6 mb-2">Detailed Analysis</h4>
                         <p class="small mb-0">Analysis of global currency usage including stability metrics, trade volumes, and digital currency adoption rates.</p>
                     </div>
+                    <div class="chart-close-btn">✕</div>
                 </div>
             </div>
 
             <div id="chartContainer5" class="chart-container card shadow-sm mb-4 position-relative"
                  aria-label="Timezone distribution chart" tabindex="0">
                 <div class="card-body">
-                    <h3 class="chart-title h5 mb-3">Timezone Distribution</h3>
-                    <p class="chart-description text-muted">Countries by timezone zone</p>
+                    <div class="chart-content">
+                        <h3 class="chart-title h5 mb-3">Timezone Distribution</h3>
+                        <p class="chart-description text-muted">Countries by timezone zone</p>
+                        <div class="chart-wrapper" style="width: 100%; height: 100%; position: relative;">
+                            <!-- Chart will be rendered here -->
+                        </div>
+                    </div>
+                    <div class="chart-detail-analysis">
+                        <h4 class="h5 mb-3">Timezone Distribution Analysis</h4>
+                        <p>Global timezone distribution highlighting business hour overlaps and impact on international operations.</p>
+                        <div class="analysis-data mt-4">
+                            <h5 class="h6 mb-2">Key Insights</h5>
+                            <ul>
+                                <li>There are 24 time zones globally, with some countries spanning multiple zones.</li>
+                                <li>Coordinated Universal Time (UTC) is the standard for timekeeping worldwide.</li>
+                                <li>Daylight Saving Time (DST) is observed in many countries, affecting time zone offsets.</li>
+                                <li>Time zone differences impact international business operations and communication.</li>
+                            </ul>
+                            <h5 class="h6 my-3">Related Metrics</h5>
+                            <p>Time zone offsets, DST observance, and global business hour overlaps are key factors in international operations.</p>
+                            <div class="data-source small text-muted mt-4">
+                                Data sources: IANA Time Zone Database, World Time Zone
+                            </div>
+                        </div>
+                    </div>
                     <div class="chart-loading position-absolute top-50 start-50 translate-middle w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-90">
                         <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
+                            <span class="visually-hidden">Loading timezone data...</span>
                         </div>
                         <p class="ms-3 mb-0">Loading timezone data...</p>
                     </div>
@@ -149,17 +456,41 @@
                         <h4 class="h6 mb-2">Detailed Analysis</h4>
                         <p class="small mb-0">Global timezone distribution highlighting business hour overlaps and impact on international operations.</p>
                     </div>
+                    <div class="chart-close-btn">✕</div>
                 </div>
             </div>
 
             <div id="chartContainer6" class="chart-container card shadow-sm mb-4 position-relative"
                  aria-label="Independence status chart" tabindex="0">
                 <div class="card-body">
-                    <h3 class="chart-title h5 mb-3">Independence Status</h3>
-                    <p class="chart-description text-muted">Independent vs. Dependent territories</p>
+                    <div class="chart-content">
+                        <h3 class="chart-title h5 mb-3">Independence Status</h3>
+                        <p class="chart-description text-muted">Independent vs. Dependent territories</p>
+                        <div class="chart-wrapper" style="width: 100%; height: 100%; position: relative;">
+                            <!-- Chart will be rendered here -->
+                        </div>
+                    </div>
+                    <div class="chart-detail-analysis">
+                        <h4 class="h5 mb-3">Independence Status Analysis</h4>
+                        <p>Sovereignty status analysis including timeline of independence declarations and types of governance structures.</p>
+                        <div class="analysis-data mt-4">
+                            <h5 class="h6 mb-2">Key Insights</h5>
+                            <ul>
+                                <li>There are 195 independent countries recognized by the United Nations.</li>
+                                <li>Several territories remain dependent on other countries for governance and administration.</li>
+                                <li>Independence movements continue in various regions seeking self-determination.</li>
+                                <li>Governance structures vary widely, from democracies to monarchies and authoritarian regimes.</li>
+                            </ul>
+                            <h5 class="h6 my-3">Related Metrics</h5>
+                            <p>Independence declarations, governance structures, and international recognition are key factors in sovereignty status.</p>
+                            <div class="data-source small text-muted mt-4">
+                                Data sources: United Nations, World Bank, CIA World Factbook
+                            </div>
+                        </div>
+                    </div>
                     <div class="chart-loading position-absolute top-50 start-50 translate-middle w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-90">
                         <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
+                            <span class="visually-hidden">Loading independence data...</span>
                         </div>
                         <p class="ms-3 mb-0">Loading independence data...</p>
                     </div>
@@ -167,17 +498,41 @@
                         <h4 class="h6 mb-2">Detailed Analysis</h4>
                         <p class="small mb-0">Sovereignty status analysis including timeline of independence declarations and types of governance structures.</p>
                     </div>
+                    <div class="chart-close-btn">✕</div>
                 </div>
             </div>
 
             <div id="chartContainer7" class="chart-container card shadow-sm mb-4 position-relative"
                  aria-label="Border statistics chart" tabindex="0">
                 <div class="card-body">
-                    <h3 class="chart-title h5 mb-3">Border Statistics</h3>
-                    <p class="chart-description text-muted">Analysis of country borders</p>
+                    <div class="chart-content">
+                        <h3 class="chart-title h5 mb-3">Border Statistics</h3>
+                        <p class="chart-description text-muted">Analysis of country borders</p>
+                        <div class="chart-wrapper" style="width: 100%; height: 100%; position: relative;">
+                            <!-- Chart will be rendered here -->
+                        </div>
+                    </div>
+                    <div class="chart-detail-analysis">
+                        <h4 class="h5 mb-3">Border Statistics Analysis</h4>
+                        <p>Border statistics showing countries with most neighbors, border lengths, and cross-border cooperation.</p>
+                        <div class="analysis-data mt-4">
+                            <h5 class="h6 mb-2">Key Insights</h5>
+                            <ul>
+                                <li>China and Russia share borders with the most countries, each having 14 neighboring nations.</li>
+                                <li>Canada and the United States share the longest international border.</li>
+                                <li>Several countries have disputed borders, leading to ongoing conflicts.</li>
+                                <li>Cross-border cooperation agreements exist to facilitate trade and security.</li>
+                            </ul>
+                            <h5 class="h6 my-3">Related Metrics</h5>
+                            <p>Border lengths, neighboring countries, and cross-border cooperation agreements impact international relations.</p>
+                            <div class="data-source small text-muted mt-4">
+                                Data sources: CIA World Factbook, United Nations, World Bank
+                            </div>
+                        </div>
+                    </div>
                     <div class="chart-loading position-absolute top-50 start-50 translate-middle w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-90">
                         <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
+                            <span class="visually-hidden">Loading border data...</span>
                         </div>
                         <p class="ms-3 mb-0">Loading border data...</p>
                     </div>
@@ -185,17 +540,41 @@
                         <h4 class="h6 mb-2">Detailed Analysis</h4>
                         <p class="small mb-0">Border statistics showing countries with most neighbors, border lengths, and cross-border cooperation.</p>
                     </div>
+                    <div class="chart-close-btn">✕</div>
                 </div>
             </div>
 
             <div id="chartContainer8" class="chart-container card shadow-sm mb-4 position-relative"
                  aria-label="Language distribution chart" tabindex="0">
                 <div class="card-body">
-                    <h3 class="chart-title h5 mb-3">Language Distribution</h3>
-                    <p class="chart-description text-muted">Most spoken languages globally</p>
+                    <div class="chart-content">
+                        <h3 class="chart-title h5 mb-3">Language Distribution</h3>
+                        <p class="chart-description text-muted">Most spoken languages globally</p>
+                        <div class="chart-wrapper" style="width: 100%; height: 100%; position: relative;">
+                            <!-- Chart will be rendered here -->
+                        </div>
+                    </div>
+                    <div class="chart-detail-analysis">
+                        <h4 class="h5 mb-3">Language Distribution Analysis</h4>
+                        <p>Language distribution analysis covering native vs non-native speakers and endangered language status.</p>
+                        <div class="analysis-data mt-4">
+                            <h5 class="h6 mb-2">Key Insights</h5>
+                            <ul>
+                                <li>Mandarin Chinese is the most spoken language by native speakers.</li>
+                                <li>English is the most widely spoken language globally, including non-native speakers.</li>
+                                <li>Several languages are endangered, with efforts underway to preserve them.</li>
+                                <li>Multilingualism is common in many countries, especially in Africa and Asia.</li>
+                            </ul>
+                            <h5 class="h6 my-3">Related Metrics</h5>
+                            <p>Language diversity, number of speakers, and language preservation efforts are key factors in language distribution.</p>
+                            <div class="data-source small text-muted mt-4">
+                                Data sources: Ethnologue, UNESCO, World Bank
+                            </div>
+                        </div>
+                    </div>
                     <div class="chart-loading position-absolute top-50 start-50 translate-middle w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-90">
                         <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
+                            <span class="visually-hidden">Loading language data...</span>
                         </div>
                         <p class="ms-3 mb-0">Loading language data...</p>
                     </div>
@@ -203,8 +582,12 @@
                         <h4 class="h6 mb-2">Detailed Analysis</h4>
                         <p class="small mb-0">Language distribution analysis covering native vs non-native speakers and endangered language status.</p>
                     </div>
+                    <div class="chart-close-btn">✕</div>
                 </div>
             </div>
+
+            <!-- Add backdrop for modal effect -->
+            <div class="chart-backdrop"></div>
         </div>
     </main>
 
