@@ -206,7 +206,8 @@ class SelectedCountryPage {
                     title: {
                         display: true,
                         text: `Population Comparison - ${this.currentCountry.region}`,
-                        font: { size: 16, weight: 'bold' }
+                        font: { size: 24, weight: 'bold' },
+                        padding: {bottom: 30}
                     }
                 },
                 scales: {
@@ -269,7 +270,8 @@ class SelectedCountryPage {
                     title: {
                         display: true,
                         text: 'Language Distribution',
-                        font: { size: 16, weight: 'bold' }
+                        font: { size: 24, weight: 'bold' },
+                        padding: {bottom: 30}
                     }
                 }
             }
@@ -429,7 +431,8 @@ class SelectedCountryPage {
                     title: {
                         display: true,
                         text: `Area Comparison - ${this.currentCountry.region}`, // Dynamic chart title
-                        font: { size: 16, weight: 'bold' }
+                        font: { size: 24, weight: 'bold' },
+                        padding: {bottom: 30}
                     }
                 },
                 scales: {
