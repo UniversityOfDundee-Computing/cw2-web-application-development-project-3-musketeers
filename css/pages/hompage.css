@@ -1,0 +1,96 @@
+//**
+ *hompage CSS File*/
+/* Error message styles */
+.error-message {
+    padding: var(--spacing-medium);
+    margin: var(--spacing-medium) 0;
+    background-color: var(--error-color);
+    color: var(--white);
+    border-radius: var(--border-radius);
+    text-align: center;
+}
+
+/* Loading spinner */
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--border-color);
+    border-top: 4px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Footer styles */
+footer {
+    text-align: center;
+    padding: var(--spacing-medium);
+    background-color: var(--primary-color);
+    color: var(--white);
+}
+
+/* Utility classes */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-medium);
+}
+
+.text-center {
+    text-align: center;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Responsive typography */
+@media (max-width: 768px) {
+    :root {
+        --font-size-base: 14px;
+        --font-size-large: 20px;
+    }
+}
+
+#globe-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* place globe behind page main content */
+    opacity: 0.2; /* Adjust for subtle effect */
+}
+
+#country-info {
+    position: absolute;
+    bottom: 30px;
+    left: 30px;
+    background-color: rgba(0, 0, 0, 0.85);
+    color: gold;
+    padding: 20px;
+    border-radius: 10px;
+    font-size: 18px;
+    box-shadow: 0 0 10px gold;
+    z-index: 10;
+    max-width: 300px;
+  }
+  
+  #country-info.hidden {
+    display: none;
+  }
+  
+  #country-info #close-info {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    color: white;
+  }
+  
