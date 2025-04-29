@@ -17,10 +17,11 @@ export class CurrencyChart extends BaseChart {
     constructor(containerId, options = {}) {
         super(containerId, {
             title: 'Top 5 Most Used Currencies',
-            type: 'radar',
+            type: 'polarArea',
             colorScheme: 'blue',
             limit: 5,
             chartType: 'currency', // Add chart type identifier for dynamic descriptions
+            supportedChartTypes: ['polarArea', 'bar', 'pie', 'doughnut', 'radar'],
             ...options
         });
     }
@@ -170,7 +171,7 @@ export class CurrencyChart extends BaseChart {
         ];
         
         const chartConfig = {
-            type: this.options.type || 'doughnut',
+            type: this.options.type || 'polarArea',
             data: {
                 labels: data.labels,
                 datasets: [{
@@ -256,6 +257,14 @@ export class CurrencyChart extends BaseChart {
             
             // Don't need legend for bar chart
             chartConfig.options.plugins.legend.display = false;
+        }
+
+        // For radar charts, customize the appearance
+        if (this.options.type === 'radar') {
+            chartConfig.data.datasets[0].pointBackgroundColor = colors;
+            chartConfig.data.datasets[0].pointRadius = 5;
+            chartConfig.data.datasets[0].fill = true;
+            chartConfig.data.datasets[0].borderWidth = 2;
         }
         
         return chartConfig;
@@ -566,5 +575,247 @@ export class CurrencyChart extends BaseChart {
         
         // Default if no matching symbol found
         return '';
+    }
+
+    /**
+     * Override the base class method to ensure chart type is reflected in descriptions
+     * @param {string} chartType - Chart type ('bar', 'pie', etc.)
+     */
+    async changeChartType(chartType) {
+        if (this.options.supportedChartTypes.includes(chartType)) {
+            console.log(`[${this.containerId}] Changing chart type to ${chartType}...`);
+            
+            // Show loading overlay
+            this.showLoading();
+            
+            try {
+                // Update options
+                this.options.type = chartType;
+                
+                // Create new chart configuration
+                const chartConfig = this.createChartConfig(this.processedData);
+                
+                // Generate chart URL
+                const chartUrl = chartService.createChartUrl(chartConfig);
+                
+                // Update the chart
+                chartUtils.displayChart(
+                    this.containerId,
+                    chartUrl,
+                    this.options.title
+                );
+                
+                // Generate and update descriptions to reflect the chart type change
+                const descriptions = this.generateDescriptions(this.processedData);
+                this.updateChartDescriptions(descriptions);
+                
+                console.log(`[${this.containerId}] Chart type changed successfully to ${chartType}.`);
+            } catch (error) {
+                console.error(`[${this.containerId}] Error changing chart type:`, error);
+                this.showError(`Failed to change chart type: ${error.message}`);
+            }
+        }
+    }
+    
+    /**
+     * Generate dynamic data-driven descriptions based on the actual chart data
+     * @param {Object} data - Processed chart data
+     * @returns {Object} Object containing chart descriptions
+     */
+    generateDescriptions(data) {
+        // Safety check
+        if (!data || !data.formatted || data.formatted.length === 0) {
+            return {
+                title: this.options.title || 'Currency Distribution',
+                short: 'No data available for currency analysis.',
+                detailed: 'This chart would display currency usage statistics when data is available.',
+                analysis: 'Currency data is currently unavailable or being loaded.',
+                insights: [
+                    'No currency data available for analysis.',
+                    'Try changing the region filter to view more data.'
+                ]
+            };
+        }
+        
+        // Get current options and state
+        const currView = this.options.currView || 'count';
+        const region = this.options.regionFilter || 'all';
+        const chartType = this.options.type || 'polarArea';
+        const limit = this.options.limit || 5;
+        
+        // Create context descriptions based on current filters
+        let viewContext = '';
+        switch (currView) {
+            case 'shared':
+                viewContext = 'shared by multiple countries';
+                break;
+            case 'exclusive':
+                viewContext = 'exclusive to single countries';
+                break;
+            default:
+                viewContext = 'by usage frequency';
+                break;
+        }
+        
+        let regionContext = '';
+        if (region !== 'all') {
+            regionContext = ` in ${region}`;
+        }
+        
+        // Create chart-type specific context
+        let chartTypeDesc = '';
+        switch (chartType) {
+            case 'bar':
+                chartTypeDesc = 'bar chart showing comparison by count';
+                break;
+            case 'pie':
+                chartTypeDesc = 'pie chart showing proportional distribution';
+                break;
+            case 'doughnut':
+                chartTypeDesc = 'doughnut chart showing proportional distribution';
+                break;
+            case 'radar':
+                chartTypeDesc = 'radar chart highlighting comparative usage';
+                break;
+            case 'polarArea':
+            default:
+                chartTypeDesc = 'polar area chart showing distribution and magnitude';
+                break;
+        }
+        
+        // Dynamic title based on current view and region
+        let title = 'Most Used Currencies';
+        if (currView === 'shared') {
+            title = 'Most Shared Currencies';
+        } else if (currView === 'exclusive') {
+            title = 'Currencies Used by Single Countries';
+        }
+        
+        if (region !== 'all') {
+            title = `${title} in ${region}`;
+        }
+        
+        // Get insights based on actual data
+        const insights = [];
+        
+        // Top currency insight
+        if (data.formatted.length > 0) {
+            const topCurrency = data.formatted[0];
+            
+            if (currView === 'shared') {
+                // For shared currencies, be specific about the number of countries
+                insights.push(`${topCurrency.currency} is the most widely shared currency, used by ${topCurrency.count} different countries${regionContext}.`);
+            } else if (currView === 'exclusive') {
+                insights.push(`${topCurrency.currency} is one of the currencies used exclusively by a single country${regionContext}.`);
+            } else {
+                insights.push(`${topCurrency.currency} is the most common currency${regionContext}, used by ${topCurrency.count} countries (${topCurrency.percentage}% of selected countries).`);
+            }
+        }
+        
+        // Regional currency pattern insight - based on data view
+        if (data.formatted.length > 1) {
+            if (region !== 'all') {
+                // For specific region filters
+                insights.push(`In ${region}, there are at least ${data.formatted.length} different currencies in use, highlighting the region's monetary diversity.`);
+            } else if (currView === 'shared') {
+                // Get the number of countries using shared currencies from the actual data
+                const totalSharedCountries = data.formatted.reduce((sum, curr) => sum + curr.count, 0);
+                insights.push(`Across these shared currencies, a total of ${totalSharedCountries} countries use currencies that are also used by at least one other country.`);
+            } else if (currView === 'exclusive') {
+                insights.push(`${data.formatted.length} countries maintain their own unique currencies, reflecting monetary sovereignty and national identity.`);
+            }
+        }
+        
+        // Third insight based on view type with specific data
+        if (currView === 'shared') {
+            // Check if we have enough data for a meaningful comparison
+            if (data.formatted.length >= 2) {
+                const topCurrency = data.formatted[0];
+                const secondCurrency = data.formatted[1];
+                insights.push(`While ${topCurrency.currency} is used by ${topCurrency.count} countries, ${secondCurrency.currency} is used by ${secondCurrency.count} countries, showing different levels of currency sharing.`);
+            } else {
+                insights.push(`Shared currencies facilitate international trade and travel between member countries but require coordinated monetary policy.`);
+            }
+        } else if (currView === 'exclusive') {
+            // Add a specific example from the data if available
+            if (data.formatted.length > 0) {
+                const example = data.formatted[0];
+                insights.push(`${example.currency} is an example of a national currency that allows for independent monetary policy but may face higher transaction costs in international trade.`);
+            } else {
+                insights.push(`Exclusive national currencies allow for independent monetary policy but may lead to higher transaction costs in international trade.`);
+            }
+        } else {
+            // If we have enough data, add a comparison insight
+            if (data.formatted.length > 2) {
+                const secondCurrency = data.formatted[1];
+                const thirdCurrency = data.formatted[2];
+                insights.push(`${secondCurrency.currency} and ${thirdCurrency.currency} are also widely used, with ${secondCurrency.count} and ${thirdCurrency.count} countries respectively.`);
+            }
+        }
+        
+        // Final insight with general currency information based on chart data
+        if (region !== 'all') {
+            insights.push(`Currency patterns in ${region} reflect historical relationships, trade partnerships, and economic integration levels.`);
+        } else {
+            // Calculate some statistics from the data for a data-driven insight
+            const totalCountries = data.formatted.reduce((sum, curr) => sum + curr.count, 0);
+            const topThreePct = data.formatted.slice(0, Math.min(3, data.formatted.length))
+                .reduce((sum, curr) => sum + parseInt(curr.percentage), 0);
+            
+            if (data.formatted.length >= 3 && !isNaN(topThreePct)) {
+                insights.push(`The top ${Math.min(3, data.formatted.length)} currencies account for approximately ${Math.round(topThreePct)}% of the countries analyzed, showing the concentration of major currencies.`);
+            } else {
+                insights.push(`Global currency usage patterns reflect economic influence, historical relationships, and regional integration efforts.`);
+            }
+        }
+        
+        // Create short description
+        const shortDesc = `Top ${limit} currencies ${viewContext}${regionContext}, displayed as a ${chartTypeDesc}.`;
+        
+        // Create detailed description
+        let detailedDesc = `This ${chartTypeDesc} displays the ${limit} most common currencies ${viewContext}${regionContext}. `;
+        
+        if (data.formatted.length > 0) {
+            const topCurrency = data.formatted[0];
+            detailedDesc += `${topCurrency.currency} leads with usage in ${topCurrency.count} countries. `;
+        }
+        
+        if (chartType === 'bar' || chartType === 'radar') {
+            detailedDesc += `The chart compares the number of countries using each currency.`;
+        } else {
+            detailedDesc += `The relative size of each segment represents the number of countries using that currency.`;
+        }
+        
+        // Analysis text
+        let analysisText = `This visualization presents the distribution of currencies ${viewContext}${regionContext}. `;
+        
+        if (data.formatted.length > 0) {
+            if (currView === 'shared') {
+                // List the top shared currencies by name from the data
+                const topSharedList = data.formatted.slice(0, Math.min(3, data.formatted.length))
+                    .map(item => item.currency)
+                    .join(', ');
+                    
+                analysisText += `${topSharedList} ${data.formatted.length <= 1 ? 'is' : 'are'} examples of widely shared currencies. `;
+                analysisText += `Shared currencies facilitate trade and economic integration between countries.`;
+            } else if (currView === 'exclusive') {
+                analysisText += `Many countries maintain their own unique currencies for economic sovereignty. `;
+                analysisText += `These currencies reflect national identity and provide monetary policy independence.`;
+            } else {
+                // Get actual percentages from the top currencies
+                const topCurrencyPct = data.formatted[0]?.percentage || '?';
+                
+                analysisText += `Currency distribution reflects economic influence and historical relationships. `;
+                analysisText += `The most widely used currency (${data.formatted[0]?.currency || 'Unknown'}) represents ${topCurrencyPct}% of the countries analyzed.`;
+            }
+        }
+        
+        return {
+            title: title,
+            short: shortDesc,
+            detailed: detailedDesc,
+            analysis: analysisText,
+            insights: insights
+        };
     }
 }

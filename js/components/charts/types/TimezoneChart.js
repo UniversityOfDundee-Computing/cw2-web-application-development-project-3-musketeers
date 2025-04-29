@@ -5,6 +5,8 @@
 
 import { BaseChart } from '../BaseChart.js';
 import * as dataProcessing from '../../../utils/dataProcessing.js';
+import { chartService } from '../../../services/chartService.js';
+import * as chartUtils from '../../../utils/chartUtils.js';
 
 export class TimezoneChart extends BaseChart {
     /**
@@ -416,6 +418,9 @@ export class TimezoneChart extends BaseChart {
             // Store range option
             this.options.tzRange = range;
             
+            // Clean up existing chart elements
+            this.cleanupExistingChart();
+            
             // Re-process data with the new range filter
             this.processedData = await this.processData(this.rawData);
             
@@ -473,6 +478,9 @@ export class TimezoneChart extends BaseChart {
             // Store grouping option
             this.options.tzGrouping = grouping;
             
+            // Clean up existing chart elements
+            this.cleanupExistingChart();
+            
             // Re-process data with the new grouping
             this.processedData = await this.processData(this.rawData);
             
@@ -492,6 +500,24 @@ export class TimezoneChart extends BaseChart {
             // Update descriptions
             const descriptions = this.generateDescriptions(this.processedData);
             this.updateChartDescriptions(descriptions);
+
+            // Update title with grouping information
+            let currentTitle = this.options.title || 'Countries per Timezone';
+            if (grouping === 'hour') {
+                currentTitle = currentTitle.replace(/\(Top \d+\)/, '(By Hour, Top ' + this.options.limit + ')');
+            } else if (grouping === 'region') {
+                currentTitle = currentTitle.replace(/\(Top \d+\)/, '(By Region, Top ' + this.options.limit + ')');
+            } else {
+                currentTitle = currentTitle.replace(/\(By (?:Hour|Region), Top \d+\)/, '(Top ' + this.options.limit + ')');
+            }
+            
+            this.options.title = currentTitle;
+            
+            // Update the chart title in the DOM
+            const titleElement = this.container.querySelector('.chart-title');
+            if (titleElement) {
+                titleElement.textContent = this.options.title;
+            }
         } catch (error) {
             console.error(`[${this.containerId}] Error changing timezone grouping:`, error);
             this.showError(`Failed to change timezone grouping: ${error.message}`);
@@ -512,6 +538,9 @@ export class TimezoneChart extends BaseChart {
             // Store business hours option
             this.options.showBusinessHours = show;
             
+            // Clean up existing chart elements
+            this.cleanupExistingChart();
+            
             // Create new chart configuration with business hours overlay
             const chartConfig = this.createChartConfig(this.processedData);
             
@@ -527,13 +556,327 @@ export class TimezoneChart extends BaseChart {
             
             // Update descriptions to include business hours context
             const descriptions = this.generateDescriptions(this.processedData);
-            if (show && descriptions.short) {
-                descriptions.short += ' The chart highlights standard business hours (9am-5pm) in major financial centers.';
-            }
             this.updateChartDescriptions(descriptions);
+            
+            // Update title to indicate business hours if shown
+            let currentTitle = this.options.title || 'Countries per Timezone';
+            if (show && !currentTitle.includes('Business Hours')) {
+                currentTitle += ' (with Business Hours)';
+            } else if (!show && currentTitle.includes('Business Hours')) {
+                currentTitle = currentTitle.replace(' (with Business Hours)', '');
+            }
+            
+            this.options.title = currentTitle;
+            
+            // Update the chart title in the DOM
+            const titleElement = this.container.querySelector('.chart-title');
+            if (titleElement) {
+                titleElement.textContent = this.options.title;
+            }
         } catch (error) {
             console.error(`[${this.containerId}] Error toggling business hours:`, error);
             this.showError(`Failed to toggle business hours: ${error.message}`);
         }
+    }
+
+    /**
+     * Override the base class method to ensure chart type is reflected in descriptions
+     * @param {string} chartType - Chart type ('bar', 'pie', etc.)
+     */
+    async changeChartType(chartType) {
+        if (this.supportedChartTypes && this.supportedChartTypes.includes(chartType)) {
+            console.log(`[${this.containerId}] Changing chart type to ${chartType}...`);
+            
+            // Show loading overlay
+            this.showLoading();
+            
+            try {
+                // Update options
+                this.options.type = chartType;
+                
+                // Clean up existing chart elements
+                this.cleanupExistingChart();
+                
+                // Create new chart configuration
+                const chartConfig = this.createChartConfig(this.processedData);
+                
+                // Generate chart URL
+                const chartUrl = chartService.createChartUrl(chartConfig);
+                
+                // Update the chart
+                chartUtils.displayChart(
+                    this.containerId,
+                    chartUrl,
+                    this.options.title
+                );
+                
+                // Generate and update descriptions to reflect the chart type change
+                const descriptions = this.generateDescriptions(this.processedData);
+                this.updateChartDescriptions(descriptions);
+                
+                console.log(`[${this.containerId}] Chart type changed successfully to ${chartType}.`);
+            } catch (error) {
+                console.error(`[${this.containerId}] Error changing chart type:`, error);
+                this.showError(`Failed to change chart type: ${error.message}`);
+            }
+        }
+    }
+    
+    /**
+     * Clean up existing chart elements to prevent stacking
+     */
+    cleanupExistingChart() {
+        console.log(`[${this.containerId}] Cleaning up existing chart elements...`);
+        
+        if (!this.container) {
+            console.error(`[${this.containerId}] Container not found during cleanup`);
+            return;
+        }
+        
+        // Find the chart wrapper
+        const chartWrapper = this.container.querySelector('.chart-wrapper');
+        if (!chartWrapper) {
+            console.error(`[${this.containerId}] Chart wrapper not found during cleanup`);
+            return;
+        }
+        
+        // Remove any existing chart images
+        const existingImages = chartWrapper.querySelectorAll('.chart-image');
+        if (existingImages.length > 0) {
+            console.log(`[${this.containerId}] Removing ${existingImages.length} existing chart images`);
+            existingImages.forEach(image => {
+                image.remove();
+            });
+        }
+        
+        // Remove any existing error messages
+        const existingErrors = chartWrapper.querySelectorAll('.chart-error');
+        if (existingErrors.length > 0) {
+            console.log(`[${this.containerId}] Removing ${existingErrors.length} existing error messages`);
+            existingErrors.forEach(error => {
+                error.remove();
+            });
+        }
+        
+        // If we have a chart instance, properly dispose of it
+        if (this.chartInstance) {
+            console.log(`[${this.containerId}] Destroying chart instance`);
+            if (typeof this.chartInstance.destroy === 'function') {
+                this.chartInstance.destroy();
+            }
+            this.chartInstance = null;
+        }
+        
+        console.log(`[${this.containerId}] Chart cleanup completed`);
+    }
+
+    /**
+     * Generate dynamic data-driven descriptions based on the actual chart data
+     * @param {Object} data - Processed chart data
+     * @returns {Object} Object containing chart descriptions
+     */
+    generateDescriptions(data) {
+        // Safety check
+        if (!data || !data.formatted || data.formatted.length === 0) {
+            return {
+                title: this.options.title || 'Timezone Distribution',
+                short: 'No data available for timezone analysis.',
+                detailed: 'This chart would display timezone distribution statistics when data is available.',
+                analysis: 'Timezone data is currently unavailable or being loaded.',
+                insights: [
+                    'No timezone data available for analysis.',
+                    'Try changing the range filter to view more data.'
+                ]
+            };
+        }
+        
+        // Get current options and state
+        const range = this.options.tzRange || 'all';
+        const grouping = this.options.tzGrouping || 'exact';
+        const chartType = this.options.type || 'bar';
+        const limit = this.options.limit || 5;
+        const showBusinessHours = this.options.showBusinessHours || false;
+        const sortOrder = this.options.sort || 'desc';
+        
+        // Create context descriptions based on current filters
+        let rangeContext = '';
+        switch (range) {
+            case 'positive':
+                rangeContext = 'in eastern hemispheres (UTC+)';
+                break;
+            case 'negative':
+                rangeContext = 'in western hemispheres (UTC-)';
+                break;
+            case 'major':
+                rangeContext = 'in major whole-hour zones';
+                break;
+            default:
+                rangeContext = 'worldwide';
+                break;
+        }
+        
+        let groupingContext = '';
+        switch (grouping) {
+            case 'hour':
+                groupingContext = 'grouped by rounded hour';
+                break;
+            case 'region':
+                groupingContext = 'grouped by geographical region';
+                break;
+            default:
+                groupingContext = 'by exact timezone';
+                break;
+        }
+        
+        // Create chart-type specific context
+        let chartTypeDesc = '';
+        switch (chartType) {
+            case 'bar':
+                chartTypeDesc = 'bar chart comparing distribution across timezones';
+                break;
+            case 'line':
+                chartTypeDesc = 'line chart showing timezone distribution trends';
+                break;
+            case 'pie':
+                chartTypeDesc = 'pie chart showing timezone distribution proportions';
+                break;
+            default:
+                chartTypeDesc = 'chart showing timezone distribution';
+                break;
+        }
+        
+        // Dynamic title based on current view and region
+        let title = 'Countries per Timezone';
+        if (range === 'positive') {
+            title = 'Countries in Eastern Timezones (UTC+)';
+        } else if (range === 'negative') {
+            title = 'Countries in Western Timezones (UTC-)';
+        } else if (range === 'major') {
+            title = 'Countries in Major Timezones';
+        }
+        title = `${title} (Top ${limit})`;
+        
+        // Get insights based on actual data
+        const insights = [];
+        
+        // Top timezone insight based on sort order
+        if (data.formatted.length > 0) {
+            const topTimezone = data.formatted[0];
+            const superlative = sortOrder === 'asc' ? 'least' : 'most';
+            insights.push(`${topTimezone.timezone} is the ${superlative} populous timezone ${rangeContext}, with ${topTimezone.count} countries (${topTimezone.percentage}% of analyzed countries).`);
+        }
+        
+        // Timezone distribution insight
+        if (data.formatted.length > 2) {
+            // Calculate concentration
+            const totalCount = data.formatted.reduce((sum, item) => sum + item.count, 0);
+            
+            // Select the appropriate countries based on sort order
+            const targetCountries = sortOrder === 'asc' 
+                ? data.formatted.slice(0, 3) // For ascending, lowest 3
+                : data.formatted.slice(0, 3); // For descending, highest 3
+                
+            const targetCount = targetCountries.reduce((sum, item) => sum + item.count, 0);
+            const targetPercent = Math.round((targetCount / totalCount) * 100);
+            
+            const concentrationDesc = sortOrder === 'asc' 
+                ? `The 3 least common timezones account for approximately ${targetPercent}% of countries ${rangeContext}`
+                : `The top 3 timezones account for approximately ${targetPercent}% of countries ${rangeContext}`;
+                
+            const distributionType = targetPercent > 60 
+                ? (sortOrder === 'asc' ? 'a concentration in rare timezones' : 'a high concentration in common timezones')
+                : 'an even distribution of countries across timezones';
+                
+            insights.push(`${concentrationDesc}, showing ${distributionType}.`);
+        }
+        
+        // Business hours insight if enabled
+        if (showBusinessHours) {
+            insights.push(`The chart highlights standard business hours (9am-5pm) in major financial centers, useful for understanding global market operating hours overlap.`);
+        }
+        
+        // Grouping-specific insight
+        if (grouping === 'region') {
+            insights.push(`Geographical grouping reveals how countries are distributed across major world regions, with implications for communication and business coordination.`);
+        } else if (grouping === 'hour') {
+            insights.push(`Rounding to whole hours simplifies analysis for global coordination planning and helps identify optimal meeting times across regions.`);
+        } else {
+            if (data.formatted.length >= 3) {
+                const uniqueOffsets = new Set(data.formatted.map(item => {
+                    const match = item.timezone.match(/UTC([+-]\d+)/);
+                    return match ? match[1] : null;
+                }).filter(Boolean));
+                
+                insights.push(`The data reveals ${uniqueOffsets.size} distinct timezone offsets among the ${sortOrder === 'asc' ? 'least' : 'most'} common ${data.formatted.length} timezones, highlighting the complexity of global time coordination.`);
+            }
+        }
+        
+        // Final insight with general timezone information
+        insights.push(`Timezone distribution reflects geographical positioning, historical factors, and regional coordination decisions among neighboring countries.`);
+        
+        // Add sort order context
+        const sortContext = sortOrder === 'asc' ? 'showing least common first' : 'showing most common first';
+        
+        // Create short description
+        const shortDesc = `Top ${limit} timezones ${rangeContext}, ${groupingContext}, displayed as a ${chartTypeDesc} (${sortContext}).`;
+        
+        // Create detailed description
+        let detailedDesc = `This ${chartTypeDesc} displays the ${limit} ${sortOrder === 'asc' ? 'least' : 'most'} common timezones ${rangeContext}, ${groupingContext}. `;
+        
+        if (data.formatted.length > 0) {
+            const topTimezone = data.formatted[0];
+            if (sortOrder === 'asc') {
+                detailedDesc += `${topTimezone.timezone} has the fewest countries at ${topTimezone.count}. `;
+            } else {
+                detailedDesc += `${topTimezone.timezone} leads with ${topTimezone.count} countries. `;
+            }
+        }
+        
+        if (chartType === 'bar') {
+            detailedDesc += `The chart compares the number of countries in each timezone, with bar height representing country count.`;
+        } else if (chartType === 'pie') {
+            detailedDesc += `The relative size of each segment represents the number of countries using that timezone.`;
+        } else {
+            detailedDesc += `The chart provides a visual representation of timezone distribution across countries.`;
+        }
+        
+        if (showBusinessHours) {
+            detailedDesc += ` Business hours (9am-5pm) in major financial centers are highlighted for reference.`;
+        }
+        
+        // Analysis text
+        let analysisText = `This visualization presents the distribution of countries across timezones ${rangeContext}, sorted to show ${sortOrder === 'asc' ? 'least' : 'most'} common timezones first. `;
+        
+        if (data.formatted.length > 0) {
+            if (grouping === 'region') {
+                analysisText += `Regional grouping provides insight into how countries cluster geographically and their impact on global time coordination. `;
+            } else {
+                const topTz = data.formatted[0].timezone;
+                const topCount = data.formatted[0].count;
+                if (sortOrder === 'asc') {
+                    analysisText += `${topTz} stands out with only ${topCount} countries, showing unique or less common time standards. `;
+                } else {
+                    analysisText += `${topTz} stands out with ${topCount} countries, which has implications for international communication and business operations. `;
+                }
+            }
+            
+            if (range === 'all') {
+                analysisText += `The full timezone spectrum demonstrates Earth's 24-hour rotation cycle and its impact on human activity coordination.`;
+            } else if (range === 'positive') {
+                analysisText += `Eastern hemisphere timezones (UTC+) cover regions including Europe, Asia, Oceania and parts of Africa.`;
+            } else if (range === 'negative') {
+                analysisText += `Western hemisphere timezones (UTC-) primarily cover the Americas and parts of the Pacific.`;
+            } else {
+                analysisText += `Major timezones represent the most commonly used hour-aligned time standards globally.`;
+            }
+        }
+        
+        return {
+            title: title,
+            short: shortDesc,
+            detailed: detailedDesc,
+            analysis: analysisText,
+            insights: insights
+        };
     }
 }
