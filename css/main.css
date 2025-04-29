@@ -151,3 +151,31 @@ footer {
     z-index: -1; /* place globe behind page main content */
     opacity: 0.2; /* Adjust for subtle effect */
 }
+
+#country-info {
+    position: absolute;
+    bottom: 30px;
+    left: 30px;
+    background-color: rgba(0, 0, 0, 0.85);
+    color: gold;
+    padding: 20px;
+    border-radius: 10px;
+    font-size: 18px;
+    box-shadow: 0 0 10px gold;
+    z-index: 10;
+    max-width: 300px;
+  }
+  
+  #country-info.hidden {
+    display: none;
+  }
+  
+  #country-info #close-info {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    color: white;
+  }
+  

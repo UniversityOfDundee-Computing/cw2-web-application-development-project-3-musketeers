@@ -6,6 +6,7 @@
   <meta name="description" content="Country Data Visualizer - Explore and analyze global country statistics through interactive visualizations">
   <title>Country Data Visualizer</title>
 
+
   <!-- Load Three.js and Globe.gl -->
   <script src="https://unpkg.com/three"></script>
   <script src="https://unpkg.com/globe.gl"></script>
@@ -22,12 +23,20 @@
     }
 
     #globeViz {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
+     position: fixed;
+     top: 0;
+     left: 0;
+     width: 100vw;
+     height: 100vh;
+     z-index: 0; /* Send behind everything */
+     pointer-events: none; /* Allows right-click and UI clicks */
     }
+
+     body {
+      position: relative;
+     z-index: 1;
+    }
+
 
     .loading-container {
       z-index: 1;
@@ -54,20 +63,53 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+
+    .globeViz .globe-tooltip {
+     font-size: 20px; /* Make tooltip text bigger */
+     font-weight: bold;
+     color: gold; /* Optional: make the text golden! */
+    }
+
+    #globeViz .globe-label {
+     transition: opacity 0.5s ease;
+     pointer-events: none;
+     font-size: 18px;
+     font-weight: bold;
+     color: gold;
+     opacity: 1;
+     animation: fadeout 8s ease forwards;
+    }
+
+     @keyframes fadeout {
+     0% { opacity: 1; }
+     80% { opacity: 1; }
+     100% { opacity: 0; }
+    
+    }
+
+
   </style>
 </head>
 
 <body>
 
   <!-- The Globe -->
-  <div id="globeViz"></div>
-
+  <div id="globe-wrapper">
+    <div id="globeViz"></div>
+  </div>
+  
   <!-- Loading Screen -->
   <div class="loading-container" id="loading">
     <h1>Country Data Visualizer</h1>
     <div class="loading-spinner"></div>
     <p>Loading application...</p>
   </div>
+
+  <div id="country-info" class="hidden">
+    <span id="close-info">&times;</span>
+    <h2 id="country-name">Country Name</h2>
+  </div>
+  
 
   <script>
     window.addEventListener('DOMContentLoaded', () => {

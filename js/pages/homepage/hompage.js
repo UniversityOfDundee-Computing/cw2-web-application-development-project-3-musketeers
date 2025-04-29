@@ -11,7 +11,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         .map(country => ({
           lat: country.latlng[0],
           lng: country.latlng[1],
-          size: 0.0006,
+          size: 0.002,
           color: 'gold',
           label: country.name.common
         }));
@@ -29,15 +29,72 @@ window.addEventListener('DOMContentLoaded', async () => {
       globe.controls().autoRotateSpeed = 0.5;
       globe.pointOfView({ lat: 20, lng: 0, altitude: 2.5 });
 
+      // Setup interaction: pause rotation when user clicks a dot
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+const renderer = globe.renderer();
+const camera = globe.camera();
+const scene = globe.scene();
+
+let isHovering = false;
+
+document.addEventListener('mousemove', (event) => {
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObjects(scene.children, true);
+
+  const hovered = intersects.find(i => i.object && i.object.userData && i.object.userData.isCountryPoint);
+
+  if (hovered && !isHovering) {
+    isHovering = true;
+    document.addEventListener('click', () => {
+        if (hovered && hovered.object && hovered.object.userData.countryName) {
+          const infoBox = document.getElementById('country-info');
+          const nameEl = document.getElementById('country-name');
+          nameEl.textContent = hovered.object.userData.countryName;
+          infoBox.classList.remove('hidden');
+        }
+      });
+      
+      // Add this to close the box when "X" is clicked
+      document.getElementById('close-info').addEventListener('click', () => {
+        document.getElementById('country-info').classList.add('hidden');
+      });
+      
+      
+    globe.controls().autoRotate = false; // Stop rotation
+  } else if (!hovered && isHovering) {
+    isHovering = false;
+    globe.controls().autoRotate = true; // Resume rotation
+  }
+});
+
+    customThreeObject(d => {
+    const material = new THREE.MeshLambertMaterial({ color: 'gold', emissive: 'gold' });
+    const geometry = new THREE.SphereGeometry(0.02, 16, 16);
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.userData.isCountryPoint = true; // Tag for raycasting
+    mesh.userData.isCountryPoint = true;
+    mesh.userData.countryName = d.label;
+
+    return mesh;
+  })
+  
+
+
       // 🔥 Animate Pulse Effect
-    setInterval(() => {
-        const time = Date.now() * 0.002; // Smooth animation speed
-        globe.pointsData().forEach(d => {
-          d.baseSize = 0.05 + 0.015 * Math.sin(time + d.lat); 
-          // Pulse between 0.05 and 0.065 gently
+      setInterval(() => {
+        const time = Date.now() * 0.002;
+        globe.customLayerData().forEach(d => {
+          const pulse = 1 + 0.4 * Math.sin(time + d.lat); // Increase strength from 0.2 ➔ 0.4
+          d.__threeObj.scale.set(pulse, pulse, pulse); // Apply pulse
         });
-        globe.pointAltitude('baseSize'); // Update globe
-      }, 50); // Refresh every 50ms
+      }, 50);
+      
+      
   
       // 🔥 Hide loading spinner AFTER globe fully initialized
       const loadingContainer = document.getElementById('loading');
