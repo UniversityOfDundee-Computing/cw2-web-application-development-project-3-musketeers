@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Country Data Visualizer - Selected Country</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css"
+    rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
     
     <!-- CSS -->
     <link rel="stylesheet" href="../css/main.css">
@@ -31,63 +33,63 @@
             </ul>
         </nav>
     </header>
+    
+    <main class="container">
 
-    <main>
-        <div class="container">
-            <section class="country-details-section">
-                <!-- Country overview -->
-                <div id="countryOverview" class="country-overview">
-                    <div class="loading-message">
-                        <p>Loading country information...</p>
+        <!-- Top Section (map, country overview, quick facts, neighbor countries) -->
+        <section class="top-section mb-4">
+            <div class="row g-4 align-items-stretch">
+                <!-- Left Side: Map + Neighbors -->
+                <div class="col-md-8 d-flex flex-column">
+
+                    <div class="map-container flex-grow-1 mb-4" id="mapView">
+                      <!-- Map here -->
+                    </div>
+                    <div class="neighbors-container" id="neighbors">
+                      <h2>Neighboring Countries</h2>
+                      <div class="neighbors-grid">
+                        <!-- Neighbors here -->
+                      </div>
                     </div>
                 </div>
 
-                <!-- Quick facts -->
-                <div id="quickFacts" class="quick-facts">
-                    <h2>Quick Facts</h2>
-                    <div class="facts-grid">
-                        <!-- Will be populated dynamically -->
+                <!-- Right Side: Country Overview + Quick Facts -->
+                <div class="col-md-4 d-flex flex-column">
+                    <div id="countryOverview" class="country-overview mb-4">
+                      <!-- Country overview content -->
+                    </div>
+                    <div id="quickFacts" class="quick-facts">
+                      <h2>Quick Facts</h2>
+                      <div class="row facts-grid">
+                        <!-- Fact items here -->
+                      </div>
                     </div>
                 </div>
-            </section>
 
-            <section class="visualizations-section">
-                <!-- Population trends -->
-                <div id="populationChart" class="chart-container">
-                    <!-- Population comparison with region -->
-                </div>
+            </div>
+        </section>
 
-                <!-- Language breakdown -->
-                <div id="languageChart" class="chart-container">
-                    <!-- Language distribution -->
-                </div>
-
-                <!-- Regional context -->
-                <div id="regionalChart" class="chart-container">
-                    <!-- Regional comparison -->
-                </div>
-
-                <!-- Area information -->
-                <div id="areaChart" class="chart-container">
-                    <!-- area bar -->
-                </div>
-            </section>
-
-            <section class="additional-info-section">
-                <!-- Map view -->
-                <div id="mapView" class="map-container">
-                    <!-- Map will be embedded here -->
-                </div>
-
-                <!-- Neighboring countries -->
-                <div id="neighbors" class="neighbors-container">
-                    <h2>Neighboring Countries</h2>
-                    <div class="neighbors-grid">
-                        <!-- Will be populated dynamically -->
+        <!-- Bottom layout: Charts and Neighbors -->
+        <section class="bottom-section mb-4">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div id="populationChart" class="chart-container">
+                    <!-- Population chart here -->
                     </div>
                 </div>
-            </section>
-        </div>
+                <div class="col-md-4">
+                    <div id="languageChart" class="chart-container">
+                    <!-- Language chart here -->
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div id="areaChart" class="chart-container">
+                    <!-- Area chart here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <footer>
@@ -96,6 +98,7 @@
 
     <!-- Templates -->
     <template id="country-overview-template">
+
         <div class="country-header">
             <img src="" alt="" class="country-flag">
             <div class="country-info">
@@ -106,8 +109,9 @@
                 </div>
             </div>
         </div>
+
         <div class="country-stats">
-            <!-- Will be populated dynamically -->
+            <!-- populated dynamically -->
         </div>
     </template>
 
@@ -143,5 +147,8 @@
 
     <!-- JavaScript Modules -->
     <script type="module" src="../js/pages/selected/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+
 </body>
 </html>

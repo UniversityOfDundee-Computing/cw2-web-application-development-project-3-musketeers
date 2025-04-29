@@ -20,7 +20,7 @@ class SelectedCountryPage {
         this.quickFacts = document.getElementById('quickFacts').querySelector('.facts-grid');
         this.populationChart = document.getElementById('populationChart');
         this.languageChart = document.getElementById('languageChart');
-        this.regionalChart = document.getElementById('regionalChart');
+        // this.regionalChart = document.getElementById('regionalChart');
         this.areaChart = document.getElementById('areaChart');
         this.mapView = document.getElementById('mapView');
         this.neighbors = document.getElementById('neighbors').querySelector('.neighbors-grid');
@@ -131,12 +131,9 @@ class SelectedCountryPage {
             this.mapView.innerHTML = `
                 <iframe
                     src="https://www.google.com/maps?q=${encodeURIComponent(country.name.common)}&output=embed"
-                    width="100%"
-                    height="400"
-                    style="border:0;border-radius:var(--border-radius);"
                     allowfullscreen=""
-                    loading="lazy">
-                </iframe>
+                    loading="lazy"
+                ></iframe>
             `;
         }
 
@@ -150,7 +147,7 @@ class SelectedCountryPage {
             await Promise.all([
                 this.createPopulationChart(),
                 this.createLanguageChart(),
-                this.createRegionalChart(),
+                // this.createRegionalChart(),
                 this.createAreaChart()
             ]);
         } catch (error) {
@@ -209,7 +206,8 @@ class SelectedCountryPage {
                     title: {
                         display: true,
                         text: `Population Comparison - ${this.currentCountry.region}`,
-                        font: { size: 16, weight: 'bold' }
+                        font: { size: 24, weight: 'bold' },
+                        padding: {bottom: 30}
                     }
                 },
                 scales: {
@@ -272,7 +270,8 @@ class SelectedCountryPage {
                     title: {
                         display: true,
                         text: 'Language Distribution',
-                        font: { size: 16, weight: 'bold' }
+                        font: { size: 24, weight: 'bold' },
+                        padding: {bottom: 30}
                     }
                 }
             }
@@ -285,51 +284,51 @@ class SelectedCountryPage {
     /**
      * Create regional context chart
      */
-    async createRegionalChart() {
-        const metrics = ['population', 'area'];
-        const regionalData = this.allCountries
-            .filter(c => c.region === this.currentCountry.region)
-            .map(c => ({
-                name: c.name.common,
-                population: c.population || 0,
-                area: c.area || 0
-            }));
+    // async createRegionalChart() {
+    //     const metrics = ['population', 'area'];
+    //     const regionalData = this.allCountries
+    //         .filter(c => c.region === this.currentCountry.region)
+    //         .map(c => ({
+    //             name: c.name.common,
+    //             population: c.population || 0,
+    //             area: c.area || 0
+    //         }));
 
-        const averages = metrics.reduce((acc, metric) => {
-            acc[metric] = regionalData.reduce((sum, c) => sum + c[metric], 0) / regionalData.length;
-            return acc;
-        }, {});
+    //     const averages = metrics.reduce((acc, metric) => {
+    //         acc[metric] = regionalData.reduce((sum, c) => sum + c[metric], 0) / regionalData.length;
+    //         return acc;
+    //     }, {});
 
-        const chartConfig = {
-            type: 'radar',
-            data: {
-                labels: metrics.map(m => m.charAt(0).toUpperCase() + m.slice(1)),
-                datasets: [{
-                    label: this.currentCountry.name.common,
-                    data: metrics.map(m => this.currentCountry[m] || 0),
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderColor: '#ff6384'
-                }, {
-                    label: `${this.currentCountry.region} Average`,
-                    data: metrics.map(m => averages[m]),
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderColor: '#36a2eb'
-                }]
-            },
-            options: {
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Regional Context',
-                        font: { size: 16, weight: 'bold' }
-                    }
-                }
-            }
-        };
+    //     const chartConfig = {
+    //         type: 'radar',
+    //         data: {
+    //             labels: metrics.map(m => m.charAt(0).toUpperCase() + m.slice(1)),
+    //             datasets: [{
+    //                 label: this.currentCountry.name.common,
+    //                 data: metrics.map(m => this.currentCountry[m] || 0),
+    //                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
+    //                 borderColor: '#ff6384'
+    //             }, {
+    //                 label: `${this.currentCountry.region} Average`,
+    //                 data: metrics.map(m => averages[m]),
+    //                 backgroundColor: 'rgba(54, 162, 235, 0.2)',
+    //                 borderColor: '#36a2eb'
+    //             }]
+    //         },
+    //         options: {
+    //             plugins: {
+    //                 title: {
+    //                     display: true,
+    //                     text: 'Regional Context',
+    //                     font: { size: 16, weight: 'bold' }
+    //                 }
+    //             }
+    //         }
+    //     };
 
-        const chartUrl = chartService.createChartUrl(chartConfig);
-        chartUtils.displayChart('regionalChart', chartUrl, 'Regional context');
-    }
+    //     const chartUrl = chartService.createChartUrl(chartConfig);
+    //     chartUtils.displayChart('regionalChart', chartUrl, 'Regional context');
+    // }
     
     // /**
     //  * Create currency usage chart
@@ -432,7 +431,8 @@ class SelectedCountryPage {
                     title: {
                         display: true,
                         text: `Area Comparison - ${this.currentCountry.region}`, // Dynamic chart title
-                        font: { size: 16, weight: 'bold' }
+                        font: { size: 24, weight: 'bold' },
+                        padding: {bottom: 30}
                     }
                 },
                 scales: {
