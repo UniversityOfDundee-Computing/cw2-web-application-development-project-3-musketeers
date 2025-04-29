@@ -5,6 +5,8 @@
 
 import { BaseChart } from '../BaseChart.js';
 import * as dataProcessing from '../../../utils/dataProcessing.js';
+import { chartService } from '../../../services/chartService.js';
+import * as chartUtils from '../../../utils/chartUtils.js';
 
 export class IndependenceChart extends BaseChart {
     /**
@@ -16,7 +18,7 @@ export class IndependenceChart extends BaseChart {
         super(containerId, {
             title: 'Independent vs Non-Independent States',
             type: 'pie',
-            colorScheme: 'default',
+            chartType: 'independence', // Add chart type identifier for dynamic descriptions
             ...options
         });
     }
@@ -124,4 +126,90 @@ export class IndependenceChart extends BaseChart {
             }
         };
     }
+
+    /**
+     * Create independence-specific chart controls
+     */
+    createChartControls() {
+        // Create base controls first
+        super.createChartControls();
+        
+        if (!this.chartControls) return;
+        
+        // 1. Add time period selector
+        const periodGroup = document.createElement('div');
+        periodGroup.className = 'form-group me-2 mb-2';
+        
+        const periodLabel = document.createElement('label');
+        periodLabel.className = 'me-2 fw-bold';
+        periodLabel.textContent = 'Period:';
+        periodGroup.appendChild(periodLabel);
+        
+        const periodSelect = document.createElement('select');
+        periodSelect.className = 'form-select form-select-sm time-period-select';
+        periodSelect.setAttribute('aria-label', 'Select time period');
+        
+        const periodOptions = [
+            { value: 'all', text: 'All Time' },
+            { value: 'pre1900', text: 'Before 1900' },
+            { value: '1900-1945', text: '1900-1945' },
+            { value: '1946-1989', text: 'Cold War (1946-1989)' },
+            { value: 'post1990', text: 'Modern Era (1990+)' }
+        ];
+        
+        periodOptions.forEach(option => {
+            const optionEl = document.createElement('option');
+            optionEl.value = option.value;
+            optionEl.textContent = option.text;
+            if (option.value === (this.options.period || 'all')) {
+                optionEl.selected = true;
+            }
+            periodSelect.appendChild(optionEl);
+        });
+        
+        periodSelect.addEventListener('change', (e) => {
+            this.changeTimePeriod(e.target.value);
+        });
+        
+        periodGroup.appendChild(periodSelect);
+        this.chartControls.appendChild(periodGroup);
+        
+        // 2. Add grouping selector
+        const groupGroup = document.createElement('div');
+        groupGroup.className = 'form-group me-2 mb-2';
+        
+        const groupLabel = document.createElement('label');
+        groupLabel.className = 'me-2 fw-bold';
+        groupLabel.textContent = 'Group By:';
+        groupGroup.appendChild(groupLabel);
+        
+        const groupSelect = document.createElement('select');
+        groupSelect.className = 'form-select form-select-sm group-select';
+        groupSelect.setAttribute('aria-label', 'Select grouping');
+        
+        const groupOptions = [
+            { value: 'status', text: 'Independence Status' },
+            { value: 'decade', text: 'Independence Decade' },
+            { value: 'region', text: 'Region' }
+        ];
+        
+        groupOptions.forEach(option => {
+            const optionEl = document.createElement('option');
+            optionEl.value = option.value;
+            optionEl.textContent = option.text;
+            if (option.value === (this.options.groupBy || 'status')) {
+                optionEl.selected = true;
+            }
+            groupSelect.appendChild(optionEl);
+        });
+        
+        groupSelect.addEventListener('change', (e) => {
+            this.changeGrouping(e.target.value);
+        });
+        
+        groupGroup.appendChild(groupSelect);
+        this.chartControls.appendChild(groupGroup);
+    }
+
+    // Keep existing methods for changeTimePeriod and changeGrouping
 }

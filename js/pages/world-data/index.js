@@ -4,9 +4,10 @@
  */
 
 import { Navigation } from '../../components/navigation.js';
+import { ChartManager } from '../../components/ChartManager.js';
 import { PopulationChart } from '../../components/charts/types/PopulationChart.js';
 import { ContinentChart } from '../../components/charts/types/ContinentChart.js';
-import { RegionChart } from '../../components/charts/types/RegionChart.js';
+// Removed RegionChart import
 import { CurrencyChart } from '../../components/charts/types/CurrencyChart.js';
 import { TimezoneChart } from '../../components/charts/types/TimezoneChart.js';
 import { BordersChart } from '../../components/charts/types/BordersChart.js';
@@ -17,6 +18,7 @@ class WorldDataPage {
     constructor() {
         this.charts = new Map();
         this.navigation = null;
+        this.chartManager = null;
         this.isInitialized = false;
 
         // Bind methods
@@ -35,6 +37,9 @@ class WorldDataPage {
 
             // Initialize all charts
             await this.initializeCharts();
+            
+            // Initialize chart manager after charts are loaded
+            this.chartManager = new ChartManager();
 
             this.isInitialized = true;
         } catch (error) {
@@ -58,11 +63,7 @@ class WorldDataPage {
                 type: ContinentChart,
                 options: { title: 'World Population by Continent' }
             },
-            {
-                id: 'chartContainer3',
-                type: RegionChart,
-                options: { title: 'Number of Countries per Region' }
-            },
+            // Regional Distribution chart removed
             {
                 id: 'chartContainer4',
                 type: CurrencyChart,

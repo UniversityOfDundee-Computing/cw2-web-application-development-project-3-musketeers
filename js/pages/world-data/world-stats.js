@@ -7,6 +7,11 @@
     const statsGrid = document.querySelector('#chartContainer9 .stats-grid');
     const loadingElement = document.querySelector('#world-stats-container .chart-loading');
     const statsWrapper = document.querySelector('#world-stats-container');
+    const descriptionElement = document.querySelector('#chartContainer9 .chart-description');
+    
+    // Auto-refresh configuration
+    const autoRefreshInterval = 60000; // Refresh every 1 minute
+    let refreshTimer = null;
     
     // Initialize loading element state
     loadingElement.style.visibility = 'visible';
@@ -28,6 +33,22 @@
     }
 
     console.log('[chartContainer9] DOM elements found, preparing to fetch data...');
+    
+    /**
+     * Generate dynamic description for world stats based on data
+     * @param {Object} stats - The stats object with calculated values
+     * @returns {string} - Dynamic description text
+     */
+    function generateStatsDescription(stats) {
+        // Extract key metrics for the description
+        const totalCountries = parseInt(stats[0].value.replace(/,/g, ''));
+        const globalPopulation = stats[1].value;
+        const languagesCount = parseInt(stats[2].value.replace(/,/g, ''));
+        const currenciesCount = parseInt(stats[3].value.replace(/,/g, ''));
+        
+        // Generate a dynamic description with the actual data
+        return `Comprehensive global statistics across ${totalCountries} countries showing key metrics including population (${globalPopulation}), ${languagesCount} languages, ${currenciesCount} currencies, and more. Updated ${new Date().toLocaleDateString()}.`;
+    }
     
     /**
      * Format large numbers into readable strings
@@ -86,6 +107,17 @@
             statsGrid.appendChild(card);
         });
         
+        // Update the description with dynamic content
+        if (descriptionElement) {
+            descriptionElement.textContent = generateStatsDescription(stats);
+        }
+        
+        // Remove any existing last-updated timestamp
+        const existingTimestamp = statsWrapper.querySelector('.last-updated');
+        if (existingTimestamp) {
+            existingTimestamp.remove();
+        }
+        
         console.log('[chartContainer9] Stats cards rendered successfully');
     }
     
@@ -123,12 +155,40 @@
     }, 10000); // 10 second timeout
     
     /**
+     * Set up auto-refresh for live updates of world stats
+     */
+    function setupAutoRefresh() {
+        // Clear any existing timer
+        if (refreshTimer) {
+            clearInterval(refreshTimer);
+        }
+        
+        // Set up a new timer to periodically refresh the stats
+        refreshTimer = setInterval(() => {
+            console.log('[chartContainer9] Auto-refreshing world stats...');
+            fetchWorldStats();
+        }, autoRefreshInterval);
+        
+        console.log(`[chartContainer9] Auto-refresh set up with interval of ${autoRefreshInterval}ms`);
+        
+        // Add cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (refreshTimer) {
+                clearInterval(refreshTimer);
+                refreshTimer = null;
+            }
+        });
+    }
+    
+    /**
      * Fetch country data and process it with async/await
      */
     async function fetchWorldStats() {
         // Only proceed if loading state is available
         if (loadingElement.style.visibility === 'hidden') {
-            return;
+            loadingElement.style.visibility = 'visible';
+            loadingElement.style.opacity = '0.3'; // Semi-transparent during refresh
+            loadingElement.style.display = 'flex';
         }
         
         console.log('[chartContainer9] Starting API request...');
@@ -258,6 +318,11 @@
             
             // Render the stats
             renderStats(stats);
+            
+            // Set up auto-refresh (only on first load)
+            if (!refreshTimer) {
+                setupAutoRefresh();
+            }
             
         } catch (error) {
             console.error('[chartContainer9] Error fetching or processing data:', error);

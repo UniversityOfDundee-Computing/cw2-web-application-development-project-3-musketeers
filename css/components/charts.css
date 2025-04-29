@@ -1,84 +1,239 @@
 /**
- * Charts Component Styles
- * Styles for chart containers and related elements
+ * Charts Component Styles with Bootstrap Integration
  */
 
-/* Base chart styles */
-.chart-wrapper {
+/* Chart container grid layout */
+.container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    padding: 1rem;
+}
+
+/* Chart interactions */
+.chart-container {
+    transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
+    border-radius: 12px;
+    overflow: hidden;
     position: relative;
+    aspect-ratio: 1/1; /* Consistent square aspect ratio */
+    min-height: clamp(320px, 40vh, 480px); /* Consistent height range */
+    padding: 0.75rem; /* Reduced base padding for chart containers */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.chart-container .card-body {
+    padding: clamp(0.75rem, 1.25vw, 1.25rem) !important;
+    position: relative;
+}
+
+.chart-container {
+    position: relative;
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+}
+
+/* Chart content wrapper for consistent internal spacing */
+.chart-wrapper {
     width: 100%;
     height: 100%;
-    display: grid;
-    place-items: center;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding: 0.5rem !important; /* Consistent padding */
+    justify-content: flex-start; /* Align content to top */
 }
 
-/* Individual chart container */
-/* Chart image container */
-.chart-image {
+.chart-wrapper {
+    width: 100%;
+    min-height: 300px;
+    position: relative;
+}
+
+.chart-wrapper img {
     max-width: 100%;
-    max-height: 100%;
-    width: auto;
     height: auto;
-    object-fit: contain;
-    border-radius: clamp(0.25rem, 0.5vw, 0.5rem);
-    opacity: 0;
-    animation: fadeIn 0.3s ease forwards;
 }
 
-/* Chart container transitions */
-.chart-container {
-    background-color: var(--white);
-    border-radius: clamp(0.5rem, 1vw, 1rem);
-    box-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.1),
-        0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    transition: all 0.2s ease-in-out;
+.chart-wrapper img.chart-image {
+    margin-top: 0 !important;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto; /* Center horizontally */
+}
+
+/* Chart content inside wrapper */
+.chart-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 0.25rem;
+    margin-top: 0 !important; /* Removed top margin */
 }
 
 .chart-container:hover {
-    transform: translateY(-2px);
-    box-shadow:
-        0 4px 6px -1px rgba(0, 0, 0, 0.1),
-        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transform: translateY(-4px);
+    box-shadow: var(--bs-box-shadow-lg) !important;
 }
 
-/* Chart title and descriptions */
-.chart-title {
-    font-size: clamp(1rem, 1.2vw, 1.25rem);
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: clamp(0.5rem, 1vw, 1rem);
-    text-align: center;
+/* When any chart is expanded */
+.container:has(.chart-container.expanded) .chart-container:not(.expanded) {
+    transform: scale(0.95);
+    filter: blur(2px);
+    opacity: 0.7;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.chart-description {
-    font-size: clamp(0.875rem, 1vw, 1rem);
-    color: var(--text-secondary);
-    text-align: center;
-    margin-bottom: clamp(1rem, 2vw, 1.5rem);
+.chart-container.expanded {
+    transform: scale(1.15);
+    z-index: 1030;
+    margin: 2rem;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Loading and error states */
-.chart-loading,
+.chart-container.expanded .card-body {
+    padding: clamp(1.5rem, 2.5vw, 2.5rem) !important;
+}
+
+/* Push adjacent charts */
+.chart-container.expanded ~ .chart-container {
+    transform: translate(2rem, 4rem) scale(0.95);
+}
+
+.chart-container.expanded:not(:first-child) {
+    margin-top: -2rem;
+}
+
+/* Push previous charts */
+.chart-container.expanded:has(~ .chart-container) {
+    transform: translate(-2rem, 4rem) scale(1.15);
+}
+
+/* Chart image styles */
+.chart-image {
+    max-width: 100%;
+    height: auto;
+    opacity: 0;
+    animation: fadeIn 0.4s ease forwards;
+}
+
+/* Detail overlay transitions */
+.chart-detail-overlay {
+    transform: translateY(100%);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+    pointer-events: none;
+}
+
+.chart-container:hover .chart-detail-overlay,
+.chart-container.expanded .chart-detail-overlay {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Blur effect for all charts when one is expanded */
+.chart-container.sibling-expanded {
+    filter: blur(2px);
+    opacity: 0.6;
+    transform: scale(0.95);
+}
+
+/* Loading state */
+.chart-loading {
+    transition: opacity 0.4s ease;
+}
+
+.chart-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.9);
+    z-index: 5;
+}
+
+.chart-loading .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 1rem;
+}
+
+/* Add spacing between chart rows */
+.chart-container:not(:first-child) {
+    margin-top: 1rem;
+}
+
 .chart-error {
     position: absolute;
     inset: 0;
-    display: grid;
-    place-items: center;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(4px);
-    border-radius: inherit;
-    opacity: 0;
-    animation: fadeIn 0.2s ease forwards;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background: var(--bs-white);
+    border-radius: var(--bs-border-radius);
 }
 
-.loading-spinner {
-    width: clamp(2rem, 3vw, 3rem);
-    height: clamp(2rem, 3vw, 3rem);
-    border: 3px solid var(--border-color);
-    border-top-color: var(--primary-color);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
+.chart-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    padding: 2rem;
+    text-align: center;
+    background-color: #f8d7da;
+    color: #721c24;
+    border-radius: 8px;
+}
+
+.chart-error .error-icon {
+    width: 48px;
+    height: 48px;
+    color: #dc3545;
+    margin-bottom: 1rem;
+}
+
+.chart-error .retry-button {
+    margin-top: 1rem;
+    padding: 0.5rem 1.5rem;
+    background-color: #0d6efd;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.chart-error .retry-button:hover {
+    background-color: #0b5ed7;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Other charts when one is expanded */
+.chart-container.expanded ~ .chart-container {
+    opacity: 0.5;
+    transform: scale(0.98);
+    filter: blur(1px);
+    transition: all 0.3s ease;
 }
 
 /* Error state styling */
@@ -156,6 +311,44 @@
     }
 }
 
+@media (max-width: 768px) {
+    .chart-controls {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .chart-controls .form-group {
+        width: 100%;
+        margin-right: 0;
+        justify-content: space-between;
+    }
+    
+    .chart-controls .form-select {
+        flex-grow: 1;
+        min-width: auto;
+    }
+    
+    .chart-container {
+        padding: 0.75rem;
+    }
+    
+    .chart-container .card-body {
+        padding: 1rem !important;
+    }
+    
+    .chart-wrapper {
+        padding: 1rem;
+    }
+    
+    .chart-container.expanded .card-body {
+        padding: 1.25rem !important;
+    }
+    
+    .chart-detail-analysis {
+        padding: 1.25rem !important;
+    }
+}
+
 /* High contrast mode */
 @media (prefers-contrast: high) {
     .chart-container {
@@ -172,20 +365,128 @@
 }
 
 /* Reduced motion preferences */
+/* Accessibility and reduced motion */
 @media (prefers-reduced-motion: reduce) {
     .chart-container,
     .chart-image,
     .chart-loading,
-    .chart-error {
-        transition: none;
-        animation: none;
+    .chart-error,
+    .chart-detail-overlay {
+        transition: none !important;
+        animation: none !important;
+        transform: none !important;
     }
     
-    .chart-container:hover {
-        transform: none;
+    .chart-detail-overlay {
+        opacity: 1 !important;
+        position: static;
     }
-    
-    .loading-spinner {
-        animation: none;
-    }
+}
+
+/* Focus styles for keyboard navigation */
+.chart-container:focus-visible {
+    outline: 3px solid var(--bs-primary);
+    outline-offset: 2px;
+}
+
+/* Last updated timestamp styling */
+.last-updated {
+    font-size: 0.75rem;
+    color: #777;
+    text-align: right;
+    margin-top: 0.5rem;
+    font-style: italic;
+    padding: 0.25rem 0.5rem;
+    background-color: rgba(249, 249, 249, 0.7);
+    border-radius: 4px;
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    z-index: 5;
+}
+
+/* Style for the last-updated timestamp in expanded view */
+.chart-container.expanded .last-updated {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(249, 249, 249, 0.9);
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Chart controls */
+.chart-controls {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+}
+
+.chart-controls .form-group {
+    display: flex;
+    align-items: center;
+    margin-right: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.chart-controls label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #495057;
+    margin-right: 0.5rem;
+    white-space: nowrap;
+}
+
+.chart-controls .form-select {
+    min-width: 120px;
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+    background-color: white;
+}
+
+.chart-controls .form-select:focus {
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    border-color: #86b7fe;
+}
+
+/* Chart title spacing improvement */
+.chart-title {
+    margin-top: 0.25rem !important;
+    margin-bottom: 0.5rem !important;
+    padding: 0 0.5rem;
+}
+
+/* Chart description spacing */
+.chart-description {
+    margin-bottom: 0.75rem !important;
+    padding: 0 0.5rem;
+    line-height: 1.4;
+}
+
+/* Detail analysis section padding */
+.chart-detail-analysis {
+    padding: clamp(1.5rem, 2vw, 2rem) !important;
+}
+
+/* Fix for the first chart's title and description spacing */
+#chartContainer .chart-title {
+    margin-top: 0.75rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+#chartContainer .chart-content {
+    padding-top: 0.5rem !important;
+}
+
+#chartContainer .chart-description {
+    margin-bottom: 1rem !important;
 }

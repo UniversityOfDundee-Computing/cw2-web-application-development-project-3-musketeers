@@ -5,6 +5,8 @@
 
 import { BaseChart } from '../BaseChart.js';
 import * as dataProcessing from '../../../utils/dataProcessing.js';
+import { chartService } from '../../../services/chartService.js';
+import * as chartUtils from '../../../utils/chartUtils.js';
 
 export class ContinentChart extends BaseChart {
     /**
@@ -17,6 +19,8 @@ export class ContinentChart extends BaseChart {
             title: 'World Population by Continent',
             type: 'doughnut',
             colorScheme: 'default',
+            chartType: 'continent', // Add chart type identifier for dynamic descriptions
+            supportedChartTypes: ['doughnut', 'pie', 'bar', 'polarArea'],
             ...options
         });
     }
@@ -28,27 +32,115 @@ export class ContinentChart extends BaseChart {
      * @returns {Object} Processed data ready for chart creation
      */
     async processData(data) {
-        // Group countries by continent and sum populations
-        const continentData = dataProcessing.groupAndSum(
-            data,
-            country => country.continents?.[0],
-            country => country.population || 0
-        );
-
-        // Convert to arrays and format data
-        const { labels, values } = dataProcessing.objectToArrays(continentData);
-
+        // Safety check for data
+        if (!Array.isArray(data) || data.length === 0) {
+            console.error('Invalid country data received for continent chart');
+            return { labels: [], values: [], formatted: [] };
+        }
+        
+        // Group countries by continent
+        const continents = {};
+        const continentArea = {};
+        const continentPopulation = {};
+        
+        // Process each country
+        data.forEach(country => {
+            if (country.continents && country.continents[0]) {
+                const continent = country.continents[0];
+                
+                // Initialize continent data if it doesn't exist
+                if (!continents[continent]) {
+                    continents[continent] = 0;
+                    continentArea[continent] = 0;
+                    continentPopulation[continent] = 0;
+                }
+                
+                // Add country population to continent
+                if (country.population) {
+                    continents[continent]++;
+                    continentPopulation[continent] += country.population;
+                }
+                
+                // Add country area to continent
+                if (country.area) {
+                    continentArea[continent] += country.area;
+                }
+            }
+        });
+        
+        // Prepare data arrays based on selected view
+        let continentData = [];
+        
+        if (this.options.dataView === 'area') {
+            // Land area view
+            continentData = Object.entries(continentArea).map(([continent, area]) => ({
+                name: continent,
+                value: area,
+                countries: continents[continent],
+                population: continentPopulation[continent],
+                area: area
+            }));
+        } else if (this.options.dataView === 'density') {
+            // Density view (population / area)
+            continentData = Object.entries(continentArea).map(([continent, area]) => ({
+                name: continent,
+                value: area > 0 ? Math.round(continentPopulation[continent] / area) : 0,
+                countries: continents[continent],
+                population: continentPopulation[continent],
+                area: area
+            }));
+        } else {
+            // Default: Population view
+            continentData = Object.entries(continentPopulation).map(([continent, population]) => ({
+                name: continent,
+                value: population,
+                countries: continents[continent],
+                population: population,
+                area: continentArea[continent]
+            }));
+        }
+        
+        // Calculate total for percentages
+        const totalValue = continentData.reduce((sum, item) => sum + item.value, 0);
+        
+        // Sort continents based on sort option
+        switch (this.options.sort) {
+            case 'asc':
+                continentData.sort((a, b) => a.value - b.value);
+                break;
+            case 'desc':
+            default:
+                continentData.sort((a, b) => b.value - a.value);
+                break;
+        }
+        
+        // Format data
         return {
-            labels,
-            values,
-            formatted: labels.map((label, index) => ({
-                continent: label,
-                population: dataProcessing.formatNumber(values[index]),
-                percentage: dataProcessing.calculatePercentage(
-                    values[index],
-                    values.reduce((sum, val) => sum + val, 0)
-                )
-            }))
+            labels: continentData.map(c => c.name),
+            values: continentData.map(c => c.value),
+            formatted: continentData.map(c => {
+                const percentage = ((c.value / totalValue) * 100).toFixed(2);
+                let metric = '';
+                
+                if (this.options.dataView === 'population') {
+                    metric = 'people';
+                } else if (this.options.dataView === 'area') {
+                    metric = 'km²';
+                } else if (this.options.dataView === 'density') {
+                    metric = 'people/km²';
+                }
+                
+                return {
+                    continent: c.name,
+                    value: c.value,
+                    formatted: new Intl.NumberFormat().format(c.value),
+                    percentage: percentage,
+                    population: c.population,
+                    area: c.area,
+                    countries: c.countries,
+                    metric: metric
+                };
+            })
         };
     }
 
@@ -58,12 +150,36 @@ export class ContinentChart extends BaseChart {
      * @returns {Object} Chart configuration for QuickChart API
      */
     createChartConfig(data) {
-        return {
-            type: 'doughnut',
+        // Use the currently selected chart type instead of hardcoding
+        const chartType = this.options.type || 'doughnut';
+        console.log(`[${this.containerId}] Creating continent chart with type: ${chartType}`);
+        
+        // Set up label formatting based on percentage view option
+        const labelCallback = (context) => {
+            const item = data.formatted[context.dataIndex];
+            if (!item) return '';
+            
+            if (this.options.showPercentage) {
+                return `${item.percentage}%`;
+            } else {
+                return item.formatted;
+            }
+        };
+        
+        // Format data for display
+        const values = this.options.showPercentage 
+            ? data.formatted.map(item => parseFloat(item.percentage)) 
+            : data.values;
+        
+        // Get title based on the current sort order
+        const titleText = this.getTitleBasedOnSortOrder();
+            
+        const config = {
+            type: chartType, // Use the variable instead of hardcoding
             data: {
                 labels: data.labels,
                 datasets: [{
-                    data: data.values,
+                    data: values,
                     backgroundColor: [
                         "#ff6384",
                         "#36a2eb",
@@ -83,7 +199,7 @@ export class ContinentChart extends BaseChart {
                 plugins: {
                     title: {
                         display: true,
-                        text: this.options.title,
+                        text: titleText,
                         font: {
                             size: 22,
                             weight: 'bold',
@@ -105,15 +221,457 @@ export class ContinentChart extends BaseChart {
                         callbacks: {
                             label: (context) => {
                                 const item = data.formatted[context.dataIndex];
+                                if (!item) return 'No data';
+                                
+                                // Different tooltip based on data view
+                                const valueLabel = this.options.showPercentage 
+                                    ? `${item.percentage}%` 
+                                    : `${item.formatted} ${item.metric}`;
+                                    
                                 return [
-                                    `Population: ${item.population}`,
-                                    `Percentage: ${item.percentage}%`
+                                    `${this.getDataViewLabel()}: ${valueLabel}`,
+                                    `Countries: ${item.countries}`,
+                                    `Population: ${new Intl.NumberFormat().format(item.population)}`,
+                                    `Area: ${new Intl.NumberFormat().format(item.area)} km²`
                                 ];
                             }
                         }
                     }
                 }
             }
+        };
+        
+        // Add scales for cartesian charts (bar, line)
+        if (chartType === 'bar' || chartType === 'line') {
+            config.options.scales = {
+                x: {
+                    ticks: {
+                        color: "#444",
+                        font: { size: 12, weight: "bold" }
+                    },
+                    grid: { display: false }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: "#444",
+                        font: { size: 12, weight: "bold" },
+                        callback: value => {
+                            if (this.options.showPercentage) {
+                                return `${value}%`;
+                            }
+                            return dataProcessing.formatNumber(value);
+                        }
+                    },
+                    grid: { color: "#eee" }
+                }
+            };
+            
+            // For bar charts, we might want to hide the legend
+            if (chartType === 'bar') {
+                config.options.plugins.legend.display = false;
+            }
+        }
+        
+        return config;
+    }
+
+    /**
+     * Create continent-specific chart controls
+     */
+    createChartControls() {
+        // Create base controls first (chart type selector)
+        super.createChartControls();
+        
+        if (!this.chartControls) return;
+        
+        // 1. Add a continent-specific view toggle for population vs area
+        const viewGroup = document.createElement('div');
+        viewGroup.className = 'form-group me-2 mb-2';
+        
+        const viewSelect = document.createElement('select');
+        viewSelect.className = 'form-select form-select-sm continent-view-select';
+        viewSelect.setAttribute('aria-label', 'Select data view');
+        
+        const viewOptions = [
+            { value: 'population', text: 'Population' },
+            { value: 'area', text: 'Land Area' },
+            { value: 'density', text: 'Population Density' }
+        ];
+        
+        viewOptions.forEach(option => {
+            const optionEl = document.createElement('option');
+            optionEl.value = option.value;
+            optionEl.textContent = option.text;
+            if (option.value === (this.options.dataView || 'population')) {
+                optionEl.selected = true;
+            }
+            viewSelect.appendChild(optionEl);
+        });
+        
+        viewSelect.addEventListener('change', (e) => {
+            this.changeDataView(e.target.value);
+        });
+        
+        viewGroup.appendChild(viewSelect);
+        this.chartControls.appendChild(viewGroup);
+        
+        // 2. Add percentage/absolute toggle
+        const displayGroup = document.createElement('div');
+        displayGroup.className = 'form-group me-2 mb-2';
+        
+        const displayCheck = document.createElement('div');
+        displayCheck.className = 'form-check form-switch';
+        
+        const displayInput = document.createElement('input');
+        displayInput.className = 'form-check-input';
+        displayInput.type = 'checkbox';
+        displayInput.id = `${this.containerId}-percentage-toggle`;
+        displayInput.setAttribute('role', 'switch');
+        displayInput.checked = this.options.showPercentage || false;
+        
+        const displayLabel = document.createElement('label');
+        displayLabel.className = 'form-check-label ms-2';
+        displayLabel.htmlFor = `${this.containerId}-percentage-toggle`;
+        displayLabel.textContent = 'Show Percentages';
+        
+        displayInput.addEventListener('change', (e) => {
+            this.togglePercentageView(e.target.checked);
+        });
+        
+        displayCheck.appendChild(displayInput);
+        displayCheck.appendChild(displayLabel);
+        displayGroup.appendChild(displayCheck);
+        this.chartControls.appendChild(displayGroup);
+    }
+
+    /**
+     * Change the data view (population, area, or density)
+     * @param {string} view - Type of data to display
+     */
+    async changeDataView(view) {
+        console.log(`[${this.containerId}] Changing data view to: ${view}`);
+        
+        // Show loading overlay
+        this.showLoading();
+        
+        try {
+            // Store view option
+            this.options.dataView = view;
+            
+            // Re-process data with the new view
+            this.processedData = await this.processData(this.rawData);
+            
+            // Update title based on the data view and sort order
+            this.options.title = this.getTitleBasedOnSortOrder();
+            
+            // Create new chart configuration
+            const chartConfig = this.createChartConfig(this.processedData);
+            
+            // Generate chart URL
+            const chartUrl = chartService.createChartUrl(chartConfig);
+            
+            // Update the chart
+            chartUtils.displayChart(
+                this.containerId,
+                chartUrl,
+                this.options.title || 'Chart'
+            );
+            
+            // Update descriptions
+            const descriptions = this.generateDescriptions(this.processedData);
+            this.updateChartDescriptions(descriptions);
+            
+            // Update the chart title in the DOM
+            const titleElement = this.container.querySelector('.chart-title');
+            if (titleElement) {
+                titleElement.textContent = this.options.title;
+            }
+        } catch (error) {
+            console.error(`[${this.containerId}] Error changing data view:`, error);
+            this.showError(`Failed to change data view: ${error.message}`);
+        }
+    }
+
+    /**
+     * Toggle between absolute values and percentages
+     * @param {boolean} showPercentage - Whether to show percentage values
+     */
+    async togglePercentageView(showPercentage) {
+        console.log(`[${this.containerId}] Toggling percentage view: ${showPercentage}`);
+        
+        // Show loading overlay
+        this.showLoading();
+        
+        try {
+            // Store percentage view option
+            this.options.showPercentage = showPercentage;
+            
+            // No need to re-process data, just update the chart configuration
+            const chartConfig = this.createChartConfig(this.processedData);
+            
+            // Generate chart URL
+            const chartUrl = chartService.createChartUrl(chartConfig);
+            
+            // Update the chart
+            chartUtils.displayChart(
+                this.containerId,
+                chartUrl,
+                this.options.title || 'Chart'
+            );
+            
+            // Update descriptions
+            const descriptions = this.generateDescriptions(this.processedData);
+            this.updateChartDescriptions(descriptions);
+        } catch (error) {
+            console.error(`[${this.containerId}] Error toggling percentage view:`, error);
+            this.showError(`Failed to update percentage view: ${error.message}`);
+        }
+    }
+
+    /**
+     * Get an appropriate title based on current options and sort order
+     * @returns {string} Chart title
+     */
+    getTitleBasedOnSortOrder() {
+        const sortOrder = this.options.sort || 'desc';
+        const dataView = this.options.dataView || 'population';
+        
+        // Base title parts
+        let baseTitle = '';
+        
+        // Set base title based on data view
+        switch (dataView) {
+            case 'area':
+                baseTitle = 'Continental Land Area';
+                break;
+            case 'density':
+                baseTitle = 'Population Density by Continent';
+                break;
+            case 'population':
+            default:
+                baseTitle = 'World Population by Continent';
+                break;
+        }
+        
+        // Add sort order context for bar charts
+        if (this.options.type === 'bar') {
+            const sortContext = sortOrder === 'asc' ? '(Smallest to Largest)' : '(Largest to Smallest)';
+            return `${baseTitle} ${sortContext}`;
+        }
+        
+        return baseTitle;
+    }
+    
+    /**
+     * Get the label for the current data view
+     * @returns {string} The label describing the current data view
+     */
+    getDataViewLabel() {
+        switch (this.options.dataView) {
+            case 'area':
+                return 'Land Area';
+            case 'density':
+                return 'Population Density';
+            case 'population':
+            default:
+                return 'Population';
+        }
+    }
+    
+    /**
+     * Override the base class method to ensure sort order is reflected in title and descriptions
+     * @param {string} sortOrder - Sort order ('asc', 'desc', or 'alpha')
+     */
+    async changeSortOrder(sortOrder) {
+        if (['asc', 'desc'].includes(sortOrder)) {
+            console.log(`[${this.containerId}] Changing sort order to ${sortOrder}...`);
+            
+            // Show loading overlay
+            this.showLoading();
+            
+            // Update options
+            this.options.sort = sortOrder;
+            
+            try {
+                // Re-process data with new sort order
+                if (this.rawData) {
+                    this.processedData = await this.processData(this.rawData);
+                }
+                
+                // Update title to reflect the sort order
+                this.options.title = this.getTitleBasedOnSortOrder();
+                
+                // Re-create chart configuration with updated title
+                const chartConfig = this.createChartConfig(this.processedData);
+                
+                // Ensure we're using the correct chart type
+                chartConfig.type = this.options.type;
+                
+                // Generate chart URL
+                const chartUrl = chartService.createChartUrl(chartConfig);
+                
+                // Update the chart
+                chartUtils.displayChart(
+                    this.containerId,
+                    chartUrl,
+                    this.options.title
+                );
+                
+                // Generate and update descriptions to reflect the sort change
+                const descriptions = this.generateDescriptions(this.processedData);
+                this.updateChartDescriptions(descriptions);
+                
+                // Update the chart title in the DOM
+                const titleElement = this.container.querySelector('.chart-title');
+                if (titleElement) {
+                    titleElement.textContent = this.options.title;
+                }
+                
+                console.log(`[${this.containerId}] Sort order changed successfully to ${sortOrder}.`);
+            } catch (error) {
+                console.error(`[${this.containerId}] Error changing sort order:`, error);
+                this.showError(`Failed to change sort order: ${error.message}`);
+            }
+        }
+    }
+    
+    /**
+     * Generate continent-specific descriptions
+     * Override the base class method to ensure descriptions match the current sort order
+     * @param {Object} data - Processed chart data
+     * @returns {Object} Object containing chart descriptions
+     */
+    generateDescriptions(data) {
+        // Get current options
+        const isAscending = this.options.sort === 'asc';
+        const dataView = this.options.dataView || 'population';
+        const showingPercentage = this.options.showPercentage || false;
+        const chartType = this.options.type || 'doughnut';
+        
+        // Get information about continents
+        const continentCount = data.labels ? data.labels.length : 0;
+        
+        // Get metric type based on data view
+        let metricType, metricUnit;
+        switch (dataView) {
+            case 'area':
+                metricType = 'land area';
+                metricUnit = 'km²';
+                break;
+            case 'density':
+                metricType = 'population density';
+                metricUnit = 'people per km²';
+                break;
+            case 'population':
+            default:
+                metricType = 'population';
+                metricUnit = 'people';
+                break;
+        }
+        
+        // Get top continent based on sorting
+        const topContinent = data.formatted && data.formatted.length > 0 ? data.formatted[0].continent : 'Unknown';
+        
+        // Get appropriate superlatives based on sort order
+        const superlative = isAscending ? 'smallest' : 'largest';
+        const densitySuperlative = isAscending ? 'lowest' : 'highest';
+        const sortContext = isAscending ? 'smallest to largest' : 'largest to smallest';
+        
+        // Get appropriate superlative based on data view
+        let viewSuperlative = '';
+        switch (dataView) {
+            case 'area':
+                viewSuperlative = isAscending ? 'smallest' : 'largest';
+                break;
+            case 'density':
+                viewSuperlative = isAscending ? 'least densely populated' : 'most densely populated';
+                break;
+            case 'population':
+            default:
+                viewSuperlative = isAscending ? 'least populated' : 'most populated';
+                break;
+        }
+        
+        // Create insights array
+        const insights = [];
+        
+        // Add insights based on data
+        if (data.formatted && data.formatted.length > 0) {
+            const first = data.formatted[0];
+            const viewLabel = this.getDataViewLabel().toLowerCase();
+            
+            // First insight: top continent
+            if (dataView === 'population') {
+                insights.push(`${first.continent} is the ${viewSuperlative} continent with ${first.formatted} ${first.metric}, representing ${first.percentage}% of the world's population.`);
+            } else if (dataView === 'area') {
+                insights.push(`${first.continent} has the ${viewSuperlative} landmass with ${first.formatted} ${first.metric}, representing ${first.percentage}% of the world's land area.`);
+            } else {
+                insights.push(`${first.continent} has the ${viewSuperlative} with ${first.formatted} ${first.metric}.`);
+            }
+            
+            // Additional insights
+            if (data.formatted.length > 1) {
+                const secondContinent = data.formatted[1].continent;
+                const secondValue = data.formatted[1].formatted;
+                const secondMetric = data.formatted[1].metric;
+                
+                insights.push(`${secondContinent} is second with ${secondValue} ${secondMetric}.`);
+            }
+            
+            // Comparison between largest and smallest
+            if (data.formatted.length > 1) {
+                const last = data.formatted[data.formatted.length - 1];
+                const ratio = Math.round(first.value / last.value * 10) / 10;
+                
+                if (ratio > 1) {
+                    insights.push(`${first.continent} has approximately ${ratio} times the ${viewLabel} of ${last.continent}.`);
+                }
+            }
+            
+            // Final insight about overall world distribution
+            switch (dataView) {
+                case 'area':
+                    insights.push(`Continental land area distribution affects population density, resources, and biodiversity patterns.`);
+                    break;
+                case 'density':
+                    insights.push(`Population density variations reflect differences in urbanization, geography, and development.`);
+                    break;
+                case 'population':
+                default:
+                    insights.push(`Population distribution across continents reflects historical patterns of migration, development, and resource availability.`);
+                    break;
+            }
+        }
+        
+        // Create title based on options
+        const title = this.getTitleBasedOnSortOrder();
+        
+        // Create detailed description based on chart type and data view
+        let detailedDesc = `This ${chartType} chart displays the ${metricType} distribution across ${continentCount} continents`;
+        
+        if (chartType === 'bar') {
+            detailedDesc += `, sorted from ${sortContext}`;
+        }
+        
+        if (showingPercentage) {
+            detailedDesc += `, with values shown as percentages of the total.`;
+        } else {
+            detailedDesc += `, with absolute values in ${metricUnit}.`;
+        }
+        
+        // Create short description
+        const shortDesc = `Comparison of continental ${metricType} showing ${topContinent} with the ${viewSuperlative} value.`;
+        
+        // Analysis text (for expanded view)
+        const analysisText = `This visualization presents ${metricType} data across all continents, highlighting ${topContinent} as having the ${viewSuperlative} value. The chart reveals geographical patterns in global ${metricType} distribution.`;
+        
+        return {
+            title: title,
+            short: shortDesc,
+            detailed: detailedDesc,
+            analysis: analysisText,
+            insights: insights
         };
     }
 }
