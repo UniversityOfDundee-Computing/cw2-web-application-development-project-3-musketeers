@@ -5,17 +5,19 @@
 
 :root {
     /* Color system */
-    --primary-color: #2563eb;
-    --primary-dark: #1d4ed8;
-    --primary-light: #60a5fa;
-    --surface: #ffffff;
-    --background: #f8fafc;
-    --text-primary: #1e293b;
-    --text-secondary: #64748b;
-    --border-color: #e2e8f0;
-    --error-color: #ef4444;
-    --success-color: #22c55e;
+    --primary-color: #89B99A; /* accent color, buttons, graphs, icons */
+    --primary-dark: #877BFB; /* gradient dark side - graphs, buttons */ 
+    --primary-light: #5489EC; /* gradient light side - graphs, buttons */
+    --surface: #F3F3F3; /* background for containers */
+    --background: #FFFFFF; /* background color and for text on dark bg */
+    --text-primary: #1F1F23; /* title color - button background */
+    --text-secondary: #84868A; /* text color for body and subtitles  */
+    --border-color: #E0E0E0; /* border color */
+    --error-color: #AD4954; /* for errors */
+    --success-color: #89B99A; /* for success */
     --white: #ffffff;
+    --primary-gradient: linear-gradient(to right, var(--primary-dark), var(--primary-light));
+
 
     /* Typography */
     --font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
