@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Country Data Visualizer - Selected Country</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css"
+    rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
     
     <!-- CSS -->
     <link rel="stylesheet" href="../css/main.css">
@@ -31,51 +33,65 @@
             </ul>
         </nav>
     </header>
-
     
-    <main>
-        <div class="container"></div>
-        <!-- Top layout: Map and country info side by side -->
+    <main class="container my-5">
+
+        <!-- Top Section (map, country overview, quick facts, neighbor countries) -->
         <section class="top-section">
-            <div class="map-container" id="mapView">
-              <!-- Map -->
-            </div>
-
-            <div class="info-container">
-                <div id="countryOverview" class="country-overview">
-                  <!-- Country overview content -->
+            <div class="row">
+                <!-- Left Side: Map + Neighbors -->
+                <div class="col-md-7 d-flex flex-column">
+                    <div class="map-container flex-grow-1 mb-4" id="mapView">
+                      <!-- Map here -->
+                    </div>
+                    <div class="neighbors-container" id="neighbors">
+                      <h2>Neighboring Countries</h2>
+                      <div class="row neighbors-grid">
+                        <!-- Neighbors here -->
+                      </div>
+                    </div>
                 </div>
-                <div id="quickFacts" class="quick-facts">
-                  <h2>Quick Facts</h2>
-                  <div class="facts-grid"></div>
+
+                <!-- Right Side: Country Overview + Quick Facts -->
+                <div class="col-md-5 d-flex flex-column">
+                    <div id="countryOverview" class="country-overview mb-4">
+                      <!-- Country overview content -->
+                    </div>
+                    <div id="quickFacts" class="quick-facts">
+                      <h2>Quick Facts</h2>
+                      <div class="row facts-grid">
+                        <!-- Fact items here -->
+                      </div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="neighbors-container" id="neighbors">
-                <h2>Neighboring Countries</h2>
-                <div class="neighbors-grid"></div>
             </div>
-
         </section>
 
         <!-- Bottom layout: Charts and Neighbors -->
-        <section class="bottom-section">
-            <div class="visualizations-section">
-              <div id="populationChart" class="chart-container"></div>
-              <div id="languageChart" class="chart-container"></div>
-              <div id="areaChart" class="chart-container"></div>
+        <section class="bottom-section mt-5">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div id="populationChart" class="chart-container h-100">
+                    <!-- Population chart here -->
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div id="languageChart" class="chart-container h-100">
+                    <!-- Language chart here -->
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div id="areaChart" class="chart-container h-100">
+                    <!-- Area chart here -->
+                    </div>
+                </div>
             </div>
-      
-            
         </section>
 
         </div>
 
     </main>
-    
-    
-    
-    
 
     <footer>
         <p>Data provided by REST Countries API and visualized using QuickChart API</p>
@@ -130,5 +146,8 @@
 
     <!-- JavaScript Modules -->
     <script type="module" src="../js/pages/selected/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+
 </body>
 </html>
