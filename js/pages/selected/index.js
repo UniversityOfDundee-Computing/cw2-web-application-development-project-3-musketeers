@@ -182,9 +182,9 @@ class SelectedCountryPage {
         const selectedCountryName = this.currentCountry.name.common;
         const backgroundColors = selectedCountries.map(c => {
             if (c.name.common === selectedCountryName) {
-                return '#ff6384'; // Highlight color
+                return '#6F88EB'; // Highlight color
             } else {
-                return '#36a2eb'; // Default color
+                return '#A5CCB8'; // Default color
             }
         });
 
@@ -257,9 +257,9 @@ class SelectedCountryPage {
                 datasets: [{
                     data: Object.values(languageStats),
                     backgroundColor: [
-                        '#ff6384',
-                        '#36a2eb',
-                        '#ffcd56',
+                        '#6F88EB',
+                        '#6F88CC',
+                        '#6F88EE',
                         '#4bc0c0',
                         '#9966ff'
                     ]
@@ -408,9 +408,9 @@ class SelectedCountryPage {
         // Set background colors (highlight the current country)
         const backgroundColors = selectedCountries.map(c => {
             if (c.name.common === selectedCountryName) {
-                return '#ff6384'; // Highlight the current country
+                return '#6F88EB'; // Highlight the current country
             } else {
-                return '#36a2eb'; // Default color for others
+                return '#A5CCB8'; // Default color for others
             }
         });
 
