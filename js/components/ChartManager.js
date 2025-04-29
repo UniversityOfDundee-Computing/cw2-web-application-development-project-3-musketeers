@@ -113,13 +113,20 @@ export class ChartManager {
         let description = baseDescription;
         
         try {
+            // Get sort order (if available from chartInstance)
+            const sortOrder = chartInstance && chartInstance.options ? chartInstance.options.sort || 'desc' : 'desc';
+            const sortContext = sortOrder === 'asc' ? 'lowest to highest' : 'highest to lowest';
+            const isAscending = sortOrder === 'asc';
+            
             switch (type) {
                 case 'population':
                     if (data.labels && data.values) {
+                        // Adapt description based on sort order
+                        const countries = isAscending ? 'smallest' : 'most populous';
                         const topCountries = data.labels.slice(0, 3).join(', ');
                         const totalPopulation = data.values.reduce((sum, val) => sum + val, 0);
                         const formattedTotal = new Intl.NumberFormat().format(totalPopulation);
-                        description = `${baseDescription} with ${topCountries} being the most populous. The top 5 countries represent ${formattedTotal} people combined.`;
+                        description = `${baseDescription} showing the ${countries} nations. ${topCountries} ${isAscending ? 'have' : 'being'} the ${isAscending ? 'smallest' : 'largest'} populations. These countries represent ${formattedTotal} people combined.`;
                     }
                     break;
                     
@@ -127,15 +134,15 @@ export class ChartManager {
                     if (data.labels && data.values) {
                         const topContinent = data.labels[0];
                         const topContinentPercent = Math.round((data.values[0] / data.values.reduce((sum, val) => sum + val, 0)) * 100);
-                        description = `${baseDescription}. ${topContinent} has the largest population at approximately ${topContinentPercent}% of the world total.`;
+                        description = `${baseDescription}. Data is sorted from ${sortContext}. ${topContinent} has the ${isAscending ? 'smallest' : 'largest'} population at approximately ${topContinentPercent}% of the world total.`;
                     }
                     break;
                     
                 case 'region':
                     if (data.labels && data.values) {
                         const totalRegions = data.labels.length;
-                        const regionWithMostCountries = data.labels[data.values.indexOf(Math.max(...data.values))];
-                        description = `${baseDescription}. Data shows ${totalRegions} regions with ${regionWithMostCountries} having the most countries.`;
+                        const regionWithMostCountries = data.labels[0];
+                        description = `${baseDescription}. Data shows ${totalRegions} regions sorted from ${sortContext}, with ${regionWithMostCountries} having the ${isAscending ? 'fewest' : 'most'} countries.`;
                     }
                     break;
                     
@@ -143,7 +150,7 @@ export class ChartManager {
                     if (data.labels && data.values) {
                         const topCurrency = data.labels[0];
                         const countryCount = data.values[0];
-                        description = `${baseDescription}. ${topCurrency} is used in ${countryCount} countries, making it the most widely used currency.`;
+                        description = `${baseDescription}. ${topCurrency} is used in ${countryCount} countries, making it the ${isAscending ? 'least' : 'most'} widely used currency in this dataset.`;
                     }
                     break;
                     
@@ -151,7 +158,7 @@ export class ChartManager {
                     if (data.labels && data.values) {
                         const topTimezone = data.labels[0];
                         const countryCount = data.values[0];
-                        description = `${baseDescription}. The timezone ${topTimezone} is used by ${countryCount} countries, making it the most common timezone.`;
+                        description = `${baseDescription}. The timezone ${topTimezone} is used by ${countryCount} countries, making it the ${isAscending ? 'least' : 'most'} common timezone.`;
                     }
                     break;
                     
@@ -169,14 +176,14 @@ export class ChartManager {
                     if (data.labels && data.values) {
                         const countryWithMostBorders = data.labels[0];
                         const borderCount = data.values[0];
-                        description = `${baseDescription}. ${countryWithMostBorders} has ${borderCount} neighboring countries, the highest number globally.`;
+                        description = `${baseDescription}. ${countryWithMostBorders} has ${borderCount} neighboring countries, the ${isAscending ? 'lowest' : 'highest'} number in this dataset.`;
                     }
                     break;
                     
                 case 'language':
                     if (data.labels && data.values) {
                         const topLanguages = data.labels.slice(0, 2).join(' and ');
-                        description = `${baseDescription}. ${topLanguages} are the most common official languages used globally.`;
+                        description = `${baseDescription}. ${topLanguages} are the ${isAscending ? 'least' : 'most'} common official languages used globally.`;
                     }
                     break;
             }
@@ -196,14 +203,35 @@ export class ChartManager {
      * Get chart type from chart ID
      */
     getChartTypeFromId(chartId) {
-        if (chartId === 'chartContainer') return 'population';
-        if (chartId === 'chartContainer2') return 'continent';
-        if (chartId === 'chartContainer3') return 'region';
-        if (chartId === 'chartContainer4') return 'currency';
-        if (chartId === 'chartContainer5') return 'timezone';
-        if (chartId === 'chartContainer6') return 'independence';
-        if (chartId === 'chartContainer7') return 'borders';
-        if (chartId === 'chartContainer8') return 'language';
+        // Handle both numeric and non-numeric IDs
+        if (chartId === 'chartContainer' || chartId === 'chartContainer1' || chartId === 1) return 'population';
+        if (chartId === 'chartContainer2' || chartId === 2) return 'continent';
+        if (chartId === 'chartContainer3' || chartId === 3) return 'region';
+        if (chartId === 'chartContainer4' || chartId === 4) return 'currency';
+        if (chartId === 'chartContainer5' || chartId === 5) return 'timezone';
+        if (chartId === 'chartContainer6' || chartId === 6) return 'independence';
+        if (chartId === 'chartContainer7' || chartId === 7) return 'borders';
+        if (chartId === 'chartContainer8' || chartId === 8) return 'language';
+        
+        // Extract number from ID if it's in a different format
+        if (typeof chartId === 'string') {
+            const match = chartId.match(/\d+$/);
+            if (match) {
+                const num = parseInt(match[0], 10);
+                switch (num) {
+                    case 1: return 'population';
+                    case 2: return 'continent';
+                    case 3: return 'region';
+                    case 4: return 'currency';
+                    case 5: return 'timezone';
+                    case 6: return 'independence';
+                    case 7: return 'borders';
+                    case 8: return 'language';
+                }
+            }
+        }
+        
+        console.warn(`Could not determine chart type for ID: ${chartId}`);
         return null;
     }
     
@@ -692,27 +720,59 @@ export class ChartManager {
         const insights = [];
         
         try {
+            // Get sort order from data arrangement and chart instance
+            // For population chart, we can determine if we're showing least populous by checking the chart title
+            // or by comparing the values (if first value is smaller than last, it's ascending order)
+            const isAscending = data.values && data.values.length > 1 && 
+                (data.values[0] < data.values[data.values.length - 1] || 
+                 (data.title && data.title.toLowerCase().includes('least')));
+            
             switch (type) {
                 case 'population':
                     if (data.labels && data.values && data.labels.length > 0) {
-                        const mostPopulous = data.labels[0];
-                        const populationMostPopulous = new Intl.NumberFormat().format(data.values[0]);
-                        insights.push(`${mostPopulous} is the most populous country with ${populationMostPopulous} people.`);
-                        
-                        if (data.labels.length > 1) {
-                            const secondMostPopulous = data.labels[1];
-                            insights.push(`${secondMostPopulous} is the second most populous country with ${new Intl.NumberFormat().format(data.values[1])} people.`);
-                        }
-                        
-                        // Calculate total population of top 5
-                        const totalTop5 = data.values.reduce((sum, val) => sum + val, 0);
-                        const formattedTotal = new Intl.NumberFormat().format(totalTop5);
-                        insights.push(`The top 5 most populous countries represent approximately ${formattedTotal} people combined.`);
-                        
-                        // Calculate ratio between most and least populous in top 5
-                        if (data.values.length >= 5) {
-                            const ratio = Math.round(data.values[0] / data.values[4]);
-                            insights.push(`${mostPopulous} has approximately ${ratio} times the population of ${data.labels[4]}.`);
+                        if (isAscending) {
+                            // For ascending order (least populous first)
+                            const leastPopulous = data.labels[0];
+                            const populationLeastPopulous = new Intl.NumberFormat().format(data.values[0]);
+                            insights.push(`${leastPopulous} has the smallest population with ${populationLeastPopulous} people.`);
+                            
+                            if (data.labels.length > 1) {
+                                const secondLeastPopulous = data.labels[1];
+                                insights.push(`${secondLeastPopulous} is the second least populous with ${new Intl.NumberFormat().format(data.values[1])} people.`);
+                            }
+                            
+                            // Calculate total population of bottom 5
+                            const totalBottom5 = data.values.reduce((sum, val) => sum + val, 0);
+                            const formattedTotal = new Intl.NumberFormat().format(totalBottom5);
+                            insights.push(`The 5 least populous territories shown represent only ${formattedTotal} people combined.`);
+                            
+                            // Calculate percentage of world population (very small)
+                            const worldPopulation = 8000000000; // Approximation of world population
+                            const percentage = ((totalBottom5 / worldPopulation) * 100).toFixed(8);
+                            insights.push(`These territories represent approximately ${percentage}% of the world's population.`);
+                        } else {
+                            // For descending order (most populous first)
+                            const mostPopulous = data.labels[0];
+                            const populationMostPopulous = new Intl.NumberFormat().format(data.values[0]);
+                            insights.push(`${mostPopulous} is the most populous country with ${populationMostPopulous} people.`);
+                            
+                            if (data.labels.length > 1) {
+                                const secondMostPopulous = data.labels[1];
+                                insights.push(`${secondMostPopulous} is the second most populous country with ${new Intl.NumberFormat().format(data.values[1])} people.`);
+                            }
+                            
+                            // Calculate total population of top 5
+                            const totalTop5 = data.values.reduce((sum, val) => sum + val, 0);
+                            const formattedTotal = new Intl.NumberFormat().format(totalTop5);
+                            insights.push(`The top 5 most populous countries represent approximately ${formattedTotal} people combined.`);
+                            
+                            // Calculate ratio between most and least populous in top 5
+                            if (data.values.length >= 5) {
+                                const ratio = Math.round(data.values[0] / data.values[4]);
+                                if (ratio > 1) {
+                                    insights.push(`${mostPopulous} has approximately ${ratio} times the population of ${data.labels[4]}.`);
+                                }
+                            }
                         }
                     }
                     break;
@@ -894,8 +954,21 @@ export class ChartManager {
     getChartType(chart) {
         // First try to get type from id
         const id = chart.id.toLowerCase();
-        if (id.includes('chartcontainer')) {
-            const num = parseInt(id.replace('chartcontainer', ''));
+        
+        // Direct test for specific chart IDs
+        if (id === 'chartcontainer' || id === 'chartcontainer1') return 'population';
+        if (id === 'chartcontainer2') return 'continent';
+        if (id === 'chartcontainer3') return 'region';
+        if (id === 'chartcontainer4') return 'currency';
+        if (id === 'chartcontainer5') return 'timezone';
+        if (id === 'chartcontainer6') return 'independence';
+        if (id === 'chartcontainer7') return 'borders';
+        if (id === 'chartcontainer8') return 'language';
+        
+        // Use regex to extract numbers from IDs that might have different formats
+        const match = id.match(/(\d+)/);
+        if (match) {
+            const num = parseInt(match[0], 10);
             switch (num) {
                 case 1: return 'population';
                 case 2: return 'continent';
@@ -905,6 +978,7 @@ export class ChartManager {
                 case 6: return 'independence';
                 case 7: return 'borders';
                 case 8: return 'language';
+                default: break;
             }
         }
 
@@ -920,6 +994,7 @@ export class ChartManager {
         if (title.includes('border')) return 'borders';
         if (title.includes('language')) return 'language';
         
+        console.warn(`Could not determine chart type for chart with ID: ${chart.id}`);
         return 'default';
     }
 

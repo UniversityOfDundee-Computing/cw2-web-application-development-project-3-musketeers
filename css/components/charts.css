@@ -14,11 +14,24 @@
 .chart-container {
     transition: all 0.3s ease;
     margin-bottom: 1.5rem;
-    border-radius: 8px;
+    border-radius: 12px;
     overflow: hidden;
     position: relative;
     aspect-ratio: 1/1; /* Consistent square aspect ratio */
     min-height: clamp(320px, 40vh, 480px); /* Consistent height range */
+    padding: 0.75rem; /* Reduced base padding for chart containers */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.chart-container .card-body {
+    padding: clamp(0.75rem, 1.25vw, 1.25rem) !important;
+    position: relative;
+}
+
+.chart-container {
+    position: relative;
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
 }
 
 /* Chart content wrapper for consistent internal spacing */
@@ -28,7 +41,27 @@
     display: flex;
     flex-direction: column;
     position: relative;
-    padding: clamp(1rem, 1.5vw, 1.5rem);
+    padding: 0.5rem !important; /* Consistent padding */
+    justify-content: flex-start; /* Align content to top */
+}
+
+.chart-wrapper {
+    width: 100%;
+    min-height: 300px;
+    position: relative;
+}
+
+.chart-wrapper img {
+    max-width: 100%;
+    height: auto;
+}
+
+.chart-wrapper img.chart-image {
+    margin-top: 0 !important;
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto; /* Center horizontally */
 }
 
 /* Chart content inside wrapper */
@@ -37,6 +70,8 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    padding: 0.25rem;
+    margin-top: 0 !important; /* Removed top margin */
 }
 
 .chart-container:hover {
@@ -57,6 +92,10 @@
     z-index: 1030;
     margin: 2rem;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chart-container.expanded .card-body {
+    padding: clamp(1.5rem, 2.5vw, 2.5rem) !important;
 }
 
 /* Push adjacent charts */
@@ -109,6 +148,26 @@
     transition: opacity 0.4s ease;
 }
 
+.chart-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.9);
+    z-index: 5;
+}
+
+.chart-loading .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 1rem;
+}
+
 /* Add spacing between chart rows */
 .chart-container:not(:first-child) {
     margin-top: 1rem;
@@ -123,6 +182,40 @@
     flex-direction: column;
     background: var(--bs-white);
     border-radius: var(--bs-border-radius);
+}
+
+.chart-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    padding: 2rem;
+    text-align: center;
+    background-color: #f8d7da;
+    color: #721c24;
+    border-radius: 8px;
+}
+
+.chart-error .error-icon {
+    width: 48px;
+    height: 48px;
+    color: #dc3545;
+    margin-bottom: 1rem;
+}
+
+.chart-error .retry-button {
+    margin-top: 1rem;
+    padding: 0.5rem 1.5rem;
+    background-color: #0d6efd;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.chart-error .retry-button:hover {
+    background-color: #0b5ed7;
 }
 
 /* Animations */
@@ -218,6 +311,44 @@
     }
 }
 
+@media (max-width: 768px) {
+    .chart-controls {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .chart-controls .form-group {
+        width: 100%;
+        margin-right: 0;
+        justify-content: space-between;
+    }
+    
+    .chart-controls .form-select {
+        flex-grow: 1;
+        min-width: auto;
+    }
+    
+    .chart-container {
+        padding: 0.75rem;
+    }
+    
+    .chart-container .card-body {
+        padding: 1rem !important;
+    }
+    
+    .chart-wrapper {
+        padding: 1rem;
+    }
+    
+    .chart-container.expanded .card-body {
+        padding: 1.25rem !important;
+    }
+    
+    .chart-detail-analysis {
+        padding: 1.25rem !important;
+    }
+}
+
 /* High contrast mode */
 @media (prefers-contrast: high) {
     .chart-container {
@@ -283,4 +414,79 @@
     padding: 0.25rem 0.75rem;
     border-radius: 4px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Chart controls */
+.chart-controls {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+}
+
+.chart-controls .form-group {
+    display: flex;
+    align-items: center;
+    margin-right: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.chart-controls label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #495057;
+    margin-right: 0.5rem;
+    white-space: nowrap;
+}
+
+.chart-controls .form-select {
+    min-width: 120px;
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+    background-color: white;
+}
+
+.chart-controls .form-select:focus {
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    border-color: #86b7fe;
+}
+
+/* Chart title spacing improvement */
+.chart-title {
+    margin-top: 0.25rem !important;
+    margin-bottom: 0.5rem !important;
+    padding: 0 0.5rem;
+}
+
+/* Chart description spacing */
+.chart-description {
+    margin-bottom: 0.75rem !important;
+    padding: 0 0.5rem;
+    line-height: 1.4;
+}
+
+/* Detail analysis section padding */
+.chart-detail-analysis {
+    padding: clamp(1.5rem, 2vw, 2rem) !important;
+}
+
+/* Fix for the first chart's title and description spacing */
+#chartContainer .chart-title {
+    margin-top: 0.75rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+#chartContainer .chart-content {
+    padding-top: 0.5rem !important;
+}
+
+#chartContainer .chart-description {
+    margin-bottom: 1rem !important;
 }
