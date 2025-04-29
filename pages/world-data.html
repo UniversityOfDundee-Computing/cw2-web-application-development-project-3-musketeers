@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Country Data Visualizer - World Data</title>
     
-    <!-- CSS -->
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="../css/components/header.css">
     <link rel="stylesheet" href="../css/components/charts.css">
@@ -38,109 +41,167 @@
     </header>
 
     <main>
-        <div class="container">
+        <div class="container py-4">
             <!-- World Stats at a Glance - Premium Banner -->
-            <div id="chartContainer9" class="chart-container" aria-label="global stats visualization">
-                <div class="chart-wrapper">
-                    <h3 class="chart-title">World Stats at a Glance</h3>
-                    <p class="chart-description">Fascinating global statistics from all countries around the world</p>
+            <div id="chartContainer9" class="chart-container card shadow-sm mb-4" aria-label="global stats visualization">
+                <div class="card-body position-relative">
+                    <h3 class="chart-title h5 mb-3">World Stats at a Glance</h3>
+                    <p class="chart-description text-muted">Fascinating global statistics from all countries around the world</p>
                     <div id="world-stats-container">
                         <div class="stats-grid">
                             <!-- Stats cards will be inserted here -->
                         </div>
-                        <div class="chart-loading">
-                            <div class="loading-spinner"></div>
-                            <p>Compiling global statistics...</p>
+                        <div class="chart-loading position-absolute top-50 start-50 translate-middle w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-90">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="ms-3 mb-0">Compiling global statistics...</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Standard charts -->
-            <div id="chartContainer" class="chart-container" aria-label="Population distribution chart">
-                <div class="chart-wrapper">
-                    <h3 class="chart-title">Global Population Distribution</h3>
-                    <p class="chart-description">Population breakdown across continents and regions</p>
-                    <div class="chart-loading">
-                        <div class="loading-spinner"></div>
-                        <p>Loading population data...</p>
+            <div id="chartContainer" class="chart-container card shadow-sm mb-4 position-relative"
+                 aria-label="Population distribution chart" tabindex="0">
+                <div class="card-body">
+                    <h3 class="chart-title h5 mb-3">Global Population Distribution</h3>
+                    <p class="chart-description text-muted">Population breakdown across continents and regions</p>
+                    <div class="chart-loading position-absolute top-50 start-50 translate-middle w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-90">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="ms-3 mb-0">Loading population data...</p>
+                    </div>
+                    <div class="chart-detail-overlay position-absolute bottom-0 start-0 end-0 bg-white bg-opacity-95 p-3 rounded-bottom border-top opacity-0">
+                        <h4 class="h6 mb-2">Detailed Analysis</h4>
+                        <p class="small mb-0">Population distribution showing the world's most populous nations, urban vs rural splits, and demographic trends from 2000-present.</p>
                     </div>
                 </div>
             </div>
 
-            <div id="chartContainer2" class="chart-container" aria-label="Continental population chart">
-                <div class="chart-wrapper">
-                    <h3 class="chart-title">Continental Population</h3>
-                    <p class="chart-description">Population distribution by continent</p>
-                    <div class="chart-loading">
-                        <div class="loading-spinner"></div>
-                        <p>Loading continental data...</p>
+            <div id="chartContainer2" class="chart-container card shadow-sm mb-4 position-relative"
+                 aria-label="Continental population chart" tabindex="0">
+                <div class="card-body">
+                    <h3 class="chart-title h5 mb-3">Continental Population</h3>
+                    <p class="chart-description text-muted">Population distribution by continent</p>
+                    <div class="chart-loading position-absolute top-50 start-50 translate-middle w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-90">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="ms-3 mb-0">Loading continental data...</p>
+                    </div>
+                    <div class="chart-detail-overlay position-absolute bottom-0 start-0 end-0 bg-white bg-opacity-95 p-3 rounded-bottom border-top opacity-0">
+                        <h4 class="h6 mb-2">Detailed Analysis</h4>
+                        <p class="small mb-0">Analysis of continental population patterns showing population density, growth rates, and urbanization trends across continents.</p>
                     </div>
                 </div>
             </div>
 
-            <div id="chartContainer3" class="chart-container" aria-label="Regional distribution chart">
-                <div class="chart-wrapper">
-                    <h3 class="chart-title">Regional Distribution</h3>
-                    <p class="chart-description">Countries by geographical region</p>
-                    <div class="chart-loading">
-                        <div class="loading-spinner"></div>
-                        <p>Loading regional data...</p>
+            <div id="chartContainer3" class="chart-container card shadow-sm mb-4 position-relative"
+                 aria-label="Regional distribution chart" tabindex="0">
+                <div class="card-body">
+                    <h3 class="chart-title h5 mb-3">Regional Distribution</h3>
+                    <p class="chart-description text-muted">Countries by geographical region</p>
+                    <div class="chart-loading position-absolute top-50 start-50 translate-middle w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-90">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="ms-3 mb-0">Loading regional data...</p>
+                    </div>
+                    <div class="chart-detail-overlay position-absolute bottom-0 start-0 end-0 bg-white bg-opacity-95 p-3 rounded-bottom border-top opacity-0">
+                        <h4 class="h6 mb-2">Detailed Analysis</h4>
+                        <p class="small mb-0">Breakdown of UN-defined geographical regions showing economic indicators and cross-region migration patterns.</p>
                     </div>
                 </div>
             </div>
 
-            <div id="chartContainer4" class="chart-container" aria-label="Currency usage chart">
-                <div class="chart-wrapper">
-                    <h3 class="chart-title">Currency Usage</h3>
-                    <p class="chart-description">Most common currencies worldwide</p>
-                    <div class="chart-loading">
-                        <div class="loading-spinner"></div>
-                        <p>Loading currency data...</p>
+            <div id="chartContainer4" class="chart-container card shadow-sm mb-4 position-relative"
+                 aria-label="Currency usage chart" tabindex="0">
+                <div class="card-body">
+                    <h3 class="chart-title h5 mb-3">Currency Usage</h3>
+                    <p class="chart-description text-muted">Most common currencies worldwide</p>
+                    <div class="chart-loading position-absolute top-50 start-50 translate-middle w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-90">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="ms-3 mb-0">Loading currency data...</p>
+                    </div>
+                    <div class="chart-detail-overlay position-absolute bottom-0 start-0 end-0 bg-white bg-opacity-95 p-3 rounded-bottom border-top opacity-0">
+                        <h4 class="h6 mb-2">Detailed Analysis</h4>
+                        <p class="small mb-0">Analysis of global currency usage including stability metrics, trade volumes, and digital currency adoption rates.</p>
                     </div>
                 </div>
             </div>
 
-            <div id="chartContainer5" class="chart-container" aria-label="Timezone distribution chart">
-                <div class="chart-wrapper">
-                    <h3 class="chart-title">Timezone Distribution</h3>
-                    <p class="chart-description">Countries by timezone zone</p>
-                    <div class="chart-loading">
-                        <div class="loading-spinner"></div>
-                        <p>Loading timezone data...</p>
+            <div id="chartContainer5" class="chart-container card shadow-sm mb-4 position-relative"
+                 aria-label="Timezone distribution chart" tabindex="0">
+                <div class="card-body">
+                    <h3 class="chart-title h5 mb-3">Timezone Distribution</h3>
+                    <p class="chart-description text-muted">Countries by timezone zone</p>
+                    <div class="chart-loading position-absolute top-50 start-50 translate-middle w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-90">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="ms-3 mb-0">Loading timezone data...</p>
+                    </div>
+                    <div class="chart-detail-overlay position-absolute bottom-0 start-0 end-0 bg-white bg-opacity-95 p-3 rounded-bottom border-top opacity-0">
+                        <h4 class="h6 mb-2">Detailed Analysis</h4>
+                        <p class="small mb-0">Global timezone distribution highlighting business hour overlaps and impact on international operations.</p>
                     </div>
                 </div>
             </div>
 
-            <div id="chartContainer6" class="chart-container" aria-label="Independence status chart">
-                <div class="chart-wrapper">
-                    <h3 class="chart-title">Independence Status</h3>
-                    <p class="chart-description">Independent vs. Dependent territories</p>
-                    <div class="chart-loading">
-                        <div class="loading-spinner"></div>
-                        <p>Loading independence data...</p>
+            <div id="chartContainer6" class="chart-container card shadow-sm mb-4 position-relative"
+                 aria-label="Independence status chart" tabindex="0">
+                <div class="card-body">
+                    <h3 class="chart-title h5 mb-3">Independence Status</h3>
+                    <p class="chart-description text-muted">Independent vs. Dependent territories</p>
+                    <div class="chart-loading position-absolute top-50 start-50 translate-middle w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-90">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="ms-3 mb-0">Loading independence data...</p>
+                    </div>
+                    <div class="chart-detail-overlay position-absolute bottom-0 start-0 end-0 bg-white bg-opacity-95 p-3 rounded-bottom border-top opacity-0">
+                        <h4 class="h6 mb-2">Detailed Analysis</h4>
+                        <p class="small mb-0">Sovereignty status analysis including timeline of independence declarations and types of governance structures.</p>
                     </div>
                 </div>
             </div>
 
-            <div id="chartContainer7" class="chart-container" aria-label="Border statistics chart">
-                <div class="chart-wrapper">
-                    <h3 class="chart-title">Border Statistics</h3>
-                    <p class="chart-description">Analysis of country borders</p>
-                    <div class="chart-loading">
-                        <div class="loading-spinner"></div>
-                        <p>Loading border data...</p>
+            <div id="chartContainer7" class="chart-container card shadow-sm mb-4 position-relative"
+                 aria-label="Border statistics chart" tabindex="0">
+                <div class="card-body">
+                    <h3 class="chart-title h5 mb-3">Border Statistics</h3>
+                    <p class="chart-description text-muted">Analysis of country borders</p>
+                    <div class="chart-loading position-absolute top-50 start-50 translate-middle w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-90">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="ms-3 mb-0">Loading border data...</p>
+                    </div>
+                    <div class="chart-detail-overlay position-absolute bottom-0 start-0 end-0 bg-white bg-opacity-95 p-3 rounded-bottom border-top opacity-0">
+                        <h4 class="h6 mb-2">Detailed Analysis</h4>
+                        <p class="small mb-0">Border statistics showing countries with most neighbors, border lengths, and cross-border cooperation.</p>
                     </div>
                 </div>
             </div>
 
-            <div id="chartContainer8" class="chart-container" aria-label="Language distribution chart">
-                <div class="chart-wrapper">
-                    <h3 class="chart-title">Language Distribution</h3>
-                    <p class="chart-description">Most spoken languages globally</p>
-                    <div class="chart-loading">
-                        <div class="loading-spinner"></div>
-                        <p>Loading language data...</p>
+            <div id="chartContainer8" class="chart-container card shadow-sm mb-4 position-relative"
+                 aria-label="Language distribution chart" tabindex="0">
+                <div class="card-body">
+                    <h3 class="chart-title h5 mb-3">Language Distribution</h3>
+                    <p class="chart-description text-muted">Most spoken languages globally</p>
+                    <div class="chart-loading position-absolute top-50 start-50 translate-middle w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-90">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="ms-3 mb-0">Loading language data...</p>
+                    </div>
+                    <div class="chart-detail-overlay position-absolute bottom-0 start-0 end-0 bg-white bg-opacity-95 p-3 rounded-bottom border-top opacity-0">
+                        <h4 class="h6 mb-2">Detailed Analysis</h4>
+                        <p class="small mb-0">Language distribution analysis covering native vs non-native speakers and endangered language status.</p>
                     </div>
                 </div>
             </div>
@@ -175,6 +236,9 @@
         </div>
     </template>
 
+    <!-- Bootstrap JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
     <!-- JavaScript Modules -->
     <script type="module" src="../js/pages/world-data/index.js"></script>
     <script src="../js/pages/world-data/world-stats.js"></script>
