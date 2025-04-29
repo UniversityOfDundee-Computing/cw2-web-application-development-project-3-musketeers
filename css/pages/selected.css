@@ -2,14 +2,15 @@
  * Selected Country Page Styles
  */
 
-
  .container {
-    margin: 0 auto;
+    margin: 0;
     padding: 2rem 1rem;
     display: flex;
     flex-direction: column;
     gap: 2.5rem;
     position: relative;
+    width: 100%;
+    max-width: none;
 }
  
 /* Top layout (map + info) */
