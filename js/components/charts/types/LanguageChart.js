@@ -25,6 +25,13 @@ function hexToRgba(hex, alpha = 1) {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
+function darkenHexColor(hex, factor = 0.85) {
+    const r = Math.round(parseInt(hex.slice(1, 3), 16) * factor);
+    const g = Math.round(parseInt(hex.slice(3, 5), 16) * factor);
+    const b = Math.round(parseInt(hex.slice(5, 7), 16) * factor);
+    return `rgba(${r}, ${g}, ${b}, 1)`;
+}
+
 function generateHueVariants(baseHex, numberOfVariants) {
     const hexToHsl = (hex) => {
         let r = parseInt(hex.slice(1, 3), 16) / 255;
@@ -130,6 +137,7 @@ export class LanguageChart extends BaseChart {
         
         // Sort and format the data
         return this.sortAndFormatLanguageData(groupedData, data.length);
+
     }
     
     /**
@@ -651,6 +659,10 @@ export class LanguageChart extends BaseChart {
     createChartConfig(data) {
         // Generate vibrant colors for languages
         const colors = this.generateLanguageColors(data.labels);
+
+        const baseColors = generateHueVariants(COLORS.primary, data.labels.length);
+        const backgroundColors = baseColors.map(color => hexToRgba(color, 0.75));
+        const borderColors = baseColors.map(color => darkenHexColor(color, 0.8));
         
         const chartConfig = {
             type: this.options.type || 'horizontalBar',
@@ -660,8 +672,10 @@ export class LanguageChart extends BaseChart {
                     label: this.options.title || "Languages",
                     data: data.values,
                     backgroundColor: colors,
-                    borderColor: hexToRgba(COLORS.primary, 1),
-                    borderWidth: 1
+                    // borderColor: hexToRgba(COLORS.primary, 1),
+                    borderColor: borderColors,
+                    borderWidth: 1,
+                    borderRadius: 12
                 }]
             },
             options: {
