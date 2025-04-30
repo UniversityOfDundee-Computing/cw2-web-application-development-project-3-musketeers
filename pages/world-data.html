@@ -266,340 +266,318 @@
     </header>
 
     <main>
-        <div class="container py-4">
-            <!-- World Stats at a Glance - Premium Banner -->
-            <div id="chartContainer9" class="chart-container card shadow-sm mb-4" aria-label="global stats visualization">
-                <div class="card-body position-relative">
-                    <h3 class="chart-title h5 mb-3">World Stats at a Glance</h3>
-                    <p class="chart-description text-muted"><!-- Will be populated dynamically --></p>
-                    <div id="world-stats-container">
-                        <div class="stats-grid">
-                            <!-- Stats cards will be inserted here -->
-                        </div>
-                        <div id="world-stats-loading" class="chart-loading position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-90" style="z-index: 1000;">
-                            <div class="spinner-container">
-                                <div class="spinner-border text-primary" role="status"></div>
-                                <div class="spinner-core"></div>
-                            </div>
-                            <p>Compiling global statistics...</p>
-                            <div class="loading-progress">
-                                <div class="loading-progress-bar"></div>
+        <div class="container-fluid py-4">
+            <!-- World Stats at a Glance - Premium Banner (Full Width) -->
+            <div class="row">
+                <div class="col-12">
+                    <div id="chartContainer9" class="chart-container card shadow-sm mb-4" aria-label="global stats visualization">
+                        <div class="card-body position-relative">
+                            <h3 class="chart-title h5 mb-3">World Stats at a Glance</h3>
+                            <p class="chart-description text-muted"><!-- Will be populated dynamically --></p>
+                            <div id="world-stats-container">
+                                <div class="stats-grid">
+                                    <!-- Stats cards will be inserted here -->
+                                </div>
+                                <div id="world-stats-loading" class="chart-loading position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-90" style="z-index: 1000;">
+                                    <div class="spinner-container">
+                                        <div class="spinner-border text-primary" role="status"></div>
+                                        <div class="spinner-core"></div>
+                                    </div>
+                                    <p>Compiling global statistics...</p>
+                                    <div class="loading-progress">
+                                        <div class="loading-progress-bar"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Standard charts with updated structure -->
-            <div id="chartContainer" class="chart-container card shadow-sm mb-4 position-relative"
-                 aria-label="Population distribution chart" tabindex="0">
-                <div class="card-body">
-                    <div class="chart-content" style="padding-top: 1rem !important;">
-                        <h3 class="chart-title h5 mb-3">Global Population Distribution</h3>
-                        <p class="chart-description text-muted"><!-- Will be populated dynamically --></p>
-                        <div class="chart-wrapper" style="width: 100%; height: 100%; position: relative;">
-                            <!-- Chart will be rendered here -->
-                        </div>
-                    </div>
-                    <div class="chart-detail-analysis">
-                        <h4 class="h5 mb-3">Population Distribution Analysis</h4>
-                        <p><!-- Will be populated dynamically --></p>
-                        <div class="analysis-data mt-4">
-                            <h5 class="h6 mb-2">Key Insights</h5>
-                            <ul>
-                                <!-- Will be populated dynamically -->
-                            </ul>
-                            <h5 class="h6 my-3">Related Metrics</h5>
-                            <p><!-- Will be populated dynamically --></p>
-                            <div class="data-source small text-muted mt-4">
-                                <!-- Will be populated dynamically -->
+            <!-- Main chart grid - 3 charts per row on medium+ screens, 2 rows total -->
+            <div class="row g-3">
+                <!-- Population Distribution Chart -->
+                <div class="col-12 col-md-4">
+                    <div id="chartContainer" class="chart-container card shadow-sm mb-4 position-relative"
+                        aria-label="Population distribution chart" tabindex="0">
+                        <div class="card-body">
+                            <div class="chart-content">
+                                <h3 class="chart-title h5 mb-2">Global Population Distribution</h3>
+                                <p class="chart-description text-muted"><!-- Will be populated dynamically --></p>
+                                <div class="chart-wrapper">
+                                    <!-- Chart will be rendered here -->
+                                </div>
                             </div>
+                            <div class="chart-detail-analysis">
+                                <h4 class="h5 mb-3">Population Distribution Analysis</h4>
+                                <p><!-- Will be populated dynamically --></p>
+                                <div class="analysis-data mt-4">
+                                    <h5 class="h6 mb-2">Key Insights</h5>
+                                    <ul>
+                                        <!-- Will be populated dynamically -->
+                                    </ul>
+                                    <h5 class="h6 my-3">Related Metrics</h5>
+                                    <p><!-- Will be populated dynamically --></p>
+                                    <div class="data-source small text-muted mt-4">
+                                        <!-- Will be populated dynamically -->
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Loading state -->
+                            <div class="chart-loading position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                                <div class="spinner-container">
+                                    <div class="spinner-border text-primary" role="status"></div>
+                                    <div class="spinner-core"></div>
+                                </div>
+                                <p>Loading chart data...</p>
+                                <div class="loading-progress">
+                                    <div class="loading-progress-bar"></div>
+                                </div>
+                            </div>
+                            <!-- Detail overlay -->
+                            <div class="chart-detail-overlay position-absolute bottom-0 start-0 end-0 bg-white bg-opacity-95 p-3 rounded-bottom border-top opacity-0">
+                                <h4 class="h6 mb-2">Detailed Analysis</h4>
+                                <p class="small mb-0"><!-- Will be populated dynamically --></p>
+                            </div>
+                            <!-- Close button -->
+                            <div class="chart-close-btn">✕</div>
                         </div>
                     </div>
-                    <!-- Loading state for chart containers - Enhanced for professional look -->
-                    <div class="chart-loading position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                        <div class="spinner-container">
-                            <div class="spinner-border text-primary" role="status"></div>
-                            <div class="spinner-core"></div>
-                        </div>
-                        <p>Loading chart data...</p>
-                        <div class="loading-progress">
-                            <div class="loading-progress-bar"></div>
-                        </div>
-                    </div>
-                    <!-- Original overlay for hover state -->
-                    <div class="chart-detail-overlay position-absolute bottom-0 start-0 end-0 bg-white bg-opacity-95 p-3 rounded-bottom border-top opacity-0">
-                        <h4 class="h6 mb-2">Detailed Analysis</h4>
-                        <p class="small mb-0"><!-- Will be populated dynamically --></p>
-                    </div>
-                    <!-- Close button -->
-                    <div class="chart-close-btn">✕</div>
                 </div>
-            </div>
 
-            <div id="chartContainer2" class="chart-container card shadow-sm mb-4 position-relative"
-                 aria-label="Continental population chart" tabindex="0">
-                <div class="card-body">
-                    <div class="chart-content">
-                        <h3 class="chart-title h5 mb-3">Continental Population</h3>
-                        <p class="chart-description text-muted"><!-- Will be populated dynamically --></p>
-                        <div class="chart-wrapper" style="width: 100%; height: 100%; position: relative;">
-                            <!-- Chart will be rendered here -->
-                        </div>
-                    </div>
-                    <div class="chart-detail-analysis">
-                        <h4 class="h5 mb-3">Continental Population Analysis</h4>
-                        <p><!-- Will be populated dynamically --></p>
-                        <div class="analysis-data mt-4">
-                            <h5 class="h6 mb-2">Key Insights</h5>
-                            <ul>
-                                <!-- Will be populated dynamically -->
-                            </ul>
-                            <h5 class="h6 my-3">Related Metrics</h5>
-                            <p><!-- Will be populated dynamically --></p>
-                            <div class="data-source small text-muted mt-4">
-                                <!-- Will be populated dynamically -->
+                <!-- Continental Population Chart -->
+                <div class="col-12 col-md-4">
+                    <div id="chartContainer2" class="chart-container card shadow-sm mb-4 position-relative"
+                        aria-label="Continental population chart" tabindex="0">
+                        <div class="card-body">
+                            <div class="chart-content">
+                                <h3 class="chart-title h5 mb-2">Continental Population</h3>
+                                <p class="chart-description text-muted"><!-- Will be populated dynamically --></p>
+                                <div class="chart-wrapper">
+                                    <!-- Chart will be rendered here -->
+                                </div>
                             </div>
+                            <div class="chart-detail-analysis">
+                                <h4 class="h5 mb-3">Continental Population Analysis</h4>
+                                <p><!-- Will be populated dynamically --></p>
+                                <div class="analysis-data mt-4">
+                                    <h5 class="h6 mb-2">Key Insights</h5>
+                                    <ul>
+                                        <!-- Will be populated dynamically -->
+                                    </ul>
+                                    <h5 class="h6 my-3">Related Metrics</h5>
+                                    <p><!-- Will be populated dynamically --></p>
+                                    <div class="data-source small text-muted mt-4">
+                                        <!-- Will be populated dynamically -->
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Loading state -->
+                            <div class="chart-loading position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                                <div class="spinner-container">
+                                    <div class="spinner-border text-primary" role="status"></div>
+                                    <div class="spinner-core"></div>
+                                </div>
+                                <p>Loading chart data...</p>
+                                <div class="loading-progress">
+                                    <div class="loading-progress-bar"></div>
+                                </div>
+                            </div>
+                            <div class="chart-detail-overlay position-absolute bottom-0 start-0 end-0 bg-white bg-opacity-95 p-3 rounded-bottom border-top opacity-0">
+                                <h4 class="h6 mb-2">Detailed Analysis</h4>
+                                <p class="small mb-0"><!-- Will be populated dynamically --></p>
+                            </div>
+                            <div class="chart-close-btn">✕</div>
                         </div>
                     </div>
-                    <!-- Loading state for chart containers - Enhanced for professional look -->
-                    <div class="chart-loading position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                        <div class="spinner-container">
-                            <div class="spinner-border text-primary" role="status"></div>
-                            <div class="spinner-core"></div>
-                        </div>
-                        <p>Loading chart data...</p>
-                        <div class="loading-progress">
-                            <div class="loading-progress-bar"></div>
-                        </div>
-                    </div>
-                    <div class="chart-detail-overlay position-absolute bottom-0 start-0 end-0 bg-white bg-opacity-95 p-3 rounded-bottom border-top opacity-0">
-                        <h4 class="h6 mb-2">Detailed Analysis</h4>
-                        <p class="small mb-0"><!-- Will be populated dynamically --></p>
-                    </div>
-                    <div class="chart-close-btn">✕</div>
                 </div>
-            </div>
 
-            <!-- Regional Distribution chart removed -->
-
-            <div id="chartContainer4" class="chart-container card shadow-sm mb-4 position-relative"
-                 aria-label="Currency usage chart" tabindex="0">
-                <div class="card-body">
-                    <div class="chart-content">
-                        <h3 class="chart-title h5 mb-3">Currency Usage</h3>
-                        <p class="chart-description text-muted"><!-- Will be populated dynamically --></p>
-                        <div class="chart-wrapper" style="width: 100%; height: 100%; position: relative;">
-                            <!-- Chart will be rendered here -->
-                        </div>
-                    </div>
-                    <div class="chart-detail-analysis">
-                        <h4 class="h5 mb-3">Currency Usage Analysis</h4>
-                        <p><!-- Will be populated dynamically --></p>
-                        <div class="analysis-data mt-4">
-                            <h5 class="h6 mb-2">Key Insights</h5>
-                            <ul>
-                                <!-- Will be populated dynamically -->
-                            </ul>
-                            <h5 class="h6 my-3">Related Metrics</h5>
-                            <p><!-- Will be populated dynamically --></p>
-                            <div class="data-source small text-muted mt-4">
-                                <!-- Will be populated dynamically -->
+                <!-- Currency Usage Chart -->
+                <div class="col-12 col-md-4">
+                    <div id="chartContainer4" class="chart-container card shadow-sm mb-4 position-relative"
+                        aria-label="Currency usage chart" tabindex="0">
+                        <div class="card-body">
+                            <div class="chart-content">
+                                <h3 class="chart-title h5 mb-2">Currency Usage</h3>
+                                <p class="chart-description text-muted"><!-- Will be populated dynamically --></p>
+                                <div class="chart-wrapper">
+                                    <!-- Chart will be rendered here -->
+                                </div>
                             </div>
+                            <div class="chart-detail-analysis">
+                                <h4 class="h5 mb-3">Currency Usage Analysis</h4>
+                                <p><!-- Will be populated dynamically --></p>
+                                <div class="analysis-data mt-4">
+                                    <h5 class="h6 mb-2">Key Insights</h5>
+                                    <ul>
+                                        <!-- Will be populated dynamically -->
+                                    </ul>
+                                    <h5 class="h6 my-3">Related Metrics</h5>
+                                    <p><!-- Will be populated dynamically --></p>
+                                    <div class="data-source small text-muted mt-4">
+                                        <!-- Will be populated dynamically -->
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Loading state -->
+                            <div class="chart-loading position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                                <div class="spinner-container">
+                                    <div class="spinner-border text-primary" role="status"></div>
+                                    <div class="spinner-core"></div>
+                                </div>
+                                <p>Loading chart data...</p>
+                                <div class="loading-progress">
+                                    <div class="loading-progress-bar"></div>
+                                </div>
+                            </div>
+                            <div class="chart-detail-overlay position-absolute bottom-0 start-0 end-0 bg-white bg-opacity-95 p-3 rounded-bottom border-top opacity-0">
+                                <h4 class="h6 mb-2">Detailed Analysis</h4>
+                                <p class="small mb-0"><!-- Will be populated dynamically --></p>
+                            </div>
+                            <div class="chart-close-btn">✕</div>
                         </div>
                     </div>
-                    <!-- Loading state for chart containers - Enhanced for professional look -->
-                    <div class="chart-loading position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                        <div class="spinner-container">
-                            <div class="spinner-border text-primary" role="status"></div>
-                            <div class="spinner-core"></div>
-                        </div>
-                        <p>Loading chart data...</p>
-                        <div class="loading-progress">
-                            <div class="loading-progress-bar"></div>
-                        </div>
-                    </div>
-                    <div class="chart-detail-overlay position-absolute bottom-0 start-0 end-0 bg-white bg-opacity-95 p-3 rounded-bottom border-top opacity-0">
-                        <h4 class="h6 mb-2">Detailed Analysis</h4>
-                        <p class="small mb-0"><!-- Will be populated dynamically --></p>
-                    </div>
-                    <div class="chart-close-btn">✕</div>
                 </div>
-            </div>
 
-            <div id="chartContainer5" class="chart-container card shadow-sm mb-4 position-relative"
-                 aria-label="Timezone distribution chart" tabindex="0">
-                <div class="card-body">
-                    <div class="chart-content">
-                        <h3 class="chart-title h5 mb-3">Timezone Distribution</h3>
-                        <p class="chart-description text-muted"><!-- Will be populated dynamically --></p>
-                        <div class="chart-wrapper" style="width: 100%; height: 100%; position: relative;">
-                            <!-- Chart will be rendered here -->
-                        </div>
-                    </div>
-                    <div class="chart-detail-analysis">
-                        <h4 class="h5 mb-3">Timezone Distribution Analysis</h4>
-                        <p><!-- Will be populated dynamically --></p>
-                        <div class="analysis-data mt-4">
-                            <h5 class="h6 mb-2">Key Insights</h5>
-                            <ul>
-                                <!-- Will be populated dynamically -->
-                            </ul>
-                            <h5 class="h6 my-3">Related Metrics</h5>
-                            <p><!-- Will be populated dynamically --></p>
-                            <div class="data-source small text-muted mt-4">
-                                <!-- Will be populated dynamically -->
+                <!-- Independence Status Chart -->
+                <div class="col-12 col-md-4">
+                    <div id="chartContainer6" class="chart-container card shadow-sm mb-4 position-relative"
+                        aria-label="Independence status chart" tabindex="0">
+                        <div class="card-body">
+                            <div class="chart-content">
+                                <h3 class="chart-title h5 mb-2">Independence Status</h3>
+                                <p class="chart-description text-muted"><!-- Will be populated dynamically --></p>
+                                <div class="chart-wrapper">
+                                    <!-- Chart will be rendered here -->
+                                </div>
                             </div>
+                            <div class="chart-detail-analysis">
+                                <h4 class="h5 mb-3">Independence Status Analysis</h4>
+                                <p><!-- Will be populated dynamically --></p>
+                                <div class="analysis-data mt-4">
+                                    <h5 class="h6 mb-2">Key Insights</h5>
+                                    <ul>
+                                        <!-- Will be populated dynamically -->
+                                    </ul>
+                                    <h5 class="h6 my-3">Related Metrics</h5>
+                                    <p><!-- Will be populated dynamically --></p>
+                                    <div class="data-source small text-muted mt-4">
+                                        <!-- Will be populated dynamically -->
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Loading state -->
+                            <div class="chart-loading position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                                <div class="spinner-container">
+                                    <div class="spinner-border text-primary" role="status"></div>
+                                    <div class="spinner-core"></div>
+                                </div>
+                                <p>Loading chart data...</p>
+                                <div class="loading-progress">
+                                    <div class="loading-progress-bar"></div>
+                                </div>
+                            </div>
+                            <div class="chart-detail-overlay position-absolute bottom-0 start-0 end-0 bg-white bg-opacity-95 p-3 rounded-bottom border-top opacity-0">
+                                <h4 class="h6 mb-2">Detailed Analysis</h4>
+                                <p class="small mb-0"><!-- Will be populated dynamically --></p>
+                            </div>
+                            <div class="chart-close-btn">✕</div>
                         </div>
                     </div>
-                    <!-- Loading state for chart containers - Enhanced for professional look -->
-                    <div class="chart-loading position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                        <div class="spinner-container">
-                            <div class="spinner-border text-primary" role="status"></div>
-                            <div class="spinner-core"></div>
-                        </div>
-                        <p>Loading chart data...</p>
-                        <div class="loading-progress">
-                            <div class="loading-progress-bar"></div>
-                        </div>
-                    </div>
-                    <div class="chart-detail-overlay position-absolute bottom-0 start-0 end-0 bg-white bg-opacity-95 p-3 rounded-bottom border-top opacity-0">
-                        <h4 class="h6 mb-2">Detailed Analysis</h4>
-                        <p class="small mb-0"><!-- Will be populated dynamically --></p>
-                    </div>
-                    <div class="chart-close-btn">✕</div>
                 </div>
-            </div>
 
-            <div id="chartContainer6" class="chart-container card shadow-sm mb-4 position-relative"
-                 aria-label="Independence status chart" tabindex="0">
-                <div class="card-body">
-                    <div class="chart-content">
-                        <h3 class="chart-title h5 mb-3">Independence Status</h3>
-                        <p class="chart-description text-muted"><!-- Will be populated dynamically --></p>
-                        <div class="chart-wrapper" style="width: 100%; height: 100%; position: relative;">
-                            <!-- Chart will be rendered here -->
-                        </div>
-                    </div>
-                    <div class="chart-detail-analysis">
-                        <h4 class="h5 mb-3">Independence Status Analysis</h4>
-                        <p><!-- Will be populated dynamically --></p>
-                        <div class="analysis-data mt-4">
-                            <h5 class="h6 mb-2">Key Insights</h5>
-                            <ul>
-                                <!-- Will be populated dynamically -->
-                            </ul>
-                            <h5 class="h6 my-3">Related Metrics</h5>
-                            <p><!-- Will be populated dynamically --></p>
-                            <div class="data-source small text-muted mt-4">
-                                <!-- Will be populated dynamically -->
+                <!-- Border Statistics Chart -->
+                <div class="col-12 col-md-4">
+                    <div id="chartContainer7" class="chart-container card shadow-sm mb-4 position-relative"
+                        aria-label="Border statistics chart" tabindex="0">
+                        <div class="card-body">
+                            <div class="chart-content">
+                                <h3 class="chart-title h5 mb-2">Border Statistics</h3>
+                                <p class="chart-description text-muted"><!-- Will be populated dynamically --></p>
+                                <div class="chart-wrapper">
+                                    <!-- Chart will be rendered here -->
+                                </div>
                             </div>
+                            <div class="chart-detail-analysis">
+                                <h4 class="h5 mb-3">Border Statistics Analysis</h4>
+                                <p><!-- Will be populated dynamically --></p>
+                                <div class="analysis-data mt-4">
+                                    <h5 class="h6 mb-2">Key Insights</h5>
+                                    <ul>
+                                        <!-- Will be populated dynamically -->
+                                    </ul>
+                                    <h5 class="h6 my-3">Related Metrics</h5>
+                                    <p><!-- Will be populated dynamically --></p>
+                                    <div class="data-source small text-muted mt-4">
+                                        <!-- Will be populated dynamically -->
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Loading state -->
+                            <div class="chart-loading position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                                <div class="spinner-container">
+                                    <div class="spinner-border text-primary" role="status"></div>
+                                    <div class="spinner-core"></div>
+                                </div>
+                                <p>Loading chart data...</p>
+                                <div class="loading-progress">
+                                    <div class="loading-progress-bar"></div>
+                                </div>
+                            </div>
+                            <div class="chart-detail-overlay position-absolute bottom-0 start-0 end-0 bg-white bg-opacity-95 p-3 rounded-bottom border-top opacity-0">
+                                <h4 class="h6 mb-2">Detailed Analysis</h4>
+                                <p class="small mb-0"><!-- Will be populated dynamically --></p>
+                            </div>
+                            <div class="chart-close-btn">✕</div>
                         </div>
                     </div>
-                    <!-- Loading state for chart containers - Enhanced for professional look -->
-                    <div class="chart-loading position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                        <div class="spinner-container">
-                            <div class="spinner-border text-primary" role="status"></div>
-                            <div class="spinner-core"></div>
-                        </div>
-                        <p>Loading chart data...</p>
-                        <div class="loading-progress">
-                            <div class="loading-progress-bar"></div>
-                        </div>
-                    </div>
-                    <div class="chart-detail-overlay position-absolute bottom-0 start-0 end-0 bg-white bg-opacity-95 p-3 rounded-bottom border-top opacity-0">
-                        <h4 class="h6 mb-2">Detailed Analysis</h4>
-                        <p class="small mb-0"><!-- Will be populated dynamically --></p>
-                    </div>
-                    <div class="chart-close-btn">✕</div>
                 </div>
-            </div>
 
-            <div id="chartContainer7" class="chart-container card shadow-sm mb-4 position-relative"
-                 aria-label="Border statistics chart" tabindex="0">
-                <div class="card-body">
-                    <div class="chart-content">
-                        <h3 class="chart-title h5 mb-3">Border Statistics</h3>
-                        <p class="chart-description text-muted"><!-- Will be populated dynamically --></p>
-                        <div class="chart-wrapper" style="width: 100%; height: 100%; position: relative;">
-                            <!-- Chart will be rendered here -->
-                        </div>
-                    </div>
-                    <div class="chart-detail-analysis">
-                        <h4 class="h5 mb-3">Border Statistics Analysis</h4>
-                        <p><!-- Will be populated dynamically --></p>
-                        <div class="analysis-data mt-4">
-                            <h5 class="h6 mb-2">Key Insights</h5>
-                            <ul>
-                                <!-- Will be populated dynamically -->
-                            </ul>
-                            <h5 class="h6 my-3">Related Metrics</h5>
-                            <p><!-- Will be populated dynamically --></p>
-                            <div class="data-source small text-muted mt-4">
-                                <!-- Will be populated dynamically -->
+                <!-- Language Distribution Chart -->
+                <div class="col-12 col-md-4">
+                    <div id="chartContainer8" class="chart-container card shadow-sm mb-4 position-relative"
+                        aria-label="Language distribution chart" tabindex="0">
+                        <div class="card-body">
+                            <div class="chart-content">
+                                <h3 class="chart-title h5 mb-2">Language Distribution</h3>
+                                <p class="chart-description text-muted"><!-- Will be populated dynamically --></p>
+                                <div class="chart-wrapper">
+                                    <!-- Chart will be rendered here -->
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <!-- Loading state for chart containers - Enhanced for professional look -->
-                    <div class="chart-loading position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                        <div class="spinner-container">
-                            <div class="spinner-border text-primary" role="status"></div>
-                            <div class="spinner-core"></div>
-                        </div>
-                        <p>Loading chart data...</p>
-                        <div class="loading-progress">
-                            <div class="loading-progress-bar"></div>
-                        </div>
-                    </div>
-                    <div class="chart-detail-overlay position-absolute bottom-0 start-0 end-0 bg-white bg-opacity-95 p-3 rounded-bottom border-top opacity-0">
-                        <h4 class="h6 mb-2">Detailed Analysis</h4>
-                        <p class="small mb-0"><!-- Will be populated dynamically --></p>
-                    </div>
-                    <div class="chart-close-btn">✕</div>
-                </div>
-            </div>
-
-            <div id="chartContainer8" class="chart-container card shadow-sm mb-4 position-relative"
-                 aria-label="Language distribution chart" tabindex="0">
-                <div class="card-body">
-                    <div class="chart-content">
-                        <h3 class="chart-title h5 mb-3">Language Distribution</h3>
-                        <p class="chart-description text-muted"><!-- Will be populated dynamically --></p>
-                        <div class="chart-wrapper" style="width: 100%; height: 100%; position: relative;">
-                            <!-- Chart will be rendered here -->
-                        </div>
-                    </div>
-                    <div class="chart-detail-analysis">
-                        <h4 class="h5 mb-3">Language Distribution Analysis</h4>
-                        <p><!-- Will be populated dynamically --></p>
-                        <div class="analysis-data mt-4">
-                            <h5 class="h6 mb-2">Key Insights</h5>
-                            <ul>
-                                <!-- Will be populated dynamically -->
-                            </ul>
-                            <h5 class="h6 my-3">Related Metrics</h5>
-                            <p><!-- Will be populated dynamically --></p>
-                            <div class="data-source small text-muted mt-4">
-                                <!-- Will be populated dynamically -->
+                            <div class="chart-detail-analysis">
+                                <h4 class="h5 mb-3">Language Distribution Analysis</h4>
+                                <p><!-- Will be populated dynamically --></p>
+                                <div class="analysis-data mt-4">
+                                    <h5 class="h6 mb-2">Key Insights</h5>
+                                    <ul>
+                                        <!-- Will be populated dynamically -->
+                                    </ul>
+                                    <h5 class="h6 my-3">Related Metrics</h5>
+                                    <p><!-- Will be populated dynamically --></p>
+                                    <div class="data-source small text-muted mt-4">
+                                        <!-- Will be populated dynamically -->
+                                    </div>
+                                </div>
                             </div>
+                            <!-- Loading state -->
+                            <div class="chart-loading position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+                                <div class="spinner-container">
+                                    <div class="spinner-border text-primary" role="status"></div>
+                                    <div class="spinner-core"></div>
+                                </div>
+                                <p>Loading chart data...</p>
+                                <div class="loading-progress">
+                                    <div class="loading-progress-bar"></div>
+                                </div>
+                            </div>
+                            <div class="chart-detail-overlay position-absolute bottom-0 start-0 end-0 bg-white bg-opacity-95 p-3 rounded-bottom border-top opacity-0">
+                                <h4 class="h6 mb-2">Detailed Analysis</h4>
+                                <p class="small mb-0"><!-- Will be populated dynamically --></p>
+                            </div>
+                            <div class="chart-close-btn">✕</div>
                         </div>
                     </div>
-                    <!-- Loading state for chart containers - Enhanced for professional look -->
-                    <div class="chart-loading position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
-                        <div class="spinner-container">
-                            <div class="spinner-border text-primary" role="status"></div>
-                            <div class="spinner-core"></div>
-                        </div>
-                        <p>Loading chart data...</p>
-                        <div class="loading-progress">
-                            <div class="loading-progress-bar"></div>
-                        </div>
-                    </div>
-                    <div class="chart-detail-overlay position-absolute bottom-0 start-0 end-0 bg-white bg-opacity-95 p-3 rounded-bottom border-top opacity-0">
-                        <h4 class="h6 mb-2">Detailed Analysis</h4>
-                        <p class="small mb-0"><!-- Will be populated dynamically --></p>
-                    </div>
-                    <div class="chart-close-btn">✕</div>
                 </div>
             </div>
 
@@ -617,7 +595,7 @@
     <template id="error-template">
         <div class="chart-error">
             <svg xmlns="http://www.w3.org/2000/svg" class="error-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 001.414-1.414L11.414 10l1.293-1.293a1 1 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
             </svg>
             <p>Failed to load chart</p>
             <button onclick="this.closest('.chart-container').querySelector('.chart-loading').style.display='block';this.closest('.chart-error').remove();" class="retry-button">

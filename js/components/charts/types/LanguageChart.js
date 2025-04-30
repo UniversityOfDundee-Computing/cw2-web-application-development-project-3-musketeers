@@ -8,6 +8,83 @@ import * as dataProcessing from '../../../utils/dataProcessing.js';
 import { chartService } from '../../../services/chartService.js';
 import * as chartUtils from '../../../utils/chartUtils.js';
 
+// Get the root styles for consistent theming
+const styles = getComputedStyle(document.documentElement);
+const COLORS = {
+    primary: styles.getPropertyValue('--primary-color').trim(),
+    primaryDark: styles.getPropertyValue('--primary-dark').trim(),
+    primaryLight: styles.getPropertyValue('--primary-light').trim(),
+    textPrimary: styles.getPropertyValue('--text-primary').trim(),
+    textSecondary: styles.getPropertyValue('--text-secondary').trim(),
+};
+
+function hexToRgba(hex, alpha = 1) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function generateHueVariants(baseHex, numberOfVariants) {
+    const hexToHsl = (hex) => {
+        let r = parseInt(hex.slice(1, 3), 16) / 255;
+        let g = parseInt(hex.slice(3, 5), 16) / 255;
+        let b = parseInt(hex.slice(5, 7), 16) / 255;
+
+        const max = Math.max(r, g, b), min = Math.min(r, g, b);
+        let h, s, l = (max + min) / 2;
+
+        if (max === min) {
+            h = s = 0;
+        } else {
+            const d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+            h /= 6;
+        }
+        return { h, s, l };
+    };
+
+    const hslToHex = ({ h, s, l }) => {
+        const hue2rgb = (p, q, t) => {
+            if (t < 0) t += 1;
+            if (t > 1) t -= 1;
+            if (t < 1 / 6) return p + (q - p) * 6 * t;
+            if (t < 1 / 2) return q;
+            if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+            return p;
+        };
+
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+        const r = hue2rgb(p, q, h + 1 / 3);
+        const g = hue2rgb(p, q, h);
+        const b = hue2rgb(p, q, h - 1 / 3);
+
+        const toHex = x => {
+            const hex = Math.round(x * 255).toString(16);
+            return hex.length === 1 ? '0' + hex : hex;
+        };
+
+        return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+    };
+
+    const baseHSL = hexToHsl(baseHex);
+    const variants = [];
+
+    const step = 1 / numberOfVariants;
+    for (let i = 0; i < numberOfVariants; i++) {
+        let newHue = (baseHSL.h + i * step) % 1;
+        variants.push(hslToHex({ h: newHue, s: baseHSL.s, l: baseHSL.l }));
+    }
+
+    return variants;
+}
+
 export class LanguageChart extends BaseChart {
     /**
      * Create a new LanguageChart instance
@@ -583,7 +660,7 @@ export class LanguageChart extends BaseChart {
                     label: this.options.title || "Languages",
                     data: data.values,
                     backgroundColor: colors,
-                    borderColor: "#333",
+                    borderColor: hexToRgba(COLORS.primary, 1),
                     borderWidth: 1
                 }]
             },
@@ -596,11 +673,12 @@ export class LanguageChart extends BaseChart {
                         display: true,
                         text: this.options.title || 'Most Common Languages',
                         font: {
-                            size: 22,
-                            weight: 'bold',
-                            family: 'Arial'
+                            size: 24,
+                            family: 'Roboto, sans-serif',
+                            weight: 600
                         },
-                        color: '#222'
+                        color: COLORS.textPrimary,
+                        padding: {bottom: 24}
                     },
                     legend: {
                         display: false
@@ -639,13 +717,19 @@ export class LanguageChart extends BaseChart {
                             display: true,
                             text: this.options.sortByPopulation ? 'Estimated Number of Speakers' : 'Number of Countries',
                             font: {
-                                size: 12,
+                                size: 14,
+                                family: 'Roboto, sans-serif',
                                 weight: 'bold'
-                            }
+                            },
+                            color: COLORS.textSecondary
                         },
                         ticks: {
-                            color: "#444",
-                            font: { size: 12, weight: "bold" },
+                            color: COLORS.textSecondary,
+                            font: {
+                                size: 14,
+                                family: 'Roboto, sans-serif',
+                                weight: 'bold'
+                            },
                             callback: (value) => {
                                 if (this.options.sortByPopulation && value >= 1000000) {
                                     return `${(value / 1000000).toFixed(1)}M`;
@@ -657,8 +741,8 @@ export class LanguageChart extends BaseChart {
                     },
                     y: {
                         ticks: {
-                            color: "#444",
-                            font: { size: 13, weight: "bold" }
+                            color: COLORS.textSecondary,
+                            font: { size: 14, family: 'Roboto, sans-serif', weight: 'bold' }
                         },
                         grid: { display: false }
                     }
@@ -689,56 +773,10 @@ export class LanguageChart extends BaseChart {
      * @returns {Array} Array of color values
      */
     generateLanguageColors(languages) {
-        // Predefined colors for common language families
-        const languageColorMap = {
-            // Romance languages
-            'Spanish': '#e74c3c',
-            'French': '#3498db',
-            'Portuguese': '#2ecc71',
-            'Italian': '#f1c40f',
-            'Romanian': '#9b59b6',
-            
-            // Germanic languages
-            'English': '#3498db',
-            'German': '#e67e22',
-            'Dutch': '#f39c12',
-            'Swedish': '#2980b9',
-            'Norwegian': '#27ae60',
-            
-            // Asian languages
-            'Chinese': '#c0392b',
-            'Japanese': '#d35400',
-            'Korean': '#8e44ad',
-            'Hindi': '#16a085',
-            'Arabic': '#7f8c8d',
-            
-            // Language families
-            'Germanic': '#3498db',
-            'Romance': '#e74c3c',
-            'Slavic': '#f39c12',
-            'Sinitic': '#c0392b',
-            'Indo-Aryan': '#16a085',
-            'Semitic': '#7f8c8d',
-            'Turkic': '#d35400',
-            'Other': '#95a5a6'
-        };
-        
-        return languages.map(lang => {
-            // Check for direct matches in our color map
-            if (languageColorMap[lang]) {
-                return languageColorMap[lang];
-            }
-            
-            // Check for partial matches
-            for (const mappedLang in languageColorMap) {
-                if (lang.includes(mappedLang) || mappedLang.includes(lang)) {
-                    return languageColorMap[mappedLang];
-                }
-            }
-            
-            // Generate a color based on the first character of the language name
-            const hue = (lang.charCodeAt(0) * 7) % 360;
-            return `hsl(${hue}, 70%, 60%)`;
+        // Generate colors using the utility function
+        return languages.map((_, index) => {
+            const variant = generateHueVariants(COLORS.primary, languages.length)[index];
+            return hexToRgba(variant, 0.75);
         });
     }
 

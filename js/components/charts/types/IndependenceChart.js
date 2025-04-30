@@ -8,6 +8,23 @@ import * as dataProcessing from '../../../utils/dataProcessing.js';
 import { chartService } from '../../../services/chartService.js';
 import * as chartUtils from '../../../utils/chartUtils.js';
 
+// Get the root styles for consistent theming
+const styles = getComputedStyle(document.documentElement);
+const COLORS = {
+    primary: styles.getPropertyValue('--primary-color').trim(),
+    primaryDark: styles.getPropertyValue('--primary-dark').trim(),
+    primaryLight: styles.getPropertyValue('--primary-light').trim(),
+    textPrimary: styles.getPropertyValue('--text-primary').trim(),
+    textSecondary: styles.getPropertyValue('--text-secondary').trim(),
+};
+
+function hexToRgba(hex, alpha = 1) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
 export class IndependenceChart extends BaseChart {
     /**
      * Create a new IndependenceChart instance
@@ -96,11 +113,12 @@ export class IndependenceChart extends BaseChart {
                 datasets: [{
                     data: data.values,
                     backgroundColor: [
-                        "#36a2eb",  // Blue for sovereign nations
-                        "#ff6384",  // Pink for dependent territories
+                        hexToRgba(COLORS.primary, 0.75),   // Primary color for sovereign nations
+                        hexToRgba(COLORS.primaryLight, 0.75) // Lighter shade for dependent territories
                     ],
-                    borderColor: "#444",
-                    borderWidth: 2
+                    borderColor: hexToRgba(COLORS.primary, 1),
+                    borderWidth: 1,
+                    borderRadius: 12
                 }]
             },
             options: {
@@ -111,21 +129,23 @@ export class IndependenceChart extends BaseChart {
                         display: true,
                         text: this.options.title || 'Global Independence Status',
                         font: {
-                            size: 22,
-                            weight: 'bold',
-                            family: 'Arial'
+                            size: 24,
+                            family: 'Roboto, sans-serif',
+                            weight: 600
                         },
-                        color: '#222'
+                        color: COLORS.textPrimary,
+                        padding: {bottom: 24}
                     },
                     legend: {
                         position: 'bottom',
                         labels: {
-                            color: "#444",
+                            color: COLORS.textSecondary,
                             font: {
-                                size: 12,
-                                weight: "bold"
+                                size: 14,
+                                family: 'Roboto, sans-serif',
+                                weight: 'bold'
                             }
-                        }
+                        },
                     },
                     tooltip: {
                         callbacks: {
@@ -140,7 +160,7 @@ export class IndependenceChart extends BaseChart {
                                     `Examples: ${this.getSampleCountries(item.countries)}`
                                 ];
                             }
-                        }
+                        },
                     }
                 }
             }
@@ -163,14 +183,16 @@ export class IndependenceChart extends BaseChart {
             
             // Add data labels for better readability
             chartConfig.options.plugins.datalabels = {
-                color: '#444',
+                color: COLORS.textSecondary,
                 font: {
+                    size: 14,
+                    family: 'Roboto, sans-serif',
                     weight: 'bold'
                 },
                 formatter: (value) => {
                     return value;
                 }
-            };
+            }
         }
         
         return chartConfig;
@@ -407,8 +429,7 @@ export class IndependenceChart extends BaseChart {
         
         // Chart type description
         const chartType = this.options.type || 'pie';
-        const chartTypeDesc = chartType === 'pie' || chartType === 'doughnut' ? 
-            `${chartType} chart` : `${chartType} chart`;
+        const chartTypeDesc = `${chartType} chart`;
         
         const title = 'Global Independence Status';
         const shortDesc = `This ${chartTypeDesc} illustrates the global distribution of sovereign nations versus dependent territories.`;
@@ -445,4 +466,4 @@ export class IndependenceChart extends BaseChart {
     generateDescriptions(data) {
         return this.generateIndependenceDescriptions(data);
     }
-}
+};
