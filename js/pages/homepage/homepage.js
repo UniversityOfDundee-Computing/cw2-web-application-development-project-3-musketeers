@@ -24,7 +24,7 @@ async function setupGlobe() {
       .pointOfView({ lat: 20, lng: 0, altitude: 2.5 }, 0)
       .pointsData(pointsData)
       .pointAltitude(d => d.baseSize)
-      .pointColor(() => 'grey')
+      .pointColor(() => 'white')
       .pointLabel('label');
 
     // Make sure controls are enabled
@@ -66,5 +66,8 @@ async function setupGlobe() {
   }
 }
 
+
 // Run setup on DOM ready
 window.addEventListener('DOMContentLoaded', setupGlobe);
+
+
