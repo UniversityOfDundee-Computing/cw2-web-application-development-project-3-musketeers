@@ -8,12 +8,154 @@ header {
     position: sticky;
     top: 0;
     z-index: 50;
-    background-color: var(--surface);
+    background-color: var(--background, #fff);
     border-bottom: 1px solid var(--border-color);
-    padding: var(--space-4) 0;
+    padding: var(--space-1) var(--space-2);
+    box-shadow: var(--shadow-md);
 }
 
-header h1 {
+.logo-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--primary-light), var(--primary-color), var(--primary-dark));
+    -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="black"><path d="M10.495 6.92..."/><path d="M8 0a8 8..."/></svg>') no-repeat center / contain;
+    mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="black"><path d="m10.495 6.92 1.278-.619a.483.483 0 0 0 .126-.782c-.252-.244-.682-.139-.932.107-.23.226-.513.373-.816.53l-.102.054c-.338.178-.264.626.1.736a.48.48 0 0 0 .346-.027ZM7.741 9.808V9.78a.413.413 0 1 1 .783.183l-.22.443a.6.6 0 0 1-.12.167l-.193.185a.36.36 0 1 1-.5-.516l.112-.108a.45.45 0 0 0 .138-.326M5.672 12.5l.482.233A.386.386 0 1 0 6.32 12h-.416a.7.7 0 0 1-.419-.139l-.277-.206a.302.302 0 1 0-.298.52z"/><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0M1.612 10.867l.756-1.288a1 1 0 0 1 1.545-.225l1.074 1.005a.986.986 0 0 0 1.36-.011l.038-.037a.88.88 0 0 0 .26-.755c-.075-.548.37-1.033.92-1.099.728-.086 1.587-.324 1.728-.957.086-.386-.114-.83-.361-1.2-.207-.312 0-.8.374-.8.123 0 .24-.055.318-.15l.393-.474c.196-.237.491-.368.797-.403.554-.064 1.407-.277 1.583-.973.098-.391-.192-.634-.484-.88-.254-.212-.51-.426-.515-.741a7 7 0 0 1 3.425 7.692 1 1 0 0 0-.087-.063l-.316-.204a1 1 0 0 0-.977-.06l-.169.082a1 1 0 0 1-.741.051l-1.021-.329A1 1 0 0 0 11.205 9h-.165a1 1 0 0 0-.945.674l-.172.499a1 1 0 0 1-.404.514l-.802.518a1 1 0 0 0-.458.84v.455a1 1 0 0 0 1 1h.257a1 1 0 0 1 .542.16l.762.49a1 1 0 0 0 .283.126 7 7 0 0 1-9.49-3.409Z"/></svg>') no-repeat center / contain;
+  }
+
+
+.navbar-nav {
+    gap: 1rem; /* space between each nav item */
+}
+
+nav .btn-primary {
+    font-family: var(--font-family, 'sans-serif');
+    font-size: var(--font-size-xs); /* Smaller font size */
+    font-weight: 500;
+    color: var(--white, #fff); /* White text */
+    background: linear-gradient(135deg, var(--primary-light), var(--primary-dark)); /* Gradient background */
+    padding: var(--space-2) var(--space-5); /* Increased padding */
+    border: none;
+    border-radius: var(--radius-md); /* Fully rounded button */
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-normal);
+    min-width: 125px; /* Set a minimum width */
+    min-height: 40px;
+    display: inline-flex; /* Ensures proper text centering and no wrap */
+    justify-content: center; /* Centers text horizontally */
+    align-items: center; /* Centers text vertically */
+    white-space: nowrap; /* Prevent text from wrapping */
+    text-align: center; /* Centers the text */
+    width: auto; /* Ensures button width adapts to content */
+    overflow: hidden; /* Hide any overflow, just in case */
+}
+
+nav .btn-primary:hover {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-light));
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+nav .btn-primary:focus {
+    outline: none;
+    box-shadow: var(--shadow-md), 0 0 0 3px color-mix(in srgb, var(--primary-color) 30%, transparent);
+}
+
+/* Remove Bootstrap's default dropdown arrow */
+.navbar .dropdown-toggle::after {
+    display: none; /* Remove the default arrow */
+}
+
+/* Style for the custom dropdown button */
+.navbar .dropdown-toggle {
+    font-family: var(--font-family, 'Roboto');
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    /* padding: var(--space-3) var(--space-4); */
+    border: 2px solid var(--border-color); /* Light grey border */
+    border-radius: var(--radius-md);
+    background-color: var(--surface, #f5f5f5); /* Light grey background */
+    color: var(--text-secondary); /* Dark grey text */
+    min-width: 250px;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    display: inline-flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    height: 40px;
+}
+
+/* Dropdown Button Styling */
+nav .btn-dropdown {
+    font-family: var(--font-family, 'Roboto', sans-serif);
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+    color: var(--text-secondary); /* Dark grey text */
+    background-color: var(--surface, #f5f5f5); /* Light grey background */
+    padding: var(--space-2) var(--space-5);
+    border: none;
+    border-radius: 150px; /* Fully rounded button */
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-normal);
+    min-width: 180px; /* Longer width */
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap;
+    text-align: center;
+    width: auto;
+    overflow: hidden;
+}
+
+nav .btn-dropdown svg {
+    margin-left: 0.5rem; /* Space between text and icon */
+}
+
+/* Hover effects */
+nav .btn-dropdown:hover {
+    background-color: #d3d3d3; /* Slightly darker grey on hover */
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Focus effect */
+nav .btn-dropdown:focus {
+    outline: none;
+    box-shadow: var(--shadow-md), 0 0 0 3px rgba(169, 169, 169, 0.4);
+}
+
+/* Dropdown Menu */
+nav .dropdown-menu {
+    background-color: #f5f5f5; /* Light grey background for dropdown */
+    color: #333; /* Dark grey text */
+    border-radius: 8px;
+    box-shadow: var(--shadow-lg);
+    width: auto;
+    min-width: 180px; /* Matches button length */
+}
+
+nav .dropdown-menu a {
+    color: #333; /* Dark grey text */
+    padding: 10px;
+    font-weight: 500;
+    text-align: left;
+    display: block;
+}
+
+nav .dropdown-menu a:hover {
+    background-color: #e2e2e2;
+    color: var(--primary-color);
+}
+
+nav .dropdown-menu a:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(169, 169, 169, 0.6);
+}
+
+
+/* header h1 {
     margin: 0 0 var(--space-4);
     color: var(--text-primary);
     font-size: var(--font-size-2xl);
@@ -24,16 +166,16 @@ header h1 {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-}
+} */
 
 /* Navigation */
-nav {
+/* nav {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 var(--space-4);
-}
+} */
 
-nav ul {
+/* nav ul {
     list-style: none;
     padding: 0;
     margin: var(--space-4) 0 0;
@@ -42,20 +184,20 @@ nav ul {
     align-items: center;
     gap: var(--space-4);
     flex-wrap: wrap;
-}
+} */
 
 /* Links inside navbar */
 /* Navigation links */
-nav a {
+.nav-item a {
     text-decoration: none;
     color: var(--text-primary);
     font-size: var(--font-size-sm);
-    font-weight: 600;
-    padding: var(--space-3) var(--space-4);
-    border-radius: var(--radius-lg);
+    font-weight: 500;
+    /* padding: var(--space-3) var(--space-4); */
+    /* border-radius: var(--radius-lg); */
     transition: all var(--transition-normal);
-    background-color: transparent;
-    border: 2px solid transparent;
+    /* background-color: transparent; */
+    /* border: 2px solid transparent; */
 }
 
 nav a:hover {
@@ -74,7 +216,6 @@ nav a:focus {
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 30%, transparent);
 }
 
-/* Country select dropdown */
 /* Country select dropdown */
 nav select {
     font-size: var(--font-size-sm);
@@ -119,7 +260,6 @@ nav select option {
 }
 
 /* Mobile menu toggle button */
-/* Mobile menu toggle */
 #menu-toggle {
     display: none;
     background: var(--surface);
@@ -146,7 +286,6 @@ nav select option {
                 0 0 0 3px color-mix(in srgb, var(--primary-color) 30%, transparent);
 }
 
-/* Responsive styles */
 /* Responsive styles */
 @media (max-width: 768px) {
     header {
@@ -204,7 +343,6 @@ nav select option {
 }
 
 /* Animation for mobile menu */
-/* Animations */
 @keyframes slideDown {
     from {
         opacity: 0;
