@@ -14,24 +14,30 @@ async function setupGlobe() {
         lat: country.latlng[0],
         lng: country.latlng[1],
         label: country.name.common,
-        baseSize: 0.02
+        baseSize: 0.001
       }));
 
     const world = Globe()(document.getElementById('globeViz'))
       .globeImageUrl('/earth-dark.jpg')
+      .globeMaterial(new THREE.MeshPhongMaterial({
+        color: 0x222222, // darker base tone
+        emissive: 0x000000,
+        specular: 0x111111,
+        shininess: 5
+      }))
       .backgroundImageUrl('/night-sky.png')
       .showAtmosphere(true)
       .pointOfView({ lat: 20, lng: 0, altitude: 2.5 }, 0)
       .pointsData(pointsData)
       .pointAltitude(d => d.baseSize)
-      .pointColor(() => 'white')
+      .pointColor(() => 'grey')
       .pointLabel('label');
 
     // Make sure controls are enabled
     world.controls().enableZoom = true;
     world.controls().enableRotate = true;
     world.controls().autoRotate = true;
-    world.controls().autoRotateSpeed = 0.5;
+    world.controls().autoRotateSpeed = 0.7;
 
     // Add custom lights
     const ambientLight = new THREE.AmbientLight(0xbbbbbb);
