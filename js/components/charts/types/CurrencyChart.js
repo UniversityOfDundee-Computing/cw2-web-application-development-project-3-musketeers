@@ -25,6 +25,13 @@ function hexToRgba(hex, alpha = 1) {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
+function darkenHexColor(hex, factor = 0.85) {
+    const r = Math.round(parseInt(hex.slice(1, 3), 16) * factor);
+    const g = Math.round(parseInt(hex.slice(3, 5), 16) * factor);
+    const b = Math.round(parseInt(hex.slice(5, 7), 16) * factor);
+    return `rgba(${r}, ${g}, ${b}, 1)`;
+}
+
 function generateHueVariants(baseHex, numberOfVariants) {
     const hexToHsl = (hex) => {
         let r = parseInt(hex.slice(1, 3), 16) / 255;
@@ -238,6 +245,10 @@ export class CurrencyChart extends BaseChart {
         const colors = generateHueVariants(COLORS.primary, data.labels.length).map(color =>
             hexToRgba(color, 0.75)
         );
+
+        const baseColors = generateHueVariants(COLORS.primary, data.labels.length);
+        const backgroundColors = baseColors.map(color => hexToRgba(color, 0.75));
+        const borderColors = baseColors.map(color => darkenHexColor(color, 0.8));
         
         const chartConfig = {
             type: this.options.type || 'polarArea',
@@ -247,7 +258,8 @@ export class CurrencyChart extends BaseChart {
                     label: "Countries",
                     data: data.values,
                     backgroundColor: colors,
-                    borderColor: hexToRgba(COLORS.primary, 1),
+                    // borderColor: hexToRgba(COLORS.primary, 1),
+                    borderColor: borderColors,
                     borderWidth: 1,
                     borderRadius: 12
                 }]

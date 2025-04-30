@@ -25,6 +25,13 @@ function hexToRgba(hex, alpha = 1) {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
+function darkenHexColor(hex, factor = 0.85) {
+    const r = Math.round(parseInt(hex.slice(1, 3), 16) * factor);
+    const g = Math.round(parseInt(hex.slice(3, 5), 16) * factor);
+    const b = Math.round(parseInt(hex.slice(5, 7), 16) * factor);
+    return `rgba(${r}, ${g}, ${b}, 1)`;
+}
+
 function generateHueVariants(baseHex, numberOfVariants) {
     const hexToHsl = (hex) => {
         let r = parseInt(hex.slice(1, 3), 16) / 255;
@@ -231,6 +238,10 @@ export class ContinentChart extends BaseChart {
         // Use the currently selected chart type instead of hardcoding
         const chartType = this.options.type || 'doughnut';
         console.log(`[${this.containerId}] Creating continent chart with type: ${chartType}`);
+
+        const baseColors = generateHueVariants(COLORS.primary, data.labels.length);
+        const backgroundColors = baseColors.map(color => hexToRgba(color, 0.75));
+        const borderColors = baseColors.map(color => darkenHexColor(color, 0.8));
         
         // Set up label formatting based on percentage view option
         const labelCallback = (context) => {
@@ -261,7 +272,8 @@ export class ContinentChart extends BaseChart {
                     backgroundColor: generateHueVariants(COLORS.primary, data.labels.length).map(color =>
                         hexToRgba(color, 0.75)
                     ),
-                    borderColor: hexToRgba(COLORS.primary, 1),
+                    // borderColor: hexToRgba(COLORS.primary, 1),
+                    borderColor: borderColors,
                     borderWidth: 1,
                     borderRadius: 12
                 }]
