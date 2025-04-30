@@ -476,6 +476,14 @@ export class RegionChart extends BaseChart {
             if (chartType === 'doughnut') {
                 chartConfig.options.cutout = '40%';
             }
+            
+            // Explicitly hide numerical values for pie/doughnut charts
+            if (chartConfig.options && chartConfig.options.plugins) {
+                if (!chartConfig.options.plugins.datalabels) {
+                    chartConfig.options.plugins.datalabels = {};
+                }
+                chartConfig.options.plugins.datalabels.display = false;
+            }
         } else if (chartType === 'polarArea') {
             // For polar area charts, special color handling
             if (chartConfig.options && chartConfig.options.scales && chartConfig.options.scales.r) {
@@ -497,6 +505,12 @@ export class RegionChart extends BaseChart {
                         padding: 8
                     }
                 };
+                
+                // Explicitly hide numerical values for polar area charts
+                if (!chartConfig.options.plugins.datalabels) {
+                    chartConfig.options.plugins.datalabels = {};
+                }
+                chartConfig.options.plugins.datalabels.display = false;
             }
         }
         
