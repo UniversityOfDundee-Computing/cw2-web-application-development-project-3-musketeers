@@ -8,6 +8,23 @@ import * as dataProcessing from '../../../utils/dataProcessing.js';
 import { chartService } from '../../../services/chartService.js';
 import * as chartUtils from '../../../utils/chartUtils.js';
 
+// Get the root styles for consistent theming
+const styles = getComputedStyle(document.documentElement);
+const COLORS = {
+    primary: styles.getPropertyValue('--primary-color').trim(),
+    primaryDark: styles.getPropertyValue('--primary-dark').trim(),
+    primaryLight: styles.getPropertyValue('--primary-light').trim(),
+    textPrimary: styles.getPropertyValue('--text-primary').trim(),
+    textSecondary: styles.getPropertyValue('--text-secondary').trim(),
+};
+
+function hexToRgba(hex, alpha = 1) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
 export class BordersChart extends BaseChart {
     /**
      * Create a new BordersChart instance
@@ -225,8 +242,8 @@ export class BordersChart extends BaseChart {
                     borderColor.push(pieColors[colorIndex].replace('0.7', '1.0'));
                 });
             } else {
-                backgroundColor = 'rgba(54, 162, 235, 0.7)';
-                borderColor = 'rgba(54, 162, 235, 1.0)';
+                backgroundColor = hexToRgba(COLORS.primaryLight, 0.75);
+                borderColor = hexToRgba(COLORS.primary, 1);
             }
         }
         
@@ -239,7 +256,8 @@ export class BordersChart extends BaseChart {
                     data: data.values,
                     backgroundColor: backgroundColor,
                     borderColor: borderColor,
-                    borderWidth: 1
+                    borderWidth: 1,
+                    borderRadius: 12
                 }]
             },
             options: {
@@ -250,15 +268,23 @@ export class BordersChart extends BaseChart {
                         display: true,
                         text: this.options.title || 'Border Count by Country',
                         font: {
-                            size: 18,
-                            weight: 'bold'
-                        }
+                            size: 24,
+                            family: 'Roboto, sans-serif',
+                            weight: 600
+                        },
+                        color: COLORS.textPrimary,
+                        padding: {bottom: 24}
                     },
                     legend: {
                         display: this.options.highlightContinents || isPieOrDoughnut,
                         position: isPieOrDoughnut && data.labels.length <= 7 ? 'right' : 'bottom',
                         labels: {
-                            font: { size: 12 }
+                            color: COLORS.textSecondary,
+                            font: {
+                                size: 14,
+                                family: 'Roboto, sans-serif',
+                                weight: 'bold'
+                            }
                         }
                     },
                     tooltip: {
@@ -307,7 +333,13 @@ export class BordersChart extends BaseChart {
                     title: {
                         display: true,
                         text: chartType === 'horizontalBar' ? 'Country' : 'Number of Borders',
-                        font: { size: 12, weight: 'bold' }
+                        font: {
+                            size: 14,
+                            family: 'Roboto, sans-serif',
+                            weight: 'bold'
+                        },
+                        color: COLORS.textSecondary,
+                        padding: {bottom: 12}
                     },
                     ticks: {
                         maxRotation: chartType === 'horizontalBar' ? 0 : 45,
@@ -319,7 +351,13 @@ export class BordersChart extends BaseChart {
                     title: {
                         display: true,
                         text: chartType === 'horizontalBar' ? 'Number of Borders' : 'Country',
-                        font: { size: 12, weight: 'bold' }
+                        font: {
+                            size: 14,
+                            family: 'Roboto, sans-serif',
+                            weight: 'bold'
+                        },
+                        color: COLORS.textSecondary,
+                        padding: {bottom: 12}
                     },
                     ticks: {
                         // Customize y-axis ticks based on item count

@@ -13,27 +13,39 @@
     margin: 0 auto;
 }
 
+/* Page specific container modifications */
+/* Override container for world data page */
+.container-fluid {
+    padding: clamp(1rem, 2vw, 2rem);
+    margin: 0 auto;
+}
+
+/* Add proper spacing to chart grid */
+.row.g-2 {
+    margin: 0 -0.5rem;
+}
+
+.row.g-2 > [class*="col-"] {
+    padding: 0.5rem;
+}
+
 /* Chart containers base styles */
 .chart-container {
     position: relative;
-    background: linear-gradient(145deg, #ffffff, #f9fafb);
-    border-radius: clamp(0.75rem, 1.5vw, 1.25rem);
-    box-shadow: 
-        0 4px 20px rgba(0, 0, 0, 0.05),
-        0 8px 16px -8px rgba(0, 0, 0, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.9);
-    padding: clamp(1.5rem, 2.5vw, 2.5rem);
+    background: var(--surface, #F3F3F3);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg, 12px);
+    padding: 0.25rem !important; /* Reduced padding to match selected country page */
     display: grid;
     place-items: center;
-    min-height: clamp(300px, 40vh, 450px);
+    min-height: clamp(250px, 40vh, 450px); /* Adjusted for better sizing */
     aspect-ratio: 1/1; /* Make all chart containers square by default */
     transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-    border: 1px solid rgba(230, 232, 236, 0.8);
     overflow: hidden;
-    border-radius: 12px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    overflow: hidden;
+    margin: 0 !important; /* Remove margins */
+    height: auto !important;
 }
 
 .chart-container::before {
@@ -310,7 +322,7 @@
     --card-accent: #6b46c1;
 }
 
-/* Chart wrapper internal styling - improved for consistent spacing and alignment */
+/* Chart wrapper internal styling - compact consistent with selected page */
 .chart-wrapper {
     width: 100%;
     height: 100%;
@@ -318,9 +330,63 @@
     flex-direction: column;
     z-index: 2;
     position: relative;
-    padding: clamp(0.75rem, 1.5vw, 1.5rem);
+    padding: 0 !important; /* Remove padding */
     justify-content: center;
     align-items: center;
+    margin: 0 !important;
+}
+
+/* Chart image styling - more compact with no excess spacing */
+.chart-wrapper img.chart-image {
+    margin: 0 auto !important;
+    padding: 0 !important;
+    max-height: 100% !important;
+    width: auto !important;
+    max-width: 100% !important;
+    display: block !important;
+}
+
+/* Target specific chart images directly */
+#chartContainer1 img.chart-image,
+#chartContainer2 img.chart-image,
+#chartContainer3 img.chart-image,
+#chartContainer4 img.chart-image,
+#chartContainer5 img.chart-image,
+#chartContainer6 img.chart-image,
+#chartContainer7 img.chart-image,
+#chartContainer8 img.chart-image {
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+}
+
+/* Override any potential styling for chart images with inline styles */
+img.chart-image[style] {
+    margin: 0 !important;
+    padding: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* Make chart titles and descriptions more compact */
+.chart-title {
+    margin-top: 0.1rem !important;
+    margin-bottom: 0.1rem !important;
+    color: #1a202c;
+    font-size: clamp(1.25rem, 1.5vw, 1.5rem);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    padding: 0 !important;
+}
+
+.chart-description {
+    color: #4a5568;
+    font-size: clamp(0.875rem, 1vw, 1rem);
+    margin-top: 0.1rem !important;
+    margin-bottom: 0.1rem !important;
+    font-weight: 400;
+    opacity: 0.8;
+    padding: 0 !important;
 }
 
 /* Chart title & description enhancements */
@@ -603,6 +669,10 @@
         margin-left: 0 !important;
         margin-right: 0 !important;
     }
+
+    .chart-container {
+        padding: 0.25rem !important;
+    }
 }
 
 @media screen and (max-width: 640px) {
@@ -815,4 +885,42 @@
     opacity: 0;
     transition: opacity 0.3s ease;
     pointer-events: none;
+}
+
+/* Override Bootstrap row and column spacing for charts */
+.row > [class*="col-"] {
+    padding: 0.25rem !important;
+}
+
+/* Override media queries that might increase padding on mobile */
+@media screen and (max-width: 768px) {
+    .chart-container {
+        padding: 0.25rem !important;
+    }
+}
+
+/* Fixed aspect ratio for all regular chart containers */
+.col-md-6 .chart-container {
+    aspect-ratio: 4/3;
+}
+
+/* Special style for the world stats banner */
+#chartContainer9 {
+    aspect-ratio: auto !important;
+    min-height: clamp(300px, 30vh, 400px);
+    margin-bottom: 1rem !important;
+}
+
+/* Improve chart wrapper styling */
+.chart-wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    z-index: 2;
+    position: relative;
+    padding: 0 !important; /* Remove padding */
+    justify-content: center;
+    align-items: center;
+    margin: 0 !important;
 }
