@@ -19,7 +19,7 @@
     --primary-gradient: linear-gradient(to right, var(--primary-dark), var(--primary-light));
 
 
-    /* Typography */
+    /* Typography - Updated with more fluid scaling */
     --font-family: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
     --font-size-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
     --font-size-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
@@ -44,7 +44,7 @@
     --line-height-normal: 1.5;
     --line-height-relaxed: 1.75;
 
-    /* Spacing scale */
+    /* Spacing scale - Updated with more fluid spacing */
     --space-1: clamp(0.25rem, 0.2rem + 0.25vw, 0.5rem);
     --space-2: clamp(0.5rem, 0.4rem + 0.5vw, 1rem);
     --space-3: clamp(0.75rem, 0.7rem + 0.25vw, 1rem);

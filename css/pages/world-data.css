@@ -42,11 +42,18 @@
     background: #ffffff;
     border: 1px solid rgba(0, 0, 0, 0.125);
     border-radius: 12px;
-    padding: 1.25rem !important;
+    padding: clamp(0.75rem, 2vw, 1.5rem) !important; /* Reduced padding */
     overflow: hidden;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
     margin: 0 0 1.5rem 0 !important;
     transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    min-height: clamp(250px, 40vh, 400px); /* Dynamic height adjustment */
+    display: flex;
+    flex-direction: column; /* Ensure proper vertical flow */
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    z-index: 1;
+    max-width: 100%; /* Ensure chart container doesn't exceed viewport width */
 }
 
 /* Consistent gradient overlay for all charts including world stats */
@@ -130,6 +137,25 @@
 .stats-grid::-webkit-scrollbar-thumb {
     background-color: var(--border-color);
     border-radius: 3px;
+}
+
+/* Better tablet layout for stats grid */
+@media (min-width: 641px) and (max-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+}
+
+/* Convert stats grid to vertical layout on mobile */
+@media (max-width: 640px) {
+    .stats-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        overflow-x: hidden;
+        padding: 1rem;
+    }
 }
 
 /* Stat card styling - matching quick facts styling */
@@ -279,6 +305,8 @@
     justify-content: center;
     align-items: center;
     margin: 0 !important;
+    overflow: hidden; /* Prevent content overflow */
+    height: auto;
 }
 
 /* Chart image styling */
@@ -289,6 +317,7 @@
     width: auto !important;
     max-width: 100% !important;
     display: block !important;
+    object-fit: contain !important; /* Keep image aspect ratio while fitting in container */
     animation: chartUpdate 0.3s ease-out forwards;
 }
 
@@ -320,8 +349,13 @@
 .card-body {
     position: relative;
     z-index: 2;
-    padding: 1.25rem !important;
+    padding: 0.75rem !important; /* Reduced padding */
     overflow: visible !important;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+    padding: 1.25rem; /* Ensure consistent padding */
 }
 
 /* Fix for the blurred card overlay issue */
@@ -424,6 +458,25 @@
     }
 }
 
+/* Set up 2x2 grid layout for medium screens using Bootstrap's row and col classes */
+@media (max-width: 991px) and (min-width: 576px) {
+    .row.g-3 {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    
+    .row.g-3 .col-md-4 {
+        width: 50% !important; /* Force 2 columns */
+        flex: 0 0 50% !important;
+    }
+    
+    /* Make chart containers more suitable for 2x2 layout */
+    .col-md-4 .chart-container {
+        aspect-ratio: 4/3;
+        min-height: clamp(250px, 35vh, 350px);
+    }
+}
+
 @media screen and (max-width: 768px) {
     .container {
         gap: 1rem;
@@ -506,6 +559,41 @@
     .stat-card .card-title,
     .stat-card .card-subtitle {
         font-size: calc(var(--font-size-xs) * 0.95);
+    }
+
+    .chart-container.expanded {
+        width: 100vw !important;
+        height: 100vh !important;
+        max-width: none !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        z-index: 9999 !important;
+        border-radius: 0 !important;
+    }
+    
+    .chart-container.expanded .card-body {
+        grid-template-columns: 1fr !important;
+        overflow-y: auto !important;
+        padding: 1rem !important;
+    }
+    
+    .chart-container.expanded .chart-detail-analysis {
+        max-height: none !important;
+        padding: 1rem !important;
+    }
+}
+
+/* Full-width chart containers on mobile */
+@media (max-width: 575px) {
+    .row.g-3 .col-md-4 {
+        width: 100% !important;
+        flex: 0 0 100% !important;
+    }
+    
+    .col-md-4 .chart-container {
+        aspect-ratio: 3/2;
+        min-height: clamp(220px, 30vh, 300px);
     }
 }
 
@@ -630,4 +718,302 @@
     padding: 1.5rem !important;
     background-color: #f8f9fa !important;
     border-radius: 8px !important;
+}
+
+/* Expanded Chart View Mobile Optimization */
+@media (max-width: 768px) {
+    .chart-container.expanded {
+        width: 100vw !important;
+        height: 100vh !important;
+        max-width: none !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        z-index: 9999 !important;
+        border-radius: 0 !important;
+    }
+    
+    .chart-container.expanded .card-body {
+        grid-template-columns: 1fr !important;
+        overflow-y: auto !important;
+        padding: 1rem !important;
+    }
+    
+    .chart-container.expanded .chart-detail-analysis {
+        max-height: none !important;
+        padding: 1rem !important;
+    }
+}
+
+/* Chart Expansion and Interaction Styles - Moved from inline HTML */
+.chart-container {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    z-index: 1;
+    max-width: 100%; /* Ensure chart container doesn't exceed viewport width */
+}
+
+.card-body {
+    position: relative;
+    overflow: hidden;
+    padding: 1.25rem; /* Ensure consistent padding */
+}
+
+/* Fix for the chart's content overflow */
+.chart-content {
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Use full height of container */
+    justify-content: flex-start; /* Align content to top */
+    gap: 0.5rem; /* Consistent gap between elements */
+}
+
+.chart-wrapper {
+    width: 100%;
+    flex: 1; /* Take up all remaining space */
+    min-height: 0; /* Allow it to shrink as needed */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+    overflow: hidden;
+    margin-top: 0.5rem !important;
+}
+
+/* Chart title with minimal margin */
+.chart-title {
+    margin-top: 0 !important;
+    margin-bottom: 0.5rem !important;
+    color: #1a202c;
+    font-size: clamp(1.1rem, 1.5vw, 1.25rem);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    padding: 0 !important;
+    line-height: 1.3;
+}
+
+/* Chart description with minimal margin */
+.chart-description {
+    color: #4a5568;
+    font-size: clamp(0.875rem, 1vw, 0.95rem);
+    margin-bottom: 0.5rem !important;
+    font-weight: 400;
+    opacity: 0.8;
+    padding: 0 !important;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    max-width: 100%;
+    line-height: 1.4;
+    max-height: 2.8em; /* Limit height to ~2 lines */
+    overflow: hidden;
+}
+
+/* Fix for chart images */
+.chart-container img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    transition: all 0.4s cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    object-fit: contain; /* Ensure image maintains aspect ratio */
+}
+
+/* Modal-like overlay when a chart is expanded */
+.chart-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 950;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+body:has(.chart-container.expanded) .chart-backdrop {
+    opacity: 1;
+    pointer-events: all;
+}
+
+/* Expanded chart styling */
+.chart-container.expanded {
+    position: fixed !important;
+    z-index: 9999 !important; /* Very high z-index to ensure it's on top */
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 90vw !important;
+    max-width: 1200px !important;
+    max-height: 90vh !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    border-radius: 8px !important;
+    background-color: white !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Adjust layout of expanded chart to show analysis on right */
+.chart-container.expanded .card-body {
+    display: grid !important;
+    grid-template-columns: 60% 40% !important;
+    grid-gap: 1rem !important;
+    padding: 1.5rem !important;
+    overflow-y: auto !important;
+    max-height: 90vh !important;
+    height: auto !important;
+}
+
+/* Position the chart content on the left */
+.chart-container.expanded .card-body .chart-content {
+    grid-column: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    max-height: calc(90vh - 3rem);
+}
+
+/* Style for the detailed analysis on the right */
+.chart-container.expanded .chart-detail-analysis {
+    grid-column: 2;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    background-color: rgba(248, 250, 252, 0.9);
+    border-radius: 8px;
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+    transform: none;
+    opacity: 1;
+    visibility: visible;
+    position: relative;
+    height: auto;
+    max-height: calc(90vh - 3rem);
+    overflow-y: auto;
+}
+
+/* Hide the bottom overlay for expanded charts */
+.chart-container.expanded .chart-detail-overlay {
+    display: none;
+}
+
+/* Close button for expanded chart */
+.chart-close-btn {
+    position: absolute !important;
+    top: 12px !important;
+    right: 12px !important;
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+    background-color: rgba(0, 0, 0, 0.6) !important;
+    color: white !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    font-size: 18px !important;
+    z-index: 10000 !important; /* Above everything */
+    opacity: 0 !important; 
+    transition: opacity 0.2s ease !important;
+    pointer-events: none !important;
+}
+
+/* Only show close button in expanded state */
+.chart-container.expanded .chart-close-btn {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+/* Adjust container when a chart is expanded - blur OTHER charts */
+.container:has(.chart-container.expanded) .chart-container:not(.expanded) {
+    filter: blur(4px);
+    pointer-events: none;
+}
+
+/* When any chart is expanded, dim and push back other charts */
+.chart-container.expanded ~ .chart-container {
+    opacity: 0.5;
+    transform: scale(0.95);
+    filter: blur(2px);
+}
+
+/* Ensure detailed analysis is hidden by default */
+.chart-detail-analysis {
+    display: none;
+}
+
+.chart-container.expanded .chart-detail-analysis {
+    display: flex;
+}
+
+/* Analysis data container with proper spacing */
+.analysis-data {
+    padding-right: 0.5rem; /* Give some space for scrollbar */
+    overflow-y: auto;
+}
+
+/* Fix for text overflow in chart description */
+.chart-description {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    max-width: 100%;
+}
+
+/* World stats loading style */
+#world-stats-loading {
+    z-index: 1000;
+}
+
+/* Mobile optimizations for expanded chart view */
+@media (max-width: 768px) {
+    .chart-container.expanded {
+        width: 100vw !important;
+        height: 100vh !important;
+        max-width: none !important;
+        max-height: none !important;
+        top: 0 !important;
+        left: 0 !important;
+        transform: none !important;
+        border-radius: 0 !important;
+        overflow-y: auto !important;
+    }
+    
+    .chart-container.expanded .card-body {
+        grid-template-columns: 1fr !important;
+        grid-template-rows: auto auto !important;
+        padding: 1rem !important;
+        max-height: none !important;
+        overflow-y: auto !important;
+    }
+    
+    .chart-container.expanded .card-body .chart-content {
+        grid-column: 1 !important;
+        grid-row: 1 !important;
+        max-height: none !important;
+        padding: 0 !important;
+    }
+    
+    .chart-container.expanded .chart-detail-analysis {
+        grid-column: 1 !important;
+        grid-row: 2 !important;
+        border-left: none !important;
+        border-top: 1px solid rgba(0, 0, 0, 0.1) !important;
+        margin-top: 1rem !important;
+        padding-top: 1rem !important;
+        max-height: none !important;
+    }
+    
+    .chart-close-btn {
+        width: 40px !important;
+        height: 40px !important;
+        top: 8px !important;
+        right: 8px !important;
+        font-size: 22px !important;
+    }
 }

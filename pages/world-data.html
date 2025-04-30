@@ -21,191 +21,6 @@
     
     <!-- Description for SEO -->
     <meta name="description" content="Visualize global country data including population, languages, and more using interactive charts.">
-    
-    <!-- Updated styles for full-width chart expansion with analysis on the right -->
-    <style>
-        /* Basic chart styling */
-        .chart-container {
-            position: relative !important;
-            overflow: hidden !important;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.215, 0.610, 0.355, 1.000) !important;
-            z-index: 1;
-            max-width: 100% !important; /* Ensure chart container doesn't exceed viewport width */
-        }
-        
-        .card-body {
-            position: relative !important;
-            overflow: hidden !important;
-            padding: 1.25rem !important; /* Ensure consistent padding */
-        }
-        
-        /* Fix for the first chart's content overflow */
-        .chart-content {
-            width: 100% !important;
-            overflow: hidden !important;
-            display: flex !important;
-            flex-direction: column !important;
-        }
-        
-        .chart-wrapper {
-            width: 100% !important;
-            height: auto !important;
-            position: relative !important;
-            z-index: 2;
-            overflow: hidden !important; /* Prevent chart content from overflowing */
-        }
-        
-        /* Fix for chart images */
-        .chart-container img {
-            max-width: 100% !important;
-            height: auto !important;
-            display: block !important;
-            transition: all 0.4s cubic-bezier(0.215, 0.610, 0.355, 1.000) !important;
-            object-fit: contain !important; /* Ensure image maintains aspect ratio */
-        }
-        
-        /* Modal-like overlay when a chart is expanded */
-        .chart-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 950;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-        }
-        
-        body:has(.chart-container.expanded) .chart-backdrop {
-            opacity: 1;
-            pointer-events: all;
-        }
-        
-        /* Expanded chart styling - fixed blur issue */
-        .chart-container.expanded {
-            position: fixed !important;
-            z-index: 1000 !important;
-            top: 50% !important;
-            left: 50% !important;
-            transform: translate(-50%, -50%) !important;
-            width: 90vw !important;
-            max-width: 1400px !important;
-            max-height: 90vh !important;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
-            overflow: hidden !important;
-            display: flex !important;
-            flex-direction: row !important;
-            border-radius: 8px !important;
-            filter: none !important; /* Ensure expanded chart is not blurred */
-            background-color: white !important; /* Ensure background is white */
-        }
-        
-        /* Adjust layout of expanded chart to show analysis on right */
-        .chart-container.expanded .card-body {
-            display: grid !important;
-            grid-template-columns: 60% 40% !important;
-            grid-gap: 1rem !important;
-            padding: 1.5rem !important;
-            overflow-y: auto !important;
-            max-height: 90vh !important;
-        }
-        
-        /* Position the chart content on the left */
-        .chart-container.expanded .card-body .chart-content {
-            grid-column: 1 !important;
-            display: flex !important;
-            flex-direction: column !important;
-            overflow-y: auto !important;
-            max-height: calc(90vh - 3rem) !important;
-        }
-        
-        /* Style for the detailed analysis on the right */
-        .chart-container.expanded .chart-detail-analysis {
-            grid-column: 2 !important;
-            display: flex !important;
-            flex-direction: column !important;
-            padding: 1rem !important;
-            background-color: rgba(248, 250, 252, 0.9) !important;
-            border-radius: 8px !important;
-            border-left: 1px solid rgba(0, 0, 0, 0.1) !important;
-            transform: none !important;
-            opacity: 1 !important;
-            visibility: visible !important;
-            position: relative !important;
-            height: auto !important;
-            max-height: calc(90vh - 3rem) !important;
-            overflow-y: auto !important;
-        }
-        
-        /* Hide the bottom overlay for expanded charts */
-        .chart-container.expanded .chart-detail-overlay {
-            display: none !important;
-        }
-        
-        /* Close button for expanded chart - FIX: only show in expanded state */
-        .chart-close-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background-color: rgba(0, 0, 0, 0.6);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 10;
-            opacity: 0; /* Hidden by default */
-            transition: opacity 0.3s ease;
-            pointer-events: none; /* No interaction when hidden */
-        }
-        
-        /* FIXED: Only show close button in expanded state, not on hover */
-        .chart-container.expanded .chart-close-btn {
-            opacity: 1;
-            pointer-events: auto; /* Enable interaction */
-        }
-        
-        /* Adjust container when a chart is expanded - blur OTHER charts */
-        .container:has(.chart-container.expanded) .chart-container:not(.expanded) {
-            filter: blur(4px);
-            pointer-events: none;
-        }
-        
-        /* When any chart is expanded, dim and push back other charts */
-        .chart-container.expanded ~ .chart-container {
-            opacity: 0.5;
-            transform: scale(0.95);
-            filter: blur(2px);
-        }
-        
-        /* Ensure detailed analysis is hidden by default */
-        .chart-detail-analysis {
-            display: none !important;
-        }
-        
-        .chart-container.expanded .chart-detail-analysis {
-            display: flex !important;
-        }
-
-        /* Analysis data container with proper spacing */
-        .analysis-data {
-            padding-right: 0.5rem !important; /* Give some space for scrollbar */
-            overflow-y: auto !important;
-        }
-
-        /* Fix for text overflow in chart description */
-        .chart-description {
-            overflow-wrap: break-word !important;
-            word-wrap: break-word !important;
-            max-width: 100% !important;
-        }
-    </style>
 </head>
 <body>
     <header>
@@ -278,7 +93,7 @@
                                 <div class="stats-grid">
                                     <!-- Stats cards will be inserted here -->
                                 </div>
-                                <div id="world-stats-loading" class="chart-loading position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-90" style="z-index: 1000;">
+                                <div id="world-stats-loading" class="chart-loading position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-white bg-opacity-90">
                                     <div class="spinner-container">
                                         <div class="spinner-border text-primary" role="status"></div>
                                         <div class="spinner-core"></div>
@@ -598,7 +413,7 @@
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 001.414-1.414L11.414 10l1.293-1.293a1 1 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
             </svg>
             <p>Failed to load chart</p>
-            <button onclick="this.closest('.chart-container').querySelector('.chart-loading').style.display='block';this.closest('.chart-error').remove();" class="retry-button">
+            <button class="retry-button">
                 Retry
             </button>
         </div>
