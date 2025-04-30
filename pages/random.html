@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Country Data Visualizer - Random Country</title>
-    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css"
+    rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
     <!-- CSS -->
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="../css/components/header.css">
@@ -32,63 +35,64 @@
         </nav>
     </header>
 
-    <main>
-        <div class="container">
-            <div class="controls" style="margin-bottom:2rem;">
-                <button id="randomizeBtn" class="primary-button">Get Random Country</button>
-            </div>
-            <section class="country-details-section">
-                <!-- Country overview -->
-                <div id="countryOverview" class="country-overview">
-                    <div class="loading-message">
-                        <p>Click the button to get a random country</p>
-                    </div>
-                </div>
-
-                <!-- Quick facts -->
-                <div id="quickFacts" class="quick-facts">
-                    <h2>Quick Facts</h2>
-                    <div class="facts-grid">
-                        <!-- Will be populated dynamically -->
-                    </div>
-                </div>
-            </section>
-
-            <section class="visualizations-section">
-                <!-- Population trends -->
-                <div id="populationChart" class="chart-container">
-                    <!-- Population comparison with region -->
-                </div>
-
-                <!-- Language breakdown -->
-                <div id="languageChart" class="chart-container">
-                    <!-- Language distribution -->
-                </div>
-
-                <!-- Regional context (optional for random page) -->
-                <div id="regionalChart" class="chart-container" style="display:none;"></div>
-
-                <!-- Currency information -->
-                <div id="currencyChart" class="chart-container">
-                    <!-- Currency usage -->
-                </div>
-            </section>
-
-            <section class="additional-info-section">
-                <!-- Map view -->
-                <div id="mapView" class="map-container">
-                    <!-- Map will be embedded here -->
-                </div>
-
-                <!-- Neighboring countries -->
-                <div id="neighbors" class="neighbors-container">
-                    <h2>Neighboring Countries</h2>
-                    <div class="neighbors-grid">
-                        <!-- Will be populated dynamically -->
-                    </div>
-                </div>
-            </section>
+    <main class="container">
+        <div class="controls mb-4">
+            <button id="randomizeBtn" class="primary-button">Get Random Country</button>
         </div>
+
+        <!-- Top Section (map, country overview, quick facts, neighbor countries) -->
+        <section class="top-section mb-4">
+            <div class="row g-4 align-items-stretch">
+                <!-- Left Side: Map + Neighbors -->
+                <div class="col-md-8 d-flex flex-column">
+                    <div class="map-container flex-grow-1 mb-4" id="mapView">
+                      <!-- Map here -->
+                    </div>
+                    <div class="neighbors-container" id="neighbors">
+                      <h2>Neighboring Countries</h2>
+                      <div class="neighbors-grid">
+                        <!-- Neighbors here -->
+                      </div>
+                    </div>
+                </div>
+
+                <!-- Right Side: Country Overview + Quick Facts -->
+                <div class="col-md-4 d-flex flex-column">
+                    <div id="countryOverview" class="country-overview mb-4">
+                      <div class="loading-message">
+                          <p>Click the button to get a random country</p>
+                      </div>
+                    </div>
+                    <div id="quickFacts" class="quick-facts">
+                      <h2>Quick Facts</h2>
+                      <div class="row facts-grid">
+                        <!-- Fact items here -->
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bottom layout: Charts -->
+        <section class="bottom-section mb-4">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div id="populationChart" class="chart-container">
+                    <!-- Population chart here -->
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div id="languageChart" class="chart-container">
+                    <!-- Language chart here -->
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div id="areaChart" class="chart-container">
+                    <!-- Area chart here -->
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 
     <footer>
@@ -144,5 +148,8 @@
 
     <!-- JavaScript Modules -->
     <script type="module" src="../js/pages/random/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+
 </body>
 </html>

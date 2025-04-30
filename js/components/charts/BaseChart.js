@@ -234,6 +234,7 @@ export class BaseChart {
             this.chartControls.appendChild(chartTypeGroup);
             
             // Create data limit selector
+            /*
             const limitGroup = document.createElement('div');
             limitGroup.className = 'form-group me-2 mb-2';
             
@@ -262,6 +263,7 @@ export class BaseChart {
             
             limitGroup.appendChild(limitSelect);
             this.chartControls.appendChild(limitGroup);
+            */
             
             // Create sort order selector
             const sortGroup = document.createElement('div');
