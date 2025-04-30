@@ -13,7 +13,7 @@
     margin: 0 auto;
 }
 
-.container-fluid {
+.main-div {
     padding: clamp(1rem, 2vw, 2rem);
     margin: 0 auto;
 }
