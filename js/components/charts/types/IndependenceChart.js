@@ -166,8 +166,14 @@ export class IndependenceChart extends BaseChart {
             }
         };
         
-        // Add specific configurations for bar charts
-        if (chartType === 'bar') {
+        // Add specific configurations based on chart type
+        if (isPieOrDoughnut) {
+            // Explicitly hide numerical values for pie/doughnut charts
+            if (!chartConfig.options.plugins.datalabels) {
+                chartConfig.options.plugins.datalabels = {};
+            }
+            chartConfig.options.plugins.datalabels.display = false;
+        } else if (chartType === 'bar') {
             chartConfig.options.scales = {
                 y: {
                     beginAtZero: true,

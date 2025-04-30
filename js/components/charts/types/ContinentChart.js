@@ -316,8 +316,15 @@ export class ContinentChart extends BaseChart {
             }
         };
         
-        // Add scales for cartesian charts (bar, line)
-        if (chartType === 'bar' || chartType === 'line') {
+        // Add specific configurations based on chart type
+        if (chartType === 'pie' || chartType === 'doughnut' || chartType === 'polarArea') {
+            // Explicitly hide numerical values for non-bar chart types
+            if (!config.options.plugins.datalabels) {
+                config.options.plugins.datalabels = {};
+            }
+            config.options.plugins.datalabels.display = false;
+        } else if (chartType === 'bar' || chartType === 'line') {
+            // Add scales for cartesian charts (bar, line)
             config.options.scales = {
                 x: {
                     ticks: {

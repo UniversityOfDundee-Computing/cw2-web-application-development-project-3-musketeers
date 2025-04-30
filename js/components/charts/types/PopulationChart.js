@@ -1,4 +1,4 @@
- /**
+/**
  * Population Chart Component
  * Extends BaseChart to create population-specific visualizations
  */
@@ -350,6 +350,12 @@ export class PopulationChart extends BaseChart {
                     ];
                 }
             };
+            
+            // Explicitly hide numerical values for pie/doughnut/polarArea charts
+            if (!config.options.plugins.datalabels) {
+                config.options.plugins.datalabels = {};
+            }
+            config.options.plugins.datalabels.display = false;
             
             // For doughnut charts
             if (chartType === 'doughnut') {

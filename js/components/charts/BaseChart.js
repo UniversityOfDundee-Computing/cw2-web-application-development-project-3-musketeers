@@ -417,6 +417,25 @@ export class BaseChart {
                 chartConfig.options.plugins.legend.display = true;
                 chartConfig.options.plugins.legend.position = 'right';
             }
+            
+            // Hide numerical values on the chart for a cleaner, minimalistic look
+            if (chartConfig.options && chartConfig.options.plugins) {
+                // Ensure datalabels plugin exists
+                if (!chartConfig.options.plugins.datalabels) {
+                    chartConfig.options.plugins.datalabels = {};
+                }
+                
+                // Hide the numerical labels on the chart
+                chartConfig.options.plugins.datalabels.display = false;
+                
+                // Make sure tooltips still work for interactivity
+                if (!chartConfig.options.plugins.tooltip) {
+                    chartConfig.options.plugins.tooltip = {};
+                }
+                if (!chartConfig.options.plugins.tooltip.callbacks) {
+                    chartConfig.options.plugins.tooltip.callbacks = {};
+                }
+            }
         } else if (chartType === 'bar' || chartType === 'line') {
             // Make sure cartesian charts have appropriate scales
             if (chartConfig.options && !chartConfig.options.scales) {
