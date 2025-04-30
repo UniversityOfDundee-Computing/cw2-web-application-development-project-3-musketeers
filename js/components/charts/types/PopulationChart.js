@@ -1,4 +1,4 @@
-/**
+ /**
  * Population Chart Component
  * Extends BaseChart to create population-specific visualizations
  */
@@ -7,6 +7,84 @@ import { BaseChart } from '../BaseChart.js';
 import * as dataProcessing from '../../../utils/dataProcessing.js';
 import { chartService } from '../../../services/chartService.js';
 import * as chartUtils from '../../../utils/chartUtils.js';
+
+// Get the root styles for consistent theming
+const styles = getComputedStyle(document.documentElement);
+const COLORS = {
+    primary: styles.getPropertyValue('--primary-color').trim(),
+    primaryDark: styles.getPropertyValue('--primary-dark').trim(),
+    primaryLight: styles.getPropertyValue('--primary-light').trim(),
+    textPrimary: styles.getPropertyValue('--text-primary').trim(),
+    textSecondary: styles.getPropertyValue('--text-secondary').trim(),
+};
+
+function hexToRgba(hex, alpha = 1) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function generateHueVariants(baseHex, numberOfVariants) {
+    const hexToHsl = (hex) => {
+        let r = parseInt(hex.slice(1, 3), 16) / 255;
+        let g = parseInt(hex.slice(3, 5), 16) / 255;
+        let b = parseInt(hex.slice(5, 7), 16) / 255;
+
+        const max = Math.max(r, g, b), min = Math.min(r, g, b);
+        let h, s, l = (max + min) / 2;
+
+        if (max === min) {
+            h = s = 0;
+        } else {
+            const d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+            h /= 6;
+        }
+        return { h, s, l };
+    };
+
+    const hslToHex = ({ h, s, l }) => {
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+
+        const hue2rgb = (p, q, t) => {
+            if (t < 0) t += 1;
+            if (t > 1) t -= 1;
+            if (t < 1 / 6) return p + (q - p) * 6 * t;
+            if (t < 1 / 2) return q;
+            if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+            return p;
+        };
+
+        const r = hue2rgb(p, q, h + 1/3);
+        const g = hue2rgb(p, q, h);
+        const b = hue2rgb(p, q, h - 1/3);
+
+        const toHex = x => {
+            const hex = Math.round(x * 255).toString(16);
+            return hex.length === 1 ? '0' + hex : hex;
+        };
+
+        return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+    };
+
+    const baseHSL = hexToHsl(baseHex);
+    const variants = [];
+
+    const step = 1 / numberOfVariants;
+    for (let i = 0; i < numberOfVariants; i++) {
+        let newHue = (baseHSL.h + i * step) % 1;
+        variants.push(hslToHex({ h: newHue, s: baseHSL.s, l: baseHSL.l }));
+    }
+
+    return variants;
+}
 
 export class PopulationChart extends BaseChart {
     /**
@@ -136,8 +214,10 @@ export class PopulationChart extends BaseChart {
      * @returns {Object} Chart configuration for QuickChart API
      */
     createChartConfig(data) {
-        // Generate colors for the chart based on the number of data points
-        const colors = this.generateColors(data.labels.length);
+        // Generate colors using theme colors
+        const colors = generateHueVariants(COLORS.primary, data.labels.length).map(color =>
+            hexToRgba(color, 0.75)
+        );
         
         // Configure based on chart type
         const chartType = this.options.type || 'bar';
@@ -154,8 +234,9 @@ export class PopulationChart extends BaseChart {
                     label: this.options.showDensity ? "Population Density" : "Population",
                     data: data.values,
                     backgroundColor: colors,
-                    borderColor: "#333",
-                    borderWidth: 1.5
+                    borderColor: hexToRgba(COLORS.primary, 1),
+                    borderWidth: 1,
+                    borderRadius: 12
                 }]
             },
             options: {
@@ -167,10 +248,11 @@ export class PopulationChart extends BaseChart {
                         text: chartImageTitle, // Use dynamic title for chart image
                         font: {
                             size: 24,
-                            weight: 'bold',
-                            family: 'Arial'
+                            family: 'Roboto, sans-serif',
+                            weight: 600
                         },
-                        color: '#222'
+                        color: COLORS.textPrimary,
+                        padding: {bottom: 24}
                     },
                     legend: {
                         display: chartType !== 'bar' && chartType !== 'line',
@@ -199,22 +281,35 @@ export class PopulationChart extends BaseChart {
                 scales: {
                     x: {
                         ticks: {
-                            maxRotation: 45, // Allow rotation up to 45 degrees
-                            minRotation: 0,
-                            color: "#444",
-                            font: { size: 12, weight: "bold" },
+                            maxRotation: 45,
+                            minRotation: 45,
+                            color: COLORS.textSecondary,
+                            font: {
+                                size: 14,
+                                family: 'Roboto, sans-serif',
+                                weight: 'bold'
+                            },
                             autoSkip: false, // Disable auto-skipping of labels to ensure all are shown
                             autoSkipPadding: 5 // Add padding between labels
                         },
-                        grid: { display: false }
+                        grid: {
+                            color: hexToRgba(COLORS.textSecondary, 0.1),
+                            display: false
+                        }
                     },
                     y: {
                         ticks: {
-                            color: "#444",
-                            font: { size: 12, weight: "bold" },
+                            color: COLORS.textSecondary,
+                            font: {
+                                size: 14,
+                                family: 'Roboto, sans-serif',
+                                weight: 'bold'
+                            },
                             callback: value => dataProcessing.formatNumber(value)
                         },
-                        grid: { color: "#eee" }
+                        grid: {
+                            color: hexToRgba(COLORS.textSecondary, 0.1)
+                        }
                     }
                 },
                 layout: {
@@ -270,7 +365,7 @@ export class PopulationChart extends BaseChart {
             config.data.datasets[0].pointHoverRadius = 7;
         } else {
             // For bar charts
-            config.data.datasets[0].borderRadius = 6;
+            config.data.datasets[0].borderRadius = 12;
             config.data.datasets[0].barThickness = 40;
             
             // For horizontal bar charts if we have more than 5 items
@@ -283,32 +378,7 @@ export class PopulationChart extends BaseChart {
         return config;
     }
     
-    /**
-     * Generate colors for chart elements
-     * @param {number} count - Number of colors needed
-     * @returns {Array} Array of color strings
-     */
-    generateColors(count) {
-        // Base colors
-        const baseColors = [
-            "#ff6384", "#36a2eb", "#ffcd56", "#4bc0c0", "#9966ff",
-            "#ff9f40", "#8ac926", "#1982c4", "#6a4c93", "#f72585"
-        ];
-        
-        // If we need more colors than available in base colors, generate them
-        if (count <= baseColors.length) {
-            return baseColors.slice(0, count);
-        } 
-        
-        // Generate more colors
-        const colors = [...baseColors];
-        for (let i = baseColors.length; i < count; i++) {
-            const hue = (i * 137.508) % 360; // Use golden angle approximation for even distribution
-            colors.push(`hsl(${hue}, 70%, 60%)`);
-        }
-        
-        return colors;
-    }
+    // Colors are now generated using generateHueVariants
     
     /**
      * Create population-specific chart controls

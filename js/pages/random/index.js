@@ -9,19 +9,96 @@ import { chartService } from '../../services/chartService.js';
 import * as dataProcessing from '../../utils/dataProcessing.js';
 import * as chartUtils from '../../utils/chartUtils.js';
 
+// Get the root styles
+const styles = getComputedStyle(document.documentElement);
+const COLORS = {
+    primary: styles.getPropertyValue('--primary-color').trim(),
+    primaryDark: styles.getPropertyValue('--primary-dark').trim(),
+    primaryLight: styles.getPropertyValue('--primary-light').trim(),
+    textPrimary: styles.getPropertyValue('--text-primary').trim(),
+    textSecondary: styles.getPropertyValue('--text-secondary').trim(),
+};
+
+function hexToRgba(hex, alpha = 1) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function generateHueVariants(baseHex, numberOfVariants) {
+    const hexToHsl = (hex) => {
+        let r = parseInt(hex.slice(1, 3), 16) / 255;
+        let g = parseInt(hex.slice(3, 5), 16) / 255;
+        let b = parseInt(hex.slice(5, 7), 16) / 255;
+
+        const max = Math.max(r, g, b), min = Math.min(r, g, b);
+        let h, s, l = (max + min) / 2;
+
+        if (max === min) {
+            h = s = 0;
+        } else {
+            const d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+            h /= 6;
+        }
+
+        return { h, s, l };
+    };
+
+    const hslToHex = ({ h, s, l }) => {
+        const hue2rgb = (p, q, t) => {
+            if (t < 0) t += 1;
+            if (t > 1) t -= 1;
+            if (t < 1 / 6) return p + (q - p) * 6 * t;
+            if (t < 1 / 2) return q;
+            if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
+            return p;
+        };
+
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+        const r = hue2rgb(p, q, h + 1 / 3);
+        const g = hue2rgb(p, q, h);
+        const b = hue2rgb(p, q, h - 1 / 3);
+
+        const toHex = x => {
+            const hex = Math.round(x * 255).toString(16);
+            return hex.length === 1 ? '0' + hex : hex;
+        };
+
+        return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+    };
+
+    const baseHSL = hexToHsl(baseHex);
+    const variants = [];
+
+    const step = 1 / numberOfVariants;
+    for (let i = 0; i < numberOfVariants; i++) {
+        let newHue = (baseHSL.h + i * step) % 1;
+        variants.push(hslToHex({ h: newHue, s: baseHSL.s, l: baseHSL.l }));
+    }
+
+    return variants;
+}
+
 class RandomCountryPage {
     constructor() {
         this.navigation = null;
         this.currentCountry = null;
         this.allCountries = [];
 
-        // Cache DOM elements (updated for new structure)
+        // Cache DOM elements
         this.countryOverview = document.getElementById('countryOverview');
         this.quickFacts = document.getElementById('quickFacts').querySelector('.facts-grid');
         this.populationChart = document.getElementById('populationChart');
         this.languageChart = document.getElementById('languageChart');
-        this.regionalChart = document.getElementById('regionalChart');
-        this.currencyChart = document.getElementById('currencyChart');
+        this.areaChart = document.getElementById('areaChart');
         this.mapView = document.getElementById('mapView');
         this.neighbors = document.getElementById('neighbors').querySelector('.neighbors-grid');
 
@@ -139,49 +216,30 @@ class RandomCountryPage {
         });
 
         // Map
+        // Map
         if (country.maps?.googleMaps) {
             this.mapView.innerHTML = `
                 <iframe
-                    src="https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${encodeURIComponent(country.name.common)}"
-                    width="100%"
-                    height="400"
-                    style="border:0;border-radius:var(--border-radius);"
+                    src="https://www.google.com/maps?q=${encodeURIComponent(country.name.common)}&output=embed"
                     allowfullscreen=""
-                    loading="lazy">
-                </iframe>
+                    loading="lazy"
+                ></iframe>
             `;
-        } else {
-            this.mapView.innerHTML = '<p>Map not available.</p>';
         }
     }
 
     /**
      * Create visualization charts for the country
-     * Implements Method 2 API approach:
-     * 1. Get data from REST Countries API
-     * 2. Process data
-     * 3. Create chart using QuickChart API
-     * 
      * @param {Object} country - Current country data
      * @param {Array} allCountries - All countries data for comparison
      */
     async createCharts(country, allCountries) {
         try {
-            // Population comparison chart
-            const popConfig = this.createPopulationChartConfig(country, allCountries);
-            const popChartUrl = chartService.createChartUrl(popConfig);
-            chartUtils.displayChart('populationChart', popChartUrl, 'Population Comparison');
-
-            // Language usage chart
-            const langConfig = this.createLanguageChartConfig(country, allCountries);
-            const langChartUrl = chartService.createChartUrl(langConfig);
-            chartUtils.displayChart('languageChart', langChartUrl, 'Language Usage');
-
-            // Currency usage chart
-            const currConfig = this.createCurrencyChartConfig(country, allCountries);
-            const currChartUrl = chartService.createChartUrl(currConfig);
-            chartUtils.displayChart('currencyChart', currChartUrl, 'Currency Usage');
-
+            await Promise.all([
+                this.createPopulationChart(country, allCountries),
+                this.createLanguageChart(country, allCountries),
+                this.createAreaChart(country, allCountries)
+            ]);
         } catch (error) {
             console.error('Error creating charts:', error);
             this.handleError(error);
@@ -189,26 +247,49 @@ class RandomCountryPage {
     }
 
     /**
-     * Create population comparison chart configuration
+     * Create population comparison chart
      */
-    createPopulationChartConfig(country, allCountries) {
-        const regionCountries = allCountries
+    async createPopulationChart(country, allCountries) {
+        // Get regional countries and sort them
+        const regionalCountries = allCountries
             .filter(c => c.region === country.region)
-            .sort((a, b) => b.population - a.population)
-            .slice(0, 5);
+            .sort((a, b) => b.population - a.population);
 
-        return {
+        // Find the index of the current country in the sorted array
+        const index = regionalCountries.findIndex(c => c.name.common === country.name.common);
+
+        // Select two countries before and two after the current country
+        const start = Math.max(index - 2, 0);
+        const end = Math.min(index + 3, regionalCountries.length);
+        const selectedCountries = regionalCountries.slice(start, end);
+        const selectedCountryName = country.name.common;
+
+        // Background colors based on selection
+        const backgroundColors = selectedCountries.map(c =>
+            c.name.common === selectedCountryName ? hexToRgba(COLORS.primaryLight, 0.75) : COLORS.primary
+        );
+
+        // Define border colors: darker shade for the borders
+        const borderColors = selectedCountries.map(c =>
+            c.name.common === selectedCountryName ? hexToRgba(COLORS.primaryLight, 1) : hexToRgba(COLORS.primary, 1)
+        );
+
+        // Round the borders and apply border width
+        const borderWidths = selectedCountries.map(c =>
+            c.name.common === selectedCountryName ? 3 : 1
+        );
+
+        const chartConfig = {
             type: 'bar',
             data: {
-                labels: regionCountries.map(c => c.name.common),
+                labels: selectedCountries.map(c => c.name.common),
                 datasets: [{
                     label: 'Population',
-                    data: regionCountries.map(c => c.population),
-                    backgroundColor: regionCountries.map(c => 
-                        c.name.common === country.name.common ? '#ff6384' : '#36a2eb'
-                    ),
-                    borderColor: '#333',
-                    borderWidth: 1
+                    data: selectedCountries.map(c => c.population),
+                    backgroundColor: backgroundColors,
+                    borderColor: borderColors,
+                    borderWidth: borderWidths,
+                    borderRadius: 12
                 }]
             },
             options: {
@@ -216,107 +297,183 @@ class RandomCountryPage {
                     title: {
                         display: true,
                         text: `Population Comparison - ${country.region}`,
-                        font: { size: 16, weight: 'bold' }
+                        font: {size: 24, family: 'Roboto, sans-serif', weight: 600},
+                        color: COLORS.textPrimary,
+                        padding: {bottom: 24}
+                    },
+                    legend: {
+                        display: false,
+                        labels: {
+                            font: {size: 14, family: 'Roboto, sans-serif'},
+                        }
                     }
                 },
                 scales: {
                     y: {
                         beginAtZero: true,
                         ticks: {
-                            callback: value => dataProcessing.formatNumber(value)
+                            callback: value => dataProcessing.formatNumber(value),
+                            color: COLORS.textSecondary,
+                            font: {size: 14, family: 'Roboto, sans-serif'}
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: COLORS.textSecondary,
+                            font: {size: 14, family: 'Roboto, sans-serif'}
                         }
                     }
                 }
             }
         };
+
+        const chartUrl = chartService.createChartUrl(chartConfig);
+        chartUtils.displayChart('populationChart', chartUrl, 'Population comparison');
     }
 
     /**
-     * Create language usage chart configuration
+     * Create language distribution chart
      */
-    createLanguageChartConfig(country, allCountries) {
-        const countryLanguages = country.languages ? Object.values(country.languages) : [];
+    async createLanguageChart(country, allCountries) {
+        if (!country.languages) {
+            this.languageChart.innerHTML = '<p>No official languages</p>';
+            return;
+        }
+
+        const languages = Object.values(country.languages);
         const languageStats = {};
 
-        // Count language usage
         allCountries.forEach(c => {
             if (c.languages) {
                 Object.values(c.languages).forEach(lang => {
-                    if (countryLanguages.includes(lang)) {
+                    if (languages.includes(lang)) {
                         languageStats[lang] = (languageStats[lang] || 0) + 1;
                     }
                 });
             }
         });
 
-        return {
-            type: 'pie',
+        const chartConfig = {
+            type: 'doughnut',
             data: {
                 labels: Object.keys(languageStats),
                 datasets: [{
                     data: Object.values(languageStats),
-                    backgroundColor: [
-                        '#ff6384',
-                        '#36a2eb',
-                        '#ffcd56',
-                        '#4bc0c0',
-                        '#9966ff'
-                    ]
+                    backgroundColor: generateHueVariants(COLORS.primary, Object.keys(languageStats).length)
                 }]
             },
             options: {
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Language Usage Distribution',
-                        font: { size: 16, weight: 'bold' }
+                        text: 'Language Distribution',
+                        font: {size: 24, family: 'Roboto, sans-serif', weight: 600},
+                        color: COLORS.textPrimary,
+                        padding: {bottom: 24}
+                    },
+                    legend: {
+                        display: true,
+                        labels: {
+                            font: {size: 14, family: 'Roboto, sans-serif'},
+                        }
                     }
                 }
             }
         };
+
+        const chartUrl = chartService.createChartUrl(chartConfig);
+        chartUtils.displayChart('languageChart', chartUrl, 'Language distribution');
     }
 
     /**
-     * Create currency usage chart configuration
+     * Create area comparison chart
      */
-    createCurrencyChartConfig(country, allCountries) {
-        const countryCurrencies = country.currencies ? Object.keys(country.currencies) : [];
-        const currencyStats = {};
+    async createAreaChart(country, allCountries) {
+        if (!country) return;
 
-        // Count currency usage
-        allCountries.forEach(c => {
-            if (c.currencies) {
-                Object.keys(c.currencies).forEach(curr => {
-                    if (countryCurrencies.includes(curr)) {
-                        currencyStats[curr] = (currencyStats[curr] || 0) + 1;
-                    }
-                });
-            }
-        });
+        // Get regional countries and sort them by area
+        const regionalCountries = allCountries
+            .filter(c => c.region === country.region)
+            .sort((a, b) => b.area - a.area);
 
-        return {
-            type: 'doughnut',
+        // Find the index of the current country in the sorted array
+        const index = regionalCountries.findIndex(c => c.name.common === country.name.common);
+
+        // Select two countries before and two after the current country
+        const start = Math.max(index - 2, 0);
+        const end = Math.min(index + 3, regionalCountries.length);
+
+        // Select the countries to display
+        const selectedCountries = regionalCountries.slice(start, end);
+        const selectedCountryName = country.name.common;
+
+        // Background colors based on selection
+        const backgroundColors = selectedCountries.map(c =>
+            c.name.common === selectedCountryName ? hexToRgba(COLORS.primaryLight, 0.75) : COLORS.primary
+        );
+
+        // Define border colors: darker shade for the borders
+        const borderColors = selectedCountries.map(c =>
+            c.name.common === selectedCountryName ? hexToRgba(COLORS.primaryLight, 1) : hexToRgba(COLORS.primary, 1)
+        );
+
+        // Round the borders and apply border width
+        const borderWidths = selectedCountries.map(c =>
+            c.name.common === selectedCountryName ? 3 : 1
+        );
+
+        // Create chart configuration
+        const chartConfig = {
+            type: 'bar',
             data: {
-                labels: Object.keys(currencyStats),
+                labels: selectedCountries.map(c => c.name.common),
                 datasets: [{
-                    data: Object.values(currencyStats),
-                    backgroundColor: [
-                        '#ff6384',
-                        '#36a2eb',
-                        '#ffcd56'
-                    ]
+                    label: 'Country Area (in km²)',
+                    data: selectedCountries.map(c => c.area),
+                    backgroundColor: backgroundColors,
+                    borderColor: borderColors,
+                    borderWidth: borderWidths,
+                    borderRadius: 8
                 }]
             },
             options: {
+                indexAxis: 'y',
                 plugins: {
                     title: {
                         display: true,
-                        text: 'Currency Usage Distribution',
-                        font: { size: 16, weight: 'bold' }
+                        text: `Area Comparison - ${country.region} (km²)`,
+                        font: {size: 24, family: 'Roboto, sans-serif', weight: 600},
+                        color: COLORS.textPrimary,
+                        padding: {bottom: 24}
+                    },
+                    legend: {
+                        display: false,
+                        labels: {
+                            font: {size: 14, family: 'Roboto, sans-serif'},
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: value => dataProcessing.formatNumber(value),
+                            color: COLORS.textSecondary,
+                            font: {size: 14, family: 'Roboto, sans-serif'}
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            color: COLORS.textSecondary,
+                            font: {size: 14, family: 'Roboto, sans-serif'}
+                        }
                     }
                 }
             }
         };
+
+        const chartUrl = chartService.createChartUrl(chartConfig);
+        chartUtils.displayChart('areaChart', chartUrl, 'Area comparison');
     }
 
     /**

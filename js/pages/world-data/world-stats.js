@@ -98,22 +98,36 @@
     function renderStats(stats) {
         // Clear any existing content
         statsGrid.innerHTML = '';
-        
+
         // Create and append each stat card
         stats.forEach(stat => {
             const card = document.createElement('div');
-            card.className = 'stat-card';
-            card.style.background = `linear-gradient(135deg, ${stat.color}, ${adjustColor(stat.color, -20)})`;
-            
+            // *** MODIFIED: Add category class for styling ***
+            const categoryClass = stat.title.toLowerCase().replace(/ /g, '-').replace(/[^a-z0-9-]/g, ''); // Generate a class like 'total-countries'
+            card.className = `stat-card ${categoryClass}`;
+            // *** END MODIFIED ***
+
+            // *** REMOVED: Inline background style ***
+            // card.style.background = `linear-gradient(135deg, ${stat.color}, ${adjustColor(stat.color, -20)})`;
+
+            // *** MODIFIED: Use CSS variables for accent color ***
+            card.style.setProperty('--card-accent', stat.color);
+
             card.innerHTML = `
-                <div class="stat-card-icon">${stat.icon}</div>
-                <div class="stat-card-value">${stat.value}</div>
-                <div class="stat-card-title">${stat.title}</div>
+                <div class="card-title">
+                    <div class="icon-container">
+                        <i>${stat.icon}</i>
+                    </div>
+                    <span>${stat.title}</span>
+                </div>
+                <div class="card-value">${stat.value}</div>
+                ${stat.subtitle ? `<div class="card-subtitle">${stat.subtitle}</div>` : ''}
             `;
-            
+            // *** END MODIFIED ***
+
             statsGrid.appendChild(card);
         });
-        
+
         // Update the description with dynamic content
         if (descriptionElement) {
             descriptionElement.textContent = generateStatsDescription(stats);
@@ -334,52 +348,75 @@
                     title: "Total Countries",
                     value: totalCountries.toLocaleString(),
                     icon: "🗺️",
-                    color: "#4285f4"
+                    color: "#4285f4", // Blue - Political/General
+                    category: "political"
                 },
                 {
                     title: "Global Population",
                     value: formatNumber(totalPopulation),
                     icon: "👥",
-                    color: "#ea4335"
+                    color: "#ea4335", // Red - Population
+                    category: "population"
                 },
                 {
                     title: "Languages Spoken",
                     value: languages.size.toLocaleString(),
                     icon: "🗣️",
-                    color: "#fbbc05"
+                    color: "#fbbc05", // Yellow - Cultural
+                    category: "language"
                 },
                 {
                     title: "Currencies Used",
                     value: currencies.size.toLocaleString(),
                     icon: "💰",
-                    color: "#34a853"
+                    color: "#34a853", // Green - Economic
+                    category: "economic"
                 },
                 {
                     title: "Capital Cities",
                     value: capitals.size.toLocaleString(),
                     icon: "🏙️",
-                    color: "#ff6d01"
+                    color: "#ff6d01", // Orange - Geography/Urban
+                    category: "geography" // Assigning to geography for color
                 },
                 {
                     title: "Global Land Area",
                     value: formatArea(totalLandArea),
                     icon: "🌐",
-                    color: "#46bdc6"
+                    color: "#46bdc6", // Teal - Geography
+                    category: "geography"
                 },
                 {
                     title: "Largest Country",
                     value: largestCountry?.name?.common || "N/A",
                     icon: "📏",
-                    color: "#7e57c2"
+                    color: "#7e57c2", // Purple - Political/Geography
+                    category: "political", // Assigning to political for color
+                    subtitle: `by Area: ${formatArea(largestCountry?.area || 0)}`
                 },
                 {
                     title: "Most Borders",
-                    value: `${mostBorders?.name?.common || "N/A"} (${mostBorders?.borders?.length || 0})`,
+                    value: `${mostBorders?.name?.common || "N/A"}`,
                     icon: "🤝",
-                    color: "#ec407a"
+                    color: "#ec407a", // Pink - Political/Geography
+                    category: "political", // Assigning to political for color
+                    subtitle: `(${mostBorders?.borders?.length || 0} neighbors)`
                 }
             ];
-            
+
+            // *** MODIFIED: Assign category class based on title/category ***
+            stats.forEach(stat => {
+                let category = stat.category || 'political'; // Default category
+                if (stat.title.includes('Population')) category = 'population';
+                else if (stat.title.includes('Area') || stat.title.includes('Largest') || stat.title.includes('Capital')) category = 'geography';
+                else if (stat.title.includes('Currenc')) category = 'economic';
+                else if (stat.title.includes('Countr') || stat.title.includes('Border') || stat.title.includes('Independen')) category = 'political';
+                else if (stat.title.includes('Language')) category = 'language';
+
+                stat.categoryClass = category; // Store for use in renderStats if needed, though CSS handles it now
+            });
+            // *** END MODIFIED ***
+
             console.log('[chartContainer9] Data processed successfully');
             
             // Clear the global timeout

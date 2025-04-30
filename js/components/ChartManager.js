@@ -346,10 +346,17 @@ export class ChartManager {
      */
     setupEventListeners() {
         const setupChart = (chart) => {
+            // *** ADDED: Check if this is the world stats container and skip if so ***
+            if (chart.id === 'chartContainer9') {
+                console.log('Skipping event listeners for world stats container:', chart.id);
+                return; // Don't attach hover/click listeners to the world stats card
+            }
+            // *** END ADDED ***
+
             if (chart.dataset.initialized) return;
-            
+
             console.log('Setting up event listeners for chart:', chart.id);
-            
+
             // Mouse events - only keep hover effect, not description display
             chart.addEventListener('mouseenter', () => {
                 console.log('Mouse entered chart:', chart.id);
@@ -408,7 +415,9 @@ export class ChartManager {
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
                 mutation.addedNodes.forEach((node) => {
-                    if (node.classList && node.classList.contains('chart-container')) {
+                    // *** ADDED: Check node type and class ***
+                    if (node.nodeType === Node.ELEMENT_NODE && node.classList && node.classList.contains('chart-container')) {
+                    // *** END ADDED ***
                         setupChart(node);
                     }
                 });
@@ -447,6 +456,13 @@ export class ChartManager {
      * Handle chart click state
      */
     handleClick(chart) {
+        // *** ADDED: Prevent click handling for world stats container ***
+        if (chart.id === 'chartContainer9') {
+            console.log('Ignoring click for world stats container:', chart.id);
+            return; // Do nothing if the world stats card is clicked
+        }
+        // *** END ADDED ***
+
         console.log('Handling click for chart:', chart.id);
         if (this.activeChart === chart) {
             this.clearExpandedState();

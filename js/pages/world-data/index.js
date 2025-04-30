@@ -9,7 +9,7 @@ import { PopulationChart } from '../../components/charts/types/PopulationChart.j
 import { ContinentChart } from '../../components/charts/types/ContinentChart.js';
 // Removed RegionChart import
 import { CurrencyChart } from '../../components/charts/types/CurrencyChart.js';
-import { TimezoneChart } from '../../components/charts/types/TimezoneChart.js';
+// Removed TimezoneChart import
 import { BordersChart } from '../../components/charts/types/BordersChart.js';
 import { IndependenceChart } from '../../components/charts/types/IndependenceChart.js';
 import { LanguageChart } from '../../components/charts/types/LanguageChart.js';
@@ -69,11 +69,7 @@ class WorldDataPage {
                 type: CurrencyChart,
                 options: { title: 'Top 5 Most Used Currencies' }
             },
-            {
-                id: 'chartContainer5',
-                type: TimezoneChart,
-                options: { title: 'Countries per Timezone (Top 5)' }
-            },
+            // Removed TimezoneChart configuration
             {
                 id: 'chartContainer6',
                 type: IndependenceChart,
