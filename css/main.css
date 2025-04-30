@@ -11,7 +11,7 @@
     --surface: #F3F3F3; /* background for containers */
     --background: #FFFFFF; /* background color and for text on dark bg */
     --text-primary: #23221f; /* title color - button background */
-    --text-secondary: #84868A; /* text color for body and subtitles  */
+    --text-secondary: #76787b; /* text color for body and subtitles  */
     --border-color: #E0E0E0; /* border color */
     --error-color: #AD4954; /* for errors */
     --success-color: #89B99A; /* for success */
@@ -35,9 +35,9 @@
     --radius-xl: 1rem;
 
     /* Shadows */
-    --shadow-sm: 0 1px 2px 0 rgba(124, 124, 124, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(84, 84, 84, 0.1);
-    --shadow-lg: 0 10px 15px -3px rgba(95, 95, 95, 0.1);
+    --shadow-sm: 0 1px 2px 0 rgba(177, 177, 177, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(162, 162, 162, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(156, 156, 156, 0.1);
     
     /* Line heights */
     --line-height-tight: 1.2;

@@ -8,54 +8,378 @@ header {
     position: sticky;
     top: 0;
     z-index: 50;
-    background-color: var(--surface);
+    background-color: var(--background, #fff);
     border-bottom: 1px solid var(--border-color);
-    padding: var(--space-4) 0;
+    padding: var(--space-1) var(--space-2);
+    box-shadow: var(--shadow-md);
 }
 
-header h1 {
-    margin: 0 0 var(--space-4);
-    color: var(--text-primary);
-    font-size: var(--font-size-2xl);
-    font-weight: 700;
-    letter-spacing: -0.025em;
-    text-align: center;
-    background: linear-gradient(120deg, var(--primary-color), var(--primary-dark));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-/* Navigation */
-nav {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 var(--space-4);
-}
-
-nav ul {
-    list-style: none;
-    padding: 0;
-    margin: var(--space-4) 0 0;
+/* Left-aligned navigation icons (horizontal) with rounded gray containers */
+.navbar-icons {
     display: flex;
+    flex-direction: row;
+    gap: 20px; /* Increased gap between icons */
+    padding: 10px;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+/* Icon button styling with gray container */
+.icon-btn {
+    background-color: var(--surface, #f2f2f2); /* Light gray background */
+    border: none;
+    display: inline-flex;
     justify-content: center;
     align-items: center;
-    gap: var(--space-4);
-    flex-wrap: wrap;
+    padding: 12px; /* Slightly larger padding */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 12px; /* Rounded square corners */
+    box-shadow: var(--shadow-sm, 0 2px 4px rgba(0,0,0,0.1));
+}
+
+.icon-btn:hover {
+    transform: scale(1.05);
+    background-color: color-mix(in srgb, var(--primary-color) 10%, var(--surface, #f2f2f2));
+}
+
+.icon-btn:active {
+    transform: scale(0.95);
+}
+
+.icon-btn svg {
+    width: 24px;
+    height: 24px;
+    fill: var(--primary-color, #007bff);
+}
+
+/* Spacer to push content to the right */
+.navbar-spacer {
+    flex-grow: 1;
+}
+
+/* Right-aligned navbar elements */
+.navbar-nav {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+/* Bootstrap Navbar adjustments */
+.navbar {
+    padding: 0.5rem 1rem;
+    width: 100%;
+}
+
+.navbar-collapse {
+    justify-content: space-between;
+}
+
+/* Surprise Me button styling */
+.navbar .btn-primary {
+    background: linear-gradient(135deg, var(--primary-light, #4da3ff), var(--primary-dark, #005bb5));
+    border: none;
+    font-weight: 500;
+    padding: 0.6rem 1.2rem;
+    border-radius: var(--radius-md, 6px);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    color: white;
+}
+
+.navbar .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    background: linear-gradient(135deg, var(--primary-dark, #005bb5), var(--primary-light, #4da3ff));
+}
+
+/* Country dropdown styling with improved spacing */
+.navbar .dropdown-toggle {
+    background-color: var(--surface, #f5f5f5);
+    border: 2px solid var(--border-color);
+    color: var(--text-primary);
+    font-weight: 500;
+    min-width: 800px; /* Keep the wide width */
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start; /* Left align content */
+    padding: 0.75rem 1.25rem; /* Increased padding */
+    border-radius: var(--radius-md, 6px);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.navbar .dropdown-toggle:hover {
+    background-color: color-mix(in srgb, var(--primary-color) 5%, var(--surface, #f5f5f5));
+    border-color: var(--primary-color);
+}
+
+/* Hide default Bootstrap dropdown arrow if present */
+.navbar .dropdown-toggle::after {
+    display: none;
+}
+
+.navbar .dropdown-toggle svg {
+    margin-left: 0.5rem;
+    transition: transform 0.3s ease;
+}
+
+.navbar .dropdown-toggle[aria-expanded="true"] svg {
+    transform: rotate(180deg);
+}
+
+/* Selected country in dropdown button - improved spacing */
+.navbar .dropdown-toggle .selected-country {
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-left: 0; /* Removed margin to reduce spacing */
+    margin-right: auto; /* Push the arrow to the right */
+}
+
+/* Dropdown menu styling - improved spacing */
+.country-dropdown-menu {
+    width: 800px; /* Match the dropdown toggle width */
+    max-height: 500px;
+    overflow-y: auto;
+    padding: 0.75rem 0; /* Increased padding */
+    border-radius: var(--radius-md, 6px);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-color);
+}
+
+.country-dropdown-menu .dropdown-item {
+    padding: 0.85rem 1.25rem; /* Increased padding */
+    font-weight: 500;
+    transition: all 0.2s ease;
+    white-space: normal;
+    color: var(--text-primary);
+    font-size: 1rem;
+    letter-spacing: 0.01rem; /* Slight letter spacing for readability */
+}
+
+.country-dropdown-menu .dropdown-item:hover {
+    background-color: color-mix(in srgb, var(--primary-color) 15%, transparent);
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Improved scrollbar for the dropdown */
+.country-dropdown-menu::-webkit-scrollbar {
+    width: 8px;
+}
+
+.country-dropdown-menu::-webkit-scrollbar-track {
+    background: color-mix(in srgb, var(--border-color) 50%, transparent);
+    border-radius: 4px;
+}
+
+.country-dropdown-menu::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+}
+
+.country-dropdown-menu::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-dark);
+}
+
+/* Navbar toggler */
+.navbar-toggler {
+    border-color: var(--border-color);
+    padding: 0.4rem 0.75rem;
+}
+
+.navbar-toggler:focus {
+    box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--primary-color) 30%, transparent);
+}
+
+/* Mobile styling for Bootstrap navbar */
+@media (max-width: 991px) {
+    .navbar-icons {
+        gap: 15px; /* Slightly reduced gap on mobile */
+    }
+    
+    .icon-btn {
+        padding: 10px; /* Slightly smaller on mobile */
+    }
+    
+    .navbar-collapse {
+        margin-top: 1rem;
+        padding: 1rem;
+        background-color: var(--surface, #f8f9fa);
+        border-radius: var(--radius-md, 6px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .navbar-nav {
+        gap: 0.75rem;
+        width: 100%;
+    }
+    
+    .navbar .nav-item {
+        width: 100%;
+    }
+    
+    .navbar .dropdown {
+        width: 100%;
+    }
+    
+    .navbar .dropdown-toggle {
+        width: 100%;
+        max-width: 500px; /* Wider on mobile too */
+        justify-content: center;
+        padding: 0.7rem 1.1rem;
+    }
+    
+    .country-dropdown-menu {
+        width: 100%;
+        max-width: 500px;
+    }
+    
+    .country-dropdown-menu .dropdown-item {
+        padding: 0.75rem 1.1rem;
+    }
+    
+    .navbar .btn-primary {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Small Mobile styling */
+@media (max-width: 576px) {
+    .navbar-icons {
+        gap: 10px;
+    }
+    
+    .icon-btn {
+        padding: 8px;
+        border-radius: 8px; /* Slightly smaller radius on very small screens */
+    }
+    
+    .icon-btn svg {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .navbar .btn-primary, 
+    .navbar .dropdown-toggle {
+        padding: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .navbar .dropdown-toggle {
+        min-width: 300px; /* Still quite wide on small screens */
+    }
+    
+    .navbar-collapse {
+        padding: 0.75rem;
+    }
+}
+
+/* Logo icon styling */
+.logo-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--primary-light), var(--primary-color), var(--primary-dark));
+    -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="black"><path d="M10.495 6.92..."/><path d="M8 0a8 8..."/></svg>') no-repeat center / contain;
+    mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="black"><path d="m10.495 6.92 1.278-.619a.483.483 0 0 0 .126-.782c-.252-.244-.682-.139-.932.107-.23.226-.513.373-.816.53l-.102.054c-.338.178-.264.626.1.736a.48.48 0 0 0 .346-.027ZM7.741 9.808V9.78a.413.413 0 1 1 .783.183l-.22.443a.6.6 0 0 1-.12.167l-.193.185a.36.36 0 1 1-.5-.516l.112-.108a.45.45 0 0 0 .138-.326M5.672 12.5l.482.233A.386.386 0 1 0 6.32 12h-.416a.7.7 0 0 1-.419-.139l-.277-.206a.302.302 0 1 0-.298.52z"/><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0M1.612 10.867l.756-1.288a1 1 0 0 1 1.545-.225l1.074 1.005a.986.986 0 0 0 1.36-.011l.038-.037a.88.88 0 0 0 .26-.755c-.075-.548.37-1.033.92-1.099.728-.086 1.587-.324 1.728-.957.086-.386-.114-.83-.361-1.2-.207-.312 0-.8.374-.8.123 0 .24-.055.318-.15l.393-.474c.196-.237.491-.368.797-.403.554-.064 1.407-.277 1.583-.973.098-.391-.192-.634-.484-.88-.254-.212-.51-.426-.515-.741a7 7 0 0 1 3.425 7.692 1 1 0 0 0-.087-.063l-.316-.204a1 1 0 0 0-.977-.06l-.169.082a1 1 0 0 1-.741.051l-1.021-.329A1 1 0 0 0 11.205 9h-.165a1 1 0 0 0-.945.674l-.172.499a1 1 0 0 1-.404.514l-.802.518a1 1 0 0 0-.458.84v.455a1 1 0 0 0 1 1h.257a1 1 0 0 1 .542.16l.762.49a1 1 0 0 0 .283.126 7 7 0 0 1-9.49-3.409Z"/></svg>') no-repeat center / contain;
+}
+
+/* Bootstrap specific overrides */
+.navbar .btn-primary {
+    background: linear-gradient(135deg, var(--primary-light), var(--primary-dark));
+    border: none;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+}
+
+.navbar .dropdown-toggle {
+    background-color: var(--surface, #f5f5f5);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+    font-weight: 500;
+    min-width: 150px;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+}
+
+.navbar .dropdown-toggle svg {
+    margin-left: 0.5rem;
+}
+
+.navbar .nav-link {
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-normal);
+}
+
+.navbar .nav-link.active {
+    color: var(--primary-color);
+    background-color: color-mix(in srgb, var(--primary-color) 15%, transparent);
+}
+
+.navbar-toggler {
+    border-color: var(--border-color);
+}
+
+/* Mobile styling for Bootstrap navbar */
+@media (max-width: 991px) {
+    .navbar-left {
+        flex-direction: row;
+        gap: 8px;
+    }
+    
+    .navbar-collapse {
+        margin-top: 1rem;
+    }
+    
+    .navbar-nav {
+        gap: 0.5rem;
+    }
+    
+    .navbar .nav-item {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .navbar .dropdown-menu {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    nav a,
+    nav select,
+    #menu-toggle {
+        transition: none;
+    }
+
+    nav ul {
+        animation: none;
+    }
+
+    nav a::after {
+        transition: none;
+    }
 }
 
 /* Links inside navbar */
 /* Navigation links */
-nav a {
+.nav-item a {
     text-decoration: none;
     color: var(--text-primary);
     font-size: var(--font-size-sm);
-    font-weight: 600;
-    padding: var(--space-3) var(--space-4);
-    border-radius: var(--radius-lg);
+    font-weight: 500;
+    /* padding: var(--space-3) var(--space-4); */
+    /* border-radius: var(--radius-lg); */
     transition: all var(--transition-normal);
-    background-color: transparent;
-    border: 2px solid transparent;
+    /* background-color: transparent; */
+    /* border: 2px solid transparent; */
 }
 
 nav a:hover {
@@ -74,7 +398,6 @@ nav a:focus {
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 30%, transparent);
 }
 
-/* Country select dropdown */
 /* Country select dropdown */
 nav select {
     font-size: var(--font-size-sm);
@@ -119,7 +442,6 @@ nav select option {
 }
 
 /* Mobile menu toggle button */
-/* Mobile menu toggle */
 #menu-toggle {
     display: none;
     background: var(--surface);
@@ -146,7 +468,6 @@ nav select option {
                 0 0 0 3px color-mix(in srgb, var(--primary-color) 30%, transparent);
 }
 
-/* Responsive styles */
 /* Responsive styles */
 @media (max-width: 768px) {
     header {
@@ -204,7 +525,6 @@ nav select option {
 }
 
 /* Animation for mobile menu */
-/* Animations */
 @keyframes slideDown {
     from {
         opacity: 0;
@@ -231,4 +551,15 @@ nav select option {
     nav a::after {
         transition: none;
     }
+}
+
+/* Make sure dropdown appears on click */
+.show {
+    display: block !important;
+}
+
+/* When dropdown is open, style the button differently */
+.dropdown.show .dropdown-toggle {
+    border-color: var(--primary-color);
+    background-color: color-mix(in srgb, var(--primary-color) 5%, var(--surface, #f5f5f5));
 }
