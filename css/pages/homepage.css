@@ -138,6 +138,43 @@ body {
   box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
 }
 
+/* Animation for the start exploring button */
+.btn-primary, 
+#explore .btn-primary {
+  background: linear-gradient(135deg, var(--primary-dark, #877bfb), var(--primary-light, #5489ec));
+  border: none;
+  font-weight: 500;
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--radius-md, 6px);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+  color: white;
+}
+
+.btn-primary:hover,
+#explore .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  background: linear-gradient(135deg, var(--primary-light, #5489ec), var(--primary-dark, #877bfb));
+}
+
+/* Styling for the outline button to match header styling */
+#explore .btn-outline-light {
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--radius-md, 6px);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+
+#explore .btn-outline-light:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  background: rgba(255, 255, 255, 0.1);
+}
+
 /* Animation for button clicks */
 .btn-animate-click {
   animation: button-pulse 0.4s;
