@@ -205,9 +205,16 @@ button.large {
 /* Footer styles */
 footer {
     text-align: center;
-    padding: var(--spacing-medium);
+    /* padding: var(--spacing-large); */
+    padding: var(--space-6);
     background-color: var(--text-primary);
     color: var(--white);
+    font-family: var(--font-family);
+    font-size: var(--font-size-xs);
+}
+
+footer p {
+    margin: 0.25rem 0;
 }
 
 /* Utility classes */
