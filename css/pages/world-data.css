@@ -39,7 +39,7 @@
 /* Chart containers base styles */
 .chart-container {
     --chart-min-height: clamp(250px, 40vh, 400px);
-    --chart-padding: clamp(0.75rem, 2vw, 1.5rem);
+    --chart-padding: clamp(2rem, 1.5vw, 1rem);
     --chart-aspect: 16/10;
     
     position: relative;
