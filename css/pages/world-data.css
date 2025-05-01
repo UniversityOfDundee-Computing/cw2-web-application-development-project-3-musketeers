@@ -719,9 +719,52 @@
 /* Analysis section styling in expanded view */
 .chart-container.expanded .chart-detail-analysis {
     padding: 1.5rem !important;
+    background-color: var(--surface) !important;
+    border: 1px solid var(--border-color) !important;
     background-color: #f8f9fa !important;
-    border-radius: 8px !important;
+    border-radius: var(--radius-lg) !important;
+    grid-column: 2;
+    display: flex;
+    flex-direction: column;
+    transform: none;
+    opacity: 1;
+    visibility: visible;
+    position: relative;
+    height: auto;
+    max-height: calc(90vh - 3rem);
+    overflow-y: auto;
+    font-family: var(--font-family);
 }
+
+.chart-container.expanded .chart-detail-analysis h4 {
+    font-size: var(--font-size-lg);
+    line-height: var(--line-height-normal);
+}
+
+.chart-container.expanded .chart-detail-analysis p {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+
+/* .chart-container.expanded .chart-detail-analysis {
+    grid-column: 2;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    background-color: rgba(248, 250, 252, 0.9);
+    border-radius: 8px;
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+    transform: none;
+    opacity: 1;
+    visibility: visible;
+    position: relative;
+    height: auto;
+    max-height: calc(90vh - 3rem);
+    overflow-y: auto;
+} */
+
+
 
 /* Expanded Chart View Mobile Optimization */
 @media (max-width: 768px) {
@@ -762,7 +805,11 @@
 .card-body {
     position: relative;
     overflow: hidden;
-    padding: 1.25rem; /* Ensure consistent padding */
+    padding: 1.25rem;
+}
+
+.chart-container.chart-container.expanded .card-body {
+    overflow-x: hidden !important;
 }
 
 /* Fix for the chart's content overflow */
@@ -885,23 +932,6 @@ body:has(.chart-container.expanded) .chart-backdrop {
     max-height: calc(90vh - 3rem);
 }
 
-/* Style for the detailed analysis on the right */
-.chart-container.expanded .chart-detail-analysis {
-    grid-column: 2;
-    display: flex;
-    flex-direction: column;
-    padding: 1rem;
-    background-color: rgba(248, 250, 252, 0.9);
-    border-radius: 8px;
-    border-left: 1px solid rgba(0, 0, 0, 0.1);
-    transform: none;
-    opacity: 1;
-    visibility: visible;
-    position: relative;
-    height: auto;
-    max-height: calc(90vh - 3rem);
-    overflow-y: auto;
-}
 
 /* Hide the bottom overlay for expanded charts */
 .chart-container.expanded .chart-detail-overlay {
@@ -953,14 +983,19 @@ body:has(.chart-container.expanded) .chart-backdrop {
     display: none;
 }
 
-.chart-container.expanded .chart-detail-analysis {
-    display: flex;
-}
-
 /* Analysis data container with proper spacing */
 .analysis-data {
     padding-right: 0.5rem; /* Give some space for scrollbar */
     overflow-y: auto;
+}
+
+.analysis-data h5 {
+    font-size: var(--font-size-base);
+}
+
+.analysis-data ul {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
 }
 
 /* Fix for text overflow in chart description */
