@@ -1,0 +1,30 @@
+{
+  "name": "cw2-web-application-development-project-3-musketeers",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "homepage.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "vite build",
+    "dev": "vite"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UniversityOfDundee-Computing/cw2-web-application-development-project-3-musketeers.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/UniversityOfDundee-Computing/cw2-web-application-development-project-3-musketeers/issues"
+  },
+  "homepage": "https://github.com/UniversityOfDundee-Computing/cw2-web-application-development-project-3-musketeers#readme",
+  "description": "",
+  "dependencies": {
+    "globe.gl": "^2.41.4",
+    "three": "^0.176.0"
+  },
+  "devDependencies": {
+    "vite": "^6.3.3"
+  }
+}

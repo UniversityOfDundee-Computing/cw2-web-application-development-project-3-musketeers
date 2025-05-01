@@ -1,0 +1,192 @@
+/* -----------------------------------
+   Base Reset
+----------------------------------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* -----------------------------------
+     Body & Background
+  ----------------------------------- */
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #0d0d2a;
+    min-height: 100vh;
+    overflow: hidden;
+    color: #ffffff;
+    position: relative;
+  }
+  
+  /* -----------------------------------
+     Globe Container (background globe)
+  ----------------------------------- */
+  #globeViz {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    /*opacity: 0.25; /* faint background effect */
+    /*pointer-events: none; /* lets user interact with overlay content */
+  }
+  /*#globeViz canvas {
+    opacity: 0.25;
+  }*/
+  
+  
+  /* -----------------------------------
+     Foreground Content (hero)
+  ----------------------------------- */
+  #content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+    z-index: 1;
+    position: relative;
+  
+    /* 🔑 Allow mouse clicks to pass through this container */
+    pointer-events: none;
+    transform: translateY(-10%);
+  }
+  
+  .hero-inner {
+    max-width: 600px;
+    padding: 1rem;
+  
+    /* 🔑 Enable pointer interaction *only* for the text and button */
+    pointer-events: auto;
+  }
+  
+  
+  
+  #content h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  #content p {
+    font-size: 1rem;
+    opacity: 0.85;
+  }
+  
+  /* -----------------------------------
+     Mobile First: Already Optimized
+  ----------------------------------- */
+  
+  /* -----------------------------------
+     Responsive Breakpoints (enhance for larger screens)
+  ----------------------------------- */
+  @media (min-width: 768px) {
+    #content h1 {
+      font-size: 3rem;
+    }
+  
+    #content p {
+      font-size: 1.2rem;
+    }
+  }
+  
+  @media (min-width: 1200px) {
+    #content {
+      padding: 4rem 2rem;
+    }
+  }
+  
+  /* -----------------------------------
+     Navigation Card Section
+  ----------------------------------- */
+  section.container {
+    z-index: 2;
+    position: relative;
+    background: none;
+    pointer-events: none; /* Let globe be clickable outside buttons */
+    margin-top: -200px; /* Pulls the card upward */
+  }
+  
+  .card {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #222; /* Ensure text stays white */
+    backdrop-filter: blur(10px); /* Glass blur effect */
+    -webkit-backdrop-filter: blur(10px); /* Safari support */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    border-radius: 1rem;
+    padding: 1rem 1rem;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+    transform: scale(1.05);
+    transform-origin: center;
+  }
+  
+  
+  .card h2 {
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 2rem;
+    pointer-events: auto;
+  }
+  
+  .card .btn {
+    padding: 0.6rem 1.2rem;
+    font-weight: 500;
+    border-radius: 2rem;
+    transition: all 0.2s ease-in-out;
+    min-width: 160px; /* Optional: for consistent button sizes */
+  }
+  
+  .card .btn:hover {
+    background-color: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+  }
+  
+  /* Transparent card base */
+  .card-bg-transparent {
+    background: none;
+    border: none;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    max-width: 800px;
+    margin: 0 auto;
+    transform: scale(1.05);
+  }
+  
+  /* Glass background layer */
+  .card-bg-layer {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.10);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 1rem;
+    z-index: 0;
+    box-shadow: 0 0 20px rgba(0, 153, 255, 0.5);
+    pointer-events: none;
+  }
+  
+  /* Foreground text and buttons */
+  .card-content {
+    position: relative;
+    z-index: 1;
+    color: #fff;
+    pointer-events: auto;
+  }
+  
+  /* Button adjustments */
+  .card-content .btn {
+    border-color: #ffffffaa;
+    color: #fff;
+    backdrop-filter: none;
+  }
+  
+  .card-content .btn:hover {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: white;
+  }
