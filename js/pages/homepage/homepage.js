@@ -1,79 +1,77 @@
-// homepage.js
-
+// main.js
 import Globe from 'globe.gl';
-import * as THREE from 'three';
+import { countryService } from '../../services/countryService';
 
-async function setupGlobe() {
+document.addEventListener('DOMContentLoaded', async () => {
+  const container = document.getElementById('globe-container');
+  const loading = document.getElementById('loading');
+  const tooltip = document.getElementById('tooltip');
+
+  if (!container) {
+    console.error('Globe container not found!');
+    return;
+  }
+
+  const world = Globe()(container)
+    .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-dark.jpg')
+    .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
+    .backgroundColor('rgba(0,0,0,0)')
+    .pointOfView({ lat: 0, lng: 0, altitude: 2.5 });
+
+  world.controls().autoRotate = true;
+  world.controls().autoRotateSpeed = 0.3;
+
   try {
-    const response = await fetch('https://restcountries.com/v3.1/all');
-    const countries = await response.json();
+    const countries = await countryService.getAllCountries();
 
-    const pointsData = countries
-      .filter(country => Array.isArray(country.latlng) && country.latlng.length === 2)
-      .map(country => ({
-        lat: country.latlng[0],
-        lng: country.latlng[1],
-        label: country.name.common,
-        baseSize: 0.001
+    const points = countries
+      .filter(c => Array.isArray(c.latlng) && c.latlng.length === 2)
+      .map(c => ({
+        name: c.name.common,
+        lat: c.latlng[0],
+        lng: c.latlng[1],
+        size: 0.0006,
+        population: c.population || 0,
+        label: c.name.common
+      }));
+      const labels = points.map(p => ({
+        lat: p.lat,
+        lng: p.lng,
+        text: p.name
       }));
 
-    const world = Globe()(document.getElementById('globeViz'))
-      .globeImageUrl('/earth-dark.jpg')
-      .globeMaterial(new THREE.MeshPhongMaterial({
-        color: 0x222222, // darker base tone
-        emissive: 0x000000,
-        specular: 0x111111,
-        shininess: 5
-      }))
-      .backgroundImageUrl('/night-sky.png')
-      .showAtmosphere(true)
-      .pointOfView({ lat: 20, lng: 0, altitude: 2.5 }, 0)
-      .pointsData(pointsData)
-      .pointAltitude(d => d.baseSize)
-      .pointColor(() => 'grey')
-      .pointLabel('label');
+    world
+      .pointsData(points)
+      .pointAltitude('size')
+      .pointRadius(0.2)
+      .pointColor(() => 'white')
+      .pointsMerge(true)
+      .pointLabel(p => p.name);
 
-    // Make sure controls are enabled
-    world.controls().enableZoom = true;
-    world.controls().enableRotate = true;
-    world.controls().autoRotate = true;
-    world.controls().autoRotateSpeed = 0.7;
+    console.log('Hover detection active');
 
-    // Add custom lights
-    const ambientLight = new THREE.AmbientLight(0xbbbbbb);
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
-    world.scene().add(ambientLight);
-    world.scene().add(directionalLight);
+    const tooltip = document.getElementById('tooltip');
 
-    // Add subtle pulse animation
-    setInterval(() => {
-      const time = Date.now() * 0.002;
-      pointsData.forEach(d => {
-        d.baseSize = 0.05 + 0.015 * Math.sin(time + d.lat);
-      });
-      world.pointAltitude(d => d.baseSize);
-    }, 50);
+    // Manual hover detection using raycasting
+    container.addEventListener('mousemove', (event) => {
+      const intersect = world.intersect(event);
 
-    // Optional: Hide loading spinner
-    const loadingContainer = document.getElementById('loading');
-    if (loadingContainer) {
-      loadingContainer.style.opacity = '0';
-      loadingContainer.style.transition = 'opacity 1s ease';
-      setTimeout(() => {
-        loadingContainer.style.display = 'none';
-      }, 1000);
+      if (intersect?.object?.__data) {
+        const point = intersect.object.__data;
+        tooltip.innerText = point.name;
+        tooltip.style.left = `${event.clientX + 10}px`;
+        tooltip.style.top = `${event.clientY + 10}px`;
+        tooltip.style.display = 'block';
+      } else {
+        tooltip.style.display = 'none';
+      }
+    });
+
+    if (loading) {
+      loading.style.display = 'none';
     }
   } catch (error) {
-    console.error('Error initializing globe:', error);
-    const loadingContainer = document.getElementById('loading');
-    if (loadingContainer) {
-      loadingContainer.innerHTML = '<h2 style="color: red;">Failed to load globe data.</h2>';
-    }
+    console.error('Failed to load country data:', error);
+    if (loading) loading.style.display = 'none';
   }
-}
-
-
-// Run setup on DOM ready
-window.addEventListener('DOMContentLoaded', setupGlobe);
-
-
+});

@@ -1,76 +1,118 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Country Data Visualizer - Explore and analyze global country statistics through interactive visualizations">
-    <title>Country Data Visualizer</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WORLDIn</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/pages/homepage.css" />
+
     <style>
-        /* Minimal styling for loading screen */
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #0d0d2a;
-            color: white;
-            text-align: center;
-        }
+      .loading-screen {
+        position: fixed;
+        z-index: 9999;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: #0d0d2a;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        transition: opacity 1s ease;
+      }
 
-        .loading-container {
-            padding: 20px;
-        }
+      .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-top: 20px;
+      }
 
-        h1 {
-            margin-bottom: 20px;
-            font-size: 2em;
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
         }
-
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #3498db;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
+        100% {
+          transform: rotate(360deg);
         }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .redirect-text {
-            font-size: 1.2em;
-            margin-top: 20px;
-        }
-
-        /* Reduced motion support */
-        @media (prefers-reduced-motion: reduce) {
-            .loading-spinner {
-                animation: none;
-            }
-        }
+      }
     </style>
-</head>
-<body>
-    <div class="loading-container">
-        <h1>Country Data Visualizer</h1>
-        <div class="loading-spinner"></div>
-        <p class="redirect-text">Loading application...</p>
+  </head>
+
+  <body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+      <h1>Loading Country Data Visualizer...</h1>
+      <div class="loading-spinner"></div>
     </div>
 
+    <div
+      id="globe-container"
+      class="bg-container"
+      style="background-image: url('./public/night-sky.png');"
+    >
+      <canvas id="globe-canvas"></canvas>
+    </div>
+
+    <!-- Page Content Over the Globe -->
+<main id="content" class="page-overlay">
+  <div class="hero-inner text-center text-white">
+    <h1 class="display-5 fw-bold">Country Data Visualizer</h1>
+    <p class="lead">Explore countries around the world interactively!</p>
+    <a href="#explore" class="btn btn-primary btn-lg mt-3">Start Exploring</a>
+  </div>
+</main>
+
+<section id="explore" class="container page-overlay">
+  <div class="card card-bg-transparent position-relative overflow-hidden glow-card">
+    <!-- Background glass layer -->
+    <div class="card-bg-layer"></div>
+
+    <!-- Foreground content -->
+    <div class="card-content position-relative text-center p-4 text-white">
+      <h2 class="h5 mb-4">Explore Data Options</h2>
+      <div class="d-flex flex-wrap justify-content-center gap-3">
+        <a href="/pages/random.html" class="btn btn-outline-light">Random Country</a>
+        <a href="/pages/selected.html" class="btn btn-outline-light">Selected Country</a>
+        <a href="/pages/world-data.html" class="btn btn-outline-light">World Overview</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+    <div id="globe-overlay" style="
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 1;
+      pointer-events: none;">
+</div>
+
+
+    <!-- JS to hide loading -->
     <script>
-        // Redirect to world data page after a short delay
-        window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                window.location.href = './pages/world-data.html';
-            }, 1000);
-        });
+      window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+          const loadingScreen = document.getElementById('loading-screen');
+          loadingScreen.style.opacity = '0';
+          setTimeout(() => (loadingScreen.style.display = 'none'), 1000);
+        }, 1000);
+      });
     </script>
-</body>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="./js/pages/homepage/homepage.js"></script>
+  </body>
 </html>
