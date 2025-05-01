@@ -1,0 +1,120 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: black;
+}
+
+/* Page wrapper background */
+#page-wrapper {
+  width: 100vw;
+  height: 100vh;
+  background-image: url('./night-sky.png');
+  background-size: cover;
+  background-position: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  overflow: visible; /* ✅ allows labels to show */
+}
+
+#globe-container {
+  position: fixed;  /* 👈 this keeps it in the background */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;       /* 👈 push globe behind everything */
+  background-size: cover;
+  background-position: center;
+  overflow: visible;
+}
+
+
+/* Loading screen */
+#loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 999;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-text {
+  color: white;
+  font-size: 1.2rem;
+  margin-top: 10px;
+}
+
+/* Globe label z-index */
+.globe-label {
+  z-index: 10000 !important;
+}
+
+.page-overlay {
+  position: relative;
+  z-index: 10; /* Above the globe */
+}
+
+.hero-inner {
+  position: relative;
+  padding-top: 15vh;
+  background: rgba(0, 0, 0, 0.4); /* semi-transparent for contrast */
+  padding: 4rem 1rem;
+  border-radius: 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+  margin-top: 25vh; /* Push down 25% of screen height */
+  text-align: center;
+}
+
+.card-bg-transparent {
+  background: rgba(33, 118, 139, 0.05);
+  border: 1px solid rgba(64, 122, 210, 0.15);
+  border-radius: 1rem;
+  backdrop-filter: blur(8px);
+}
+
+.card-bg-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: inherit;
+  backdrop-filter: inherit;
+  z-index: 0;
+  border-radius: inherit;
+}
+
+.card-content {
+  position: relative;
+  z-index: 1;
+}
+
+#explore {
+  margin-top: 100px; /* try values like 4rem, 6rem, or 100px */
+}
+
+.glow-card {
+  box-shadow: 0 0 20px rgba(0, 123, 255, 0.5); /* bluish glow */
+}
+
+.globe-tooltip {
+  z-index: 9999 !important;
+  font-size: 0.9rem;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+
