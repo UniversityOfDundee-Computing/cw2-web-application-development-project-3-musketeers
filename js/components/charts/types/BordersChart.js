@@ -193,65 +193,32 @@ export class BordersChart extends BaseChart {
         const chartType = this.options.type || 'bar';
         const isPieOrDoughnut = chartType === 'pie' || chartType === 'doughnut';
         
-        if (this.options.highlightContinents) {
-            // Create a color mapping for continents
-            const continentColors = {
-                'Africa': 'rgba(255, 206, 86, 0.7)',
-                'Asia': 'rgba(255, 99, 132, 0.7)',
-                'Europe': 'rgba(54, 162, 235, 0.7)',
-                'North America': 'rgba(75, 192, 192, 0.7)',
-                'South America': 'rgba(153, 102, 255, 0.7)',
-                'Oceania': 'rgba(255, 159, 64, 0.7)',
-                'Antarctica': 'rgba(199, 199, 199, 0.7)',
-                'Unknown': 'rgba(128, 128, 128, 0.7)'
-            };
+        // Default color scheme
+        if (isPieOrDoughnut) {
+            // For pie/doughnut charts, use a color array for better distinction
+            const pieColors = [
+                'rgba(54, 162, 235, 0.7)',
+                'rgba(255, 99, 132, 0.7)',
+                'rgba(255, 206, 86, 0.7)',
+                'rgba(75, 192, 192, 0.7)',
+                'rgba(153, 102, 255, 0.7)',
+                'rgba(255, 159, 64, 0.7)',
+                'rgba(201, 203, 207, 0.7)',
+                'rgba(100, 149, 237, 0.7)',
+                'rgba(50, 205, 50, 0.7)',
+                'rgba(255, 127, 80, 0.7)'
+            ];
             
-            // Map country colors based on their continent
-            backgroundColor = data.formatted.map(country => {
-                // Handle more general region names if continent not available
-                if (continentColors[country.continent]) {
-                    return continentColors[country.continent];
-                } 
-                
-                // Handle regions that contain continent names
-                for (const continent in continentColors) {
-                    if (country.continent.includes(continent)) {
-                        return continentColors[continent];
-                    }
-                }
-                
-                return continentColors['Unknown'];
+            backgroundColor = [];
+            borderColor = [];
+            data.formatted.forEach((_, idx) => {
+                const colorIndex = idx % pieColors.length;
+                backgroundColor.push(pieColors[colorIndex]);
+                borderColor.push(pieColors[colorIndex].replace('0.7', '1.0'));
             });
-            
-            borderColor = backgroundColor.map(color => color.replace('0.7', '1.0'));
         } else {
-            // Default color scheme
-            if (isPieOrDoughnut) {
-                // For pie/doughnut charts, use a color array for better distinction
-                const pieColors = [
-                    'rgba(54, 162, 235, 0.7)',
-                    'rgba(255, 99, 132, 0.7)',
-                    'rgba(255, 206, 86, 0.7)',
-                    'rgba(75, 192, 192, 0.7)',
-                    'rgba(153, 102, 255, 0.7)',
-                    'rgba(255, 159, 64, 0.7)',
-                    'rgba(201, 203, 207, 0.7)',
-                    'rgba(100, 149, 237, 0.7)',
-                    'rgba(50, 205, 50, 0.7)',
-                    'rgba(255, 127, 80, 0.7)'
-                ];
-                
-                backgroundColor = [];
-                borderColor = [];
-                data.formatted.forEach((_, idx) => {
-                    const colorIndex = idx % pieColors.length;
-                    backgroundColor.push(pieColors[colorIndex]);
-                    borderColor.push(pieColors[colorIndex].replace('0.7', '1.0'));
-                });
-            } else {
-                backgroundColor = hexToRgba(COLORS.primaryLight, 0.75);
-                borderColor = hexToRgba(COLORS.primary, 1);
-            }
+            backgroundColor = hexToRgba(COLORS.primaryLight, 0.75);
+            borderColor = hexToRgba(COLORS.primary, 1);
         }
         
         const chartConfig = {
@@ -283,7 +250,7 @@ export class BordersChart extends BaseChart {
                         padding: {bottom: 24}
                     },
                     legend: {
-                        display: this.options.highlightContinents || isPieOrDoughnut,
+                        display: isPieOrDoughnut,
                         position: isPieOrDoughnut && data.labels.length <= 7 ? 'right' : 'bottom',
                         labels: {
                             color: COLORS.textSecondary,
@@ -459,39 +426,6 @@ export class BordersChart extends BaseChart {
             }
         }
         
-        // Add legend if using continental highlighting
-        if (this.options.highlightContinents) {
-            // Create custom legend using continent colors
-            const continentLabels = ['Africa', 'Asia', 'Europe', 'North America', 'South America', 'Oceania', 'Antarctica'];
-            
-            chartConfig.options.plugins.legend = {
-                display: true,
-                position: data.labels.length > 10 ? 'bottom' : 'right',
-                labels: {
-                    generateLabels: () => {
-                        return continentLabels.map(label => {
-                            const color = {
-                                'Africa': 'rgba(255, 206, 86, 0.7)',
-                                'Asia': 'rgba(255, 99, 132, 0.7)',
-                                'Europe': 'rgba(54, 162, 235, 0.7)',
-                                'North America': 'rgba(75, 192, 192, 0.7)',
-                                'South America': 'rgba(153, 102, 255, 0.7)',
-                                'Oceania': 'rgba(255, 159, 64, 0.7)',
-                                'Antarctica': 'rgba(199, 199, 199, 0.7)'
-                            }[label];
-                            
-                            return {
-                                text: label,
-                                fillStyle: color,
-                                strokeStyle: color.replace('0.7', '1.0'),
-                                lineWidth: 1,
-                                fontSize: data.labels.length > 15 ? 8 : 12
-                            };
-                        });
-                    }
-                }
-            };
-        }
         
         return chartConfig;
     }
@@ -555,36 +489,6 @@ export class BordersChart extends BaseChart {
         rangeGroup.appendChild(rangeSelect);
         leftControls.appendChild(rangeGroup);
         
-        // 2. Add continental highlight toggle with improved styling
-        const continentGroup = document.createElement('div');
-        continentGroup.className = 'form-group mb-0 ms-3'; // Add left margin for spacing
-        continentGroup.style.display = 'flex';
-        continentGroup.style.alignItems = 'center';
-        
-        const continentCheck = document.createElement('div');
-        continentCheck.className = 'form-check form-switch mb-0'; // Remove bottom margin
-        
-        const continentInput = document.createElement('input');
-        continentInput.className = 'form-check-input';
-        continentInput.type = 'checkbox';
-        continentInput.id = `${this.containerId}-continent-toggle`;
-        continentInput.setAttribute('role', 'switch');
-        continentInput.checked = this.options.highlightContinents || false;
-        
-        const continentLabel = document.createElement('label');
-        continentLabel.className = 'form-check-label ms-2 mb-0'; // Remove bottom margin
-        continentLabel.htmlFor = `${this.containerId}-continent-toggle`;
-        continentLabel.textContent = 'Color by Continent';
-        
-        continentInput.addEventListener('change', (e) => {
-            e.stopPropagation();
-            this.toggleContinentalHighlighting(e.target.checked);
-        });
-        
-        continentCheck.appendChild(continentInput);
-        continentCheck.appendChild(continentLabel);
-        continentGroup.appendChild(continentCheck);
-        leftControls.appendChild(continentGroup);
     }
 
     /**
@@ -663,60 +567,6 @@ export class BordersChart extends BaseChart {
         }
     }
 
-    /**
-     * Toggle coloring chart bars by continent
-     * @param {boolean} highlight - Whether to color by continent
-     */
-    async toggleContinentalHighlighting(highlight) {
-        console.log(`[${this.containerId}] Toggling continental highlighting: ${highlight}`);
-        
-        // Show loading overlay
-        this.showLoading();
-        
-        try {
-            // Clean up existing chart before updating
-            this.cleanupExistingChart();
-            
-            // Store highlighting option
-            this.options.highlightContinents = highlight;
-            
-            // Update title to reflect continental highlighting
-            let currentTitle = this.options.title || 'Border Count by Country';
-            currentTitle = currentTitle.replace(' (By Continent)', '');
-            
-            if (highlight) {
-                this.options.title = `${currentTitle} (By Continent)`;
-            } else {
-                this.options.title = currentTitle;
-            }
-            
-            // Create new chart configuration
-            const chartConfig = this.createChartConfig(this.processedData);
-            
-            // Generate chart URL
-            const chartUrl = chartService.createChartUrl(chartConfig);
-            
-            // Update the chart
-            chartUtils.displayChart(
-                this.containerId,
-                chartUrl,
-                this.options.title
-            );
-            
-            // Generate descriptions that accurately reflect the current highlighting state
-            const descriptions = this.generateBordersDescriptions(this.processedData);
-            this.updateChartDescriptions(descriptions);
-            
-            // Update the chart title in the DOM
-            const titleElement = this.container.querySelector('.chart-title');
-            if (titleElement) {
-                titleElement.textContent = this.options.title;
-            }
-        } catch (error) {
-            console.error(`[${this.containerId}] Error toggling continental highlighting:`, error);
-            this.showError(`Failed to toggle continental highlighting: ${error.message}`);
-        }
-    }
 
     /**
      * Toggle between border count and border density
@@ -903,7 +753,6 @@ export class BordersChart extends BaseChart {
      */
     generateBordersDescriptions(data) {
         const borderRange = this.options.borderRange || 'all';
-        const highlightContinents = this.options.highlightContinents || false;
         const totalItems = data.labels ? data.labels.length : 0;
         const totalAvailable = data.totalCount || totalItems;
         const sortOrder = this.options.sort || 'desc';
@@ -1021,57 +870,6 @@ export class BordersChart extends BaseChart {
             }
         }
         
-        // Continental highlight specific insights
-        if (highlightContinents && data.formatted && data.formatted.length > 2) {
-            // Group by continent
-            const continentBorders = {};
-            const continentCounts = {};
-            data.formatted.forEach(country => {
-                if (!continentBorders[country.continent]) {
-                    continentBorders[country.continent] = [];
-                    continentCounts[country.continent] = 0;
-                }
-                continentBorders[country.continent].push(country.borderCount);
-                continentCounts[country.continent]++;
-            });
-            
-            // Find continent with highest average borders and most representation
-            let maxAvg = 0;
-            let maxContinent = '';
-            let minAvg = Infinity;
-            let minContinent = '';
-            let mostRepresented = '';
-            let mostRepCount = 0;
-            
-            for (const continent in continentBorders) {
-                if (continentBorders[continent].length > 0) {
-                    const avg = continentBorders[continent].reduce((sum, val) => sum + val, 0) / continentBorders[continent].length;
-                    if (avg > maxAvg) {
-                        maxAvg = avg;
-                        maxContinent = continent;
-                    }
-                    if (avg < minAvg) {
-                        minAvg = avg;
-                        minContinent = continent;
-                    }
-                    
-                    if (continentCounts[continent] > mostRepCount) {
-                        mostRepresented = continent;
-                        mostRepCount = continentCounts[continent];
-                    }
-                }
-            }
-            
-            // Add insights about continental patterns
-            if (maxContinent && minContinent && maxContinent !== minContinent) {
-                insights.push(`${maxContinent} countries tend to have more borders (avg. ${maxAvg.toFixed(1)}) than ${minContinent} (avg. ${minAvg.toFixed(1)}), reflecting different continental geography.`);
-            } 
-            
-            if (mostRepresented && mostRepCount > 1 && Object.keys(continentCounts).length > 1) {
-                const percentage = Math.round((mostRepCount / totalItems) * 100);
-                insights.push(`${percentage}% of countries in this view are from ${mostRepresented}, making it the most represented continent in the current display.`);
-            }
-        }
         
         // Sort-specific insights
         if (sortOrder === 'alphabetical') {
@@ -1092,7 +890,6 @@ export class BordersChart extends BaseChart {
         
         // Build short and detailed descriptions
         let shortDesc = `This ${chartTypeDesc} shows ${contextDesc}`;
-        if (highlightContinents) shortDesc += ', color-coded by continent';
         if (sortOrder === 'asc') shortDesc += ', sorted from fewest to most';
         if (sortOrder === 'desc') shortDesc += ', sorted from most to fewest';
         if (sortOrder === 'alphabetical') shortDesc += ', in alphabetical order';
@@ -1106,9 +903,6 @@ export class BordersChart extends BaseChart {
             if (sortOrder === 'desc' && topBorders > 0) detailedDesc += `, the most in this dataset`;
             if (sortOrder === 'asc' && (borderRange !== 'no-borders' || data.formatted.length > 1)) detailedDesc += `, the fewest in this dataset`;
             detailedDesc += '.';
-        }
-        if (highlightContinents) {
-            detailedDesc += ' Countries are color-coded by their continental location.';
         }
         
         let analysisDesc;
