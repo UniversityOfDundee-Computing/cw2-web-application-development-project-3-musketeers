@@ -254,33 +254,7 @@ export class IndependenceChart extends BaseChart {
             }
         }
         
-        // Add a visualization style toggle
-        const displayGroup = document.createElement('div');
-        displayGroup.className = 'form-group me-2 mb-2';
-        
-        const displayCheck = document.createElement('div');
-        displayCheck.className = 'form-check form-switch';
-        
-        const displayInput = document.createElement('input');
-        displayInput.className = 'form-check-input';
-        displayInput.type = 'checkbox';
-        displayInput.id = `${this.containerId}-show-examples`;
-        displayInput.setAttribute('role', 'switch');
-        displayInput.checked = this.options.showExamples || false;
-        
-        const displayLabel = document.createElement('label');
-        displayLabel.className = 'form-check-label ms-2';
-        displayLabel.htmlFor = `${this.containerId}-show-examples`;
-        displayLabel.textContent = 'Show Country Examples';
-        
-        displayInput.addEventListener('change', (e) => {
-            this.toggleExampleDisplay(e.target.checked);
-        });
-        
-        displayCheck.appendChild(displayInput);
-        displayCheck.appendChild(displayLabel);
-        displayGroup.appendChild(displayCheck);
-        this.chartControls.appendChild(displayGroup);
+        // Example toggle removed
     }
 
     /**

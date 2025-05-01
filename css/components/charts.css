@@ -640,14 +640,16 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 1rem;
+    justify-content: space-between;
+    gap: 0.75rem;
+    border-bottom: 1px solid #eee;
 }
 
 .chart-controls .form-group {
     display: flex;
     align-items: center;
-    margin-right: 1rem;
-    margin-bottom: 0.5rem;
+    margin-right: 0.75rem;
+    margin-bottom: 0;
 }
 
 .chart-controls label {
@@ -656,10 +658,12 @@
     color: #495057;
     margin-right: 0.5rem;
     white-space: nowrap;
+    min-width: 80px;
+    margin-bottom: 0;
 }
 
 .chart-controls .form-select {
-    min-width: 120px;
+    width: 130px;
     font-size: 0.875rem;
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
@@ -670,6 +674,60 @@
 .chart-controls .form-select:focus {
     box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
     border-color: #86b7fe;
+}
+
+/* Download button styling */
+.chart-controls .btn {
+    white-space: nowrap;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+}
+
+.chart-controls .btn-primary {
+    background: linear-gradient(135deg, var(--primary-light, #4da3ff), var(--primary-dark, #005bb5));
+    border: none;
+    color: white;
+}
+
+.chart-controls .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    background: linear-gradient(135deg, var(--primary-dark, #005bb5), var(--primary-light, #4da3ff));
+}
+
+/* Responsive adjustments for chart controls */
+@media (max-width: 768px) {
+    .chart-controls {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0.75rem 1rem;
+    }
+    
+    .chart-controls .form-group {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 0.5rem;
+        justify-content: space-between;
+    }
+    
+    .chart-controls label {
+        min-width: 70px;
+    }
+    
+    .chart-controls .form-select {
+        flex-grow: 1;
+        width: auto;
+    }
+    
+    .chart-controls .btn {
+        align-self: flex-start;
+        width: 100%;
+        margin-top: 0.5rem;
+    }
 }
 
 /* Chart title spacing improvement */

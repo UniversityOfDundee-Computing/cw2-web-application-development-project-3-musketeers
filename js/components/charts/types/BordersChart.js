@@ -505,17 +505,23 @@ export class BordersChart extends BaseChart {
         
         if (!this.chartControls) return;
         
-        // 1. Add border count range selector
+        // Find the left controls container (created in BaseChart)
+        const leftControls = this.chartControls.querySelector('div:first-child');
+        if (!leftControls) return;
+        
+        // 1. Add border count range selector with consistent styling
         const rangeGroup = document.createElement('div');
-        rangeGroup.className = 'form-group me-2 mb-2';
+        rangeGroup.className = 'form-group mb-0'; // Remove bottom margin for consistent alignment
         
         const rangeLabel = document.createElement('label');
-        rangeLabel.className = 'me-2 fw-bold';
+        rangeLabel.className = 'me-2 fw-bold mb-0'; // Remove bottom margin for vertical alignment
+        rangeLabel.style.minWidth = '80px'; // Ensure consistent label width
         rangeLabel.textContent = 'Border Count:';
         rangeGroup.appendChild(rangeLabel);
         
         const rangeSelect = document.createElement('select');
         rangeSelect.className = 'form-select form-select-sm border-range-select';
+        rangeSelect.style.width = '130px'; // Fixed width for consistency
         rangeSelect.setAttribute('aria-label', 'Select border count range');
         
         const rangeOptions = [
@@ -536,19 +542,27 @@ export class BordersChart extends BaseChart {
             rangeSelect.appendChild(optionEl);
         });
         
+        rangeSelect.addEventListener('click', (e) => {
+            e.stopPropagation(); // Stop click from bubbling up
+        });
+        
         rangeSelect.addEventListener('change', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             this.changeBorderRange(e.target.value);
         });
         
         rangeGroup.appendChild(rangeSelect);
-        this.chartControls.appendChild(rangeGroup);
+        leftControls.appendChild(rangeGroup);
         
-        // 2. Add continental highlight toggle
+        // 2. Add continental highlight toggle with improved styling
         const continentGroup = document.createElement('div');
-        continentGroup.className = 'form-group me-2 mb-2';
+        continentGroup.className = 'form-group mb-0 ms-3'; // Add left margin for spacing
+        continentGroup.style.display = 'flex';
+        continentGroup.style.alignItems = 'center';
         
         const continentCheck = document.createElement('div');
-        continentCheck.className = 'form-check form-switch';
+        continentCheck.className = 'form-check form-switch mb-0'; // Remove bottom margin
         
         const continentInput = document.createElement('input');
         continentInput.className = 'form-check-input';
@@ -558,20 +572,19 @@ export class BordersChart extends BaseChart {
         continentInput.checked = this.options.highlightContinents || false;
         
         const continentLabel = document.createElement('label');
-        continentLabel.className = 'form-check-label ms-2';
+        continentLabel.className = 'form-check-label ms-2 mb-0'; // Remove bottom margin
         continentLabel.htmlFor = `${this.containerId}-continent-toggle`;
         continentLabel.textContent = 'Color by Continent';
         
         continentInput.addEventListener('change', (e) => {
+            e.stopPropagation();
             this.toggleContinentalHighlighting(e.target.checked);
         });
         
         continentCheck.appendChild(continentInput);
         continentCheck.appendChild(continentLabel);
         continentGroup.appendChild(continentCheck);
-        this.chartControls.appendChild(continentGroup);
-        
-        // Border density toggle removed
+        leftControls.appendChild(continentGroup);
     }
 
     /**

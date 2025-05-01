@@ -375,17 +375,23 @@ export class CurrencyChart extends BaseChart {
         
         if (!this.chartControls) return;
         
-        // Add a currency type selector
+        // Find the left controls container (created in BaseChart)
+        const leftControls = this.chartControls.querySelector('div:first-child');
+        if (!leftControls) return;
+        
+        // Add a currency type selector with consistent styling
         const typeGroup = document.createElement('div');
-        typeGroup.className = 'form-group me-2 mb-2';
+        typeGroup.className = 'form-group mb-0'; // Remove bottom margin for consistent alignment
         
         const typeLabel = document.createElement('label');
-        typeLabel.className = 'me-2 fw-bold';
+        typeLabel.className = 'me-2 fw-bold mb-0'; // Remove bottom margin for vertical alignment
+        typeLabel.style.minWidth = '80px'; // Ensure consistent label width
         typeLabel.textContent = 'View:';
         typeGroup.appendChild(typeLabel);
         
         const typeSelect = document.createElement('select');
         typeSelect.className = 'form-select form-select-sm currency-type-select';
+        typeSelect.style.width = '130px'; // Fixed width for consistency
         typeSelect.setAttribute('aria-label', 'Select currency view');
         
         const typeOptions = [
@@ -404,24 +410,32 @@ export class CurrencyChart extends BaseChart {
             typeSelect.appendChild(optionEl);
         });
         
+        typeSelect.addEventListener('click', (e) => {
+            e.stopPropagation(); // Stop click from bubbling up
+        });
+        
         typeSelect.addEventListener('change', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             this.changeCurrencyView(e.target.value);
         });
         
         typeGroup.appendChild(typeSelect);
-        this.chartControls.appendChild(typeGroup);
+        leftControls.appendChild(typeGroup);
         
-        // Add a region filter
+        // Add a region filter with consistent styling
         const regionGroup = document.createElement('div');
-        regionGroup.className = 'form-group me-2 mb-2';
+        regionGroup.className = 'form-group mb-0 ms-3'; // Add left margin for spacing
         
         const regionLabel = document.createElement('label');
-        regionLabel.className = 'me-2 fw-bold';
+        regionLabel.className = 'me-2 fw-bold mb-0'; // Remove bottom margin for vertical alignment
+        regionLabel.style.minWidth = '60px'; // Slightly narrower since "Region" is shorter
         regionLabel.textContent = 'Region:';
         regionGroup.appendChild(regionLabel);
         
         const regionSelect = document.createElement('select');
         regionSelect.className = 'form-select form-select-sm region-filter-select';
+        regionSelect.style.width = '130px'; // Fixed width for consistency
         regionSelect.setAttribute('aria-label', 'Filter by region');
         
         // Add options dynamically from available regions
@@ -444,18 +458,49 @@ export class CurrencyChart extends BaseChart {
             regionSelect.appendChild(optionEl);
         });
         
+        regionSelect.addEventListener('click', (e) => {
+            e.stopPropagation(); // Stop click from bubbling up
+        });
+        
         regionSelect.addEventListener('change', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             this.filterByRegion(e.target.value);
         });
         
         regionGroup.appendChild(regionSelect);
-        this.chartControls.appendChild(regionGroup);
+        leftControls.appendChild(regionGroup);
         
-        // Change the default "Show:" label to be more specific
-        const limitLabel = this.chartControls.querySelector('.form-group:nth-child(2) label');
-        if (limitLabel) {
-            limitLabel.textContent = 'Top Currencies:';
-        }
+        // Add symbol toggle with improved styling
+        const symbolGroup = document.createElement('div');
+        symbolGroup.className = 'form-group mb-0 ms-3'; // Add left margin for spacing
+        symbolGroup.style.display = 'flex';
+        symbolGroup.style.alignItems = 'center';
+        
+        const symbolCheck = document.createElement('div');
+        symbolCheck.className = 'form-check form-switch mb-0'; // Remove bottom margin
+        
+        const symbolInput = document.createElement('input');
+        symbolInput.className = 'form-check-input';
+        symbolInput.type = 'checkbox';
+        symbolInput.id = `${this.containerId}-symbol-toggle`;
+        symbolInput.setAttribute('role', 'switch');
+        symbolInput.checked = this.options.showSymbols || false;
+        
+        const symbolLabel = document.createElement('label');
+        symbolLabel.className = 'form-check-label ms-2 mb-0'; // Remove bottom margin
+        symbolLabel.htmlFor = `${this.containerId}-symbol-toggle`;
+        symbolLabel.textContent = 'Show Symbols';
+        
+        symbolInput.addEventListener('change', (e) => {
+            e.stopPropagation();
+            this.toggleSymbols(e.target.checked);
+        });
+        
+        symbolCheck.appendChild(symbolInput);
+        symbolCheck.appendChild(symbolLabel);
+        symbolGroup.appendChild(symbolCheck);
+        leftControls.appendChild(symbolGroup);
     }
 
     /**

@@ -408,12 +408,23 @@ export class PopulationChart extends BaseChart {
         
         if (!this.chartControls) return;
         
-        // 1. Add population filter dropdown
+        // Find the left controls container (created in BaseChart)
+        const leftControls = this.chartControls.querySelector('div:first-child');
+        if (!leftControls) return;
+        
+        // Add population filter dropdown with consistent styling
         const filterGroup = document.createElement('div');
-        filterGroup.className = 'form-group me-2 mb-2';
+        filterGroup.className = 'form-group mb-0'; // Remove bottom margin for consistent alignment
+        
+        const filterLabel = document.createElement('label');
+        filterLabel.className = 'me-2 fw-bold mb-0'; // Remove bottom margin for vertical alignment
+        filterLabel.style.minWidth = '80px'; // Ensure consistent label width
+        filterLabel.textContent = 'Countries:';
+        filterGroup.appendChild(filterLabel);
         
         const filterSelect = document.createElement('select');
         filterSelect.className = 'form-select form-select-sm population-filter-select';
+        filterSelect.style.width = '170px'; // Wider for longer text options
         filterSelect.setAttribute('aria-label', 'Filter population data');
         
         const filterOptions = [
@@ -432,19 +443,27 @@ export class PopulationChart extends BaseChart {
             filterSelect.appendChild(optionEl);
         });
         
+        filterSelect.addEventListener('click', (e) => {
+            e.stopPropagation(); // Stop click from bubbling up
+        });
+        
         filterSelect.addEventListener('change', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             this.filterPopulation(e.target.value);
         });
         
         filterGroup.appendChild(filterSelect);
-        this.chartControls.appendChild(filterGroup);
+        leftControls.appendChild(filterGroup);
         
-        // 2. Add density toggle switch
+        // Add density toggle switch with consistent styling
         const densityGroup = document.createElement('div');
-        densityGroup.className = 'form-group me-2 mb-2';
+        densityGroup.className = 'form-group mb-0 ms-3'; // Add left margin for spacing
+        densityGroup.style.display = 'flex';
+        densityGroup.style.alignItems = 'center';
         
         const densityCheck = document.createElement('div');
-        densityCheck.className = 'form-check form-switch';
+        densityCheck.className = 'form-check form-switch mb-0'; // Remove bottom margin
         
         const densityInput = document.createElement('input');
         densityInput.className = 'form-check-input';
@@ -454,18 +473,19 @@ export class PopulationChart extends BaseChart {
         densityInput.checked = this.options.showDensity || false;
         
         const densityLabel = document.createElement('label');
-        densityLabel.className = 'form-check-label ms-2';
+        densityLabel.className = 'form-check-label ms-2 mb-0'; // Remove bottom margin
         densityLabel.htmlFor = `${this.containerId}-density-toggle`;
         densityLabel.textContent = 'Show Density';
         
         densityInput.addEventListener('change', (e) => {
+            e.stopPropagation();
             this.toggleDensity(e.target.checked);
         });
         
         densityCheck.appendChild(densityInput);
         densityCheck.appendChild(densityLabel);
         densityGroup.appendChild(densityCheck);
-        this.chartControls.appendChild(densityGroup);
+        leftControls.appendChild(densityGroup);
     }
 
     /**
