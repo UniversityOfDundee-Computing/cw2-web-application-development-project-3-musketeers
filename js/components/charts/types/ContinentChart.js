@@ -387,12 +387,23 @@ export class ContinentChart extends BaseChart {
         
         if (!this.chartControls) return;
         
-        // 1. Add a continent-specific view toggle for population vs area
+        // Find the left controls container (created in BaseChart)
+        const leftControls = this.chartControls.querySelector('div:first-child');
+        if (!leftControls) return;
+        
+        // Add a continent-specific view toggle for population vs area with consistent styling
         const viewGroup = document.createElement('div');
-        viewGroup.className = 'form-group me-2 mb-2';
+        viewGroup.className = 'form-group mb-0'; // Remove bottom margin for consistent alignment
+        
+        const viewLabel = document.createElement('label');
+        viewLabel.className = 'me-2 fw-bold mb-0'; // Remove bottom margin for vertical alignment
+        viewLabel.style.minWidth = '80px'; // Ensure consistent label width
+        viewLabel.textContent = 'Data View:';
+        viewGroup.appendChild(viewLabel);
         
         const viewSelect = document.createElement('select');
         viewSelect.className = 'form-select form-select-sm continent-view-select';
+        viewSelect.style.width = '130px'; // Fixed width for consistency
         viewSelect.setAttribute('aria-label', 'Select data view');
         
         const viewOptions = [
@@ -411,40 +422,49 @@ export class ContinentChart extends BaseChart {
             viewSelect.appendChild(optionEl);
         });
         
+        viewSelect.addEventListener('click', (e) => {
+            e.stopPropagation(); // Stop click from bubbling up
+        });
+        
         viewSelect.addEventListener('change', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             this.changeDataView(e.target.value);
         });
         
         viewGroup.appendChild(viewSelect);
-        this.chartControls.appendChild(viewGroup);
+        leftControls.appendChild(viewGroup);
         
-        // 2. Add percentage/absolute toggle
-        const displayGroup = document.createElement('div');
-        displayGroup.className = 'form-group me-2 mb-2';
+        // Add percentage toggle with improved styling
+        const percentageGroup = document.createElement('div');
+        percentageGroup.className = 'form-group mb-0 ms-3'; // Add left margin for spacing
+        percentageGroup.style.display = 'flex';
+        percentageGroup.style.alignItems = 'center';
         
-        const displayCheck = document.createElement('div');
-        displayCheck.className = 'form-check form-switch';
+        const percentageCheck = document.createElement('div');
+        percentageCheck.className = 'form-check form-switch mb-0'; // Remove bottom margin
         
-        const displayInput = document.createElement('input');
-        displayInput.className = 'form-check-input';
-        displayInput.type = 'checkbox';
-        displayInput.id = `${this.containerId}-percentage-toggle`;
-        displayInput.setAttribute('role', 'switch');
-        displayInput.checked = this.options.showPercentage || false;
+        const percentageInput = document.createElement('input');
+        percentageInput.className = 'form-check-input';
+        percentageInput.type = 'checkbox';
+        percentageInput.id = `${this.containerId}-percentage-toggle`;
+        percentageInput.setAttribute('role', 'switch');
+        percentageInput.checked = this.options.showPercentage || false;
         
-        const displayLabel = document.createElement('label');
-        displayLabel.className = 'form-check-label ms-2';
-        displayLabel.htmlFor = `${this.containerId}-percentage-toggle`;
-        displayLabel.textContent = 'Show Percentages';
+        const percentageLabel = document.createElement('label');
+        percentageLabel.className = 'form-check-label ms-2 mb-0'; // Remove bottom margin
+        percentageLabel.htmlFor = `${this.containerId}-percentage-toggle`;
+        percentageLabel.textContent = 'Show Percentages';
         
-        displayInput.addEventListener('change', (e) => {
+        percentageInput.addEventListener('change', (e) => {
+            e.stopPropagation();
             this.togglePercentageView(e.target.checked);
         });
         
-        displayCheck.appendChild(displayInput);
-        displayCheck.appendChild(displayLabel);
-        displayGroup.appendChild(displayCheck);
-        this.chartControls.appendChild(displayGroup);
+        percentageCheck.appendChild(percentageInput);
+        percentageCheck.appendChild(percentageLabel);
+        percentageGroup.appendChild(percentageCheck);
+        leftControls.appendChild(percentageGroup);
     }
 
     /**

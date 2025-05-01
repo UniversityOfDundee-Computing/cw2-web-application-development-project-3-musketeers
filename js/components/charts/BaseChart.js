@@ -195,19 +195,34 @@ export class BaseChart {
         if (!this.chartControls) {
             // Create controls container
             this.chartControls = document.createElement('div');
-            this.chartControls.className = 'chart-controls d-flex flex-wrap align-items-center justify-content-between mb-3 p-2 bg-light rounded';
+            this.chartControls.className = 'chart-controls d-flex flex-wrap align-items-center justify-content-between mb-3 p-3 bg-light rounded';
+            this.chartControls.style.borderBottom = '1px solid #eee';
+            this.chartControls.style.gap = '0.5rem'; // Ensure consistent spacing between wrapped elements
+            this.chartControls.style.position = 'relative'; // Make it a positioning context
             
-            // Create chart type selector
+            // Add a click event listener to the controls container to stop propagation
+            this.chartControls.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+            
+            // Create left-side controls container for chart type & sort options
+            const leftControls = document.createElement('div');
+            leftControls.className = 'd-flex flex-wrap align-items-center';
+            leftControls.style.gap = '1rem'; // Consistent spacing between controls
+            
+            // Create chart type selector group with consistent styling
             const chartTypeGroup = document.createElement('div');
-            chartTypeGroup.className = 'form-group me-2 mb-2';
+            chartTypeGroup.className = 'form-group mb-0'; // Remove bottom margin for consistent alignment
             
             const chartTypeLabel = document.createElement('label');
-            chartTypeLabel.className = 'me-2 fw-bold';
+            chartTypeLabel.className = 'me-2 fw-bold mb-0'; // Remove bottom margin for vertical alignment
+            chartTypeLabel.style.minWidth = '80px'; // Ensure consistent label width
             chartTypeLabel.textContent = 'Chart Type:';
             chartTypeGroup.appendChild(chartTypeLabel);
             
             const chartTypeSelect = document.createElement('select');
             chartTypeSelect.className = 'form-select form-select-sm chart-type-select';
+            chartTypeSelect.style.width = '130px'; // Fixed width for consistency
             chartTypeSelect.setAttribute('aria-label', 'Select chart type');
             
             // Make sure we're using the current chart type
@@ -226,56 +241,32 @@ export class BaseChart {
                 chartTypeSelect.appendChild(option);
             });
             
+            chartTypeSelect.addEventListener('click', (e) => {
+                e.stopPropagation(); // Stop click from bubbling up
+            });
+            
             chartTypeSelect.addEventListener('change', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 this.changeChartType(e.target.value);
             });
             
             chartTypeGroup.appendChild(chartTypeSelect);
-            this.chartControls.appendChild(chartTypeGroup);
+            leftControls.appendChild(chartTypeGroup);
             
-            // Create data limit selector
-            /*
-            const limitGroup = document.createElement('div');
-            limitGroup.className = 'form-group me-2 mb-2';
-            
-            const limitLabel = document.createElement('label');
-            limitLabel.className = 'me-2 fw-bold';
-            limitLabel.textContent = 'Show:';
-            limitGroup.appendChild(limitLabel);
-            
-            const limitSelect = document.createElement('select');
-            limitSelect.className = 'form-select form-select-sm data-limit-select';
-            limitSelect.setAttribute('aria-label', 'Select number of items to display');
-            
-            [5, 10, 15, 20].forEach(limit => {
-                const option = document.createElement('option');
-                option.value = limit;
-                option.textContent = `${limit} items`;
-                if (limit === (this.options.limit || 5)) {
-                    option.selected = true;
-                }
-                limitSelect.appendChild(option);
-            });
-            
-            limitSelect.addEventListener('change', (e) => {
-                this.changeDataLimit(parseInt(e.target.value, 10));
-            });
-            
-            limitGroup.appendChild(limitSelect);
-            this.chartControls.appendChild(limitGroup);
-            */
-            
-            // Create sort order selector
+            // Create sort order selector with matching styling
             const sortGroup = document.createElement('div');
-            sortGroup.className = 'form-group mb-2';
+            sortGroup.className = 'form-group mb-0'; // Remove bottom margin for consistent alignment
             
             const sortLabel = document.createElement('label');
-            sortLabel.className = 'me-2 fw-bold';
+            sortLabel.className = 'me-2 fw-bold mb-0'; // Remove bottom margin for vertical alignment
+            sortLabel.style.minWidth = '60px'; // Ensure consistent label width
             sortLabel.textContent = 'Sort:';
             sortGroup.appendChild(sortLabel);
             
             const sortSelect = document.createElement('select');
             sortSelect.className = 'form-select form-select-sm sort-select';
+            sortSelect.style.width = '130px'; // Fixed width for consistency
             sortSelect.setAttribute('aria-label', 'Select sort order');
             
             const sortOptions = [
@@ -293,12 +284,77 @@ export class BaseChart {
                 sortSelect.appendChild(optionEl);
             });
             
+            sortSelect.addEventListener('click', (e) => {
+                e.stopPropagation(); // Stop click from bubbling up
+            });
+            
             sortSelect.addEventListener('change', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 this.changeSortOrder(e.target.value);
             });
             
             sortGroup.appendChild(sortSelect);
-            this.chartControls.appendChild(sortGroup);
+            leftControls.appendChild(sortGroup);
+            
+            // Add the left controls to the main control container
+            this.chartControls.appendChild(leftControls);
+            
+            // Create download button container positioned at bottom right
+            const downloadContainer = document.createElement('div');
+            downloadContainer.className = 'download-container';
+            downloadContainer.style.position = 'absolute';
+            downloadContainer.style.bottom = '8px';
+            downloadContainer.style.right = '8px';
+            downloadContainer.style.zIndex = '10';
+            
+            // Create download button for chart image with styling matching the "Surprise Me" button
+            const downloadButton = document.createElement('button');
+            downloadButton.className = 'btn btn-sm btn-primary download-btn';
+            downloadButton.innerHTML = '<i class="bi bi-download me-1"></i> Download Chart';
+            downloadButton.title = 'Download chart as image';
+            downloadButton.setAttribute('aria-label', 'Download chart image');
+
+            // Apply "Surprise Me" button styling from header.css with size adjustments
+            downloadButton.style.background = 'linear-gradient(135deg, var(--primary-light, #4da3ff), var(--primary-dark, #005bb5))';
+            downloadButton.style.border = 'none';
+            downloadButton.style.fontWeight = '500';
+            downloadButton.style.padding = '0.5rem 1rem';
+            downloadButton.style.borderRadius = '6px';
+            downloadButton.style.boxShadow = 'var(--shadow-sm)';
+            downloadButton.style.transition = 'all 0.3s ease';
+            downloadButton.style.color = 'white';
+            downloadButton.style.fontSize = '0.85rem';
+            downloadButton.style.whiteSpace = 'nowrap'; // Prevent text wrapping
+            
+            // Add hover effects
+            downloadButton.addEventListener('mouseover', () => {
+                downloadButton.style.transform = 'translateY(-2px)';
+                downloadButton.style.boxShadow = 'var(--shadow-md)';
+                downloadButton.style.background = 'linear-gradient(135deg, var(--primary-dark, #005bb5), var(--primary-light, #4da3ff))';
+            });
+            
+            downloadButton.addEventListener('mouseout', () => {
+                downloadButton.style.transform = '';
+                downloadButton.style.boxShadow = 'var(--shadow-sm)';
+                downloadButton.style.background = 'linear-gradient(135deg, var(--primary-light, #4da3ff), var(--primary-dark, #005bb5))';
+            });
+            
+            // Prevent any event propagation from the download button to keep expanded view open
+            downloadButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation(); // This is key to stop all propagation
+                this.downloadChartImage();
+                return false; // Extra safeguard to prevent default behavior
+            });
+            
+            downloadButton.addEventListener('mousedown', (e) => {
+                e.stopPropagation(); // Stop mousedown from bubbling up
+            });
+            
+            downloadContainer.appendChild(downloadButton);
+            this.chartControls.appendChild(downloadContainer);
         }
     }
 
@@ -1677,5 +1733,152 @@ export class BaseChart {
             clearTimeout(timerId);
         });
         this.timers = [];
+    }
+
+    /**
+     * Download the current chart image
+     */
+    downloadChartImage() {
+        console.log(`[${this.containerId}] Downloading chart image...`);
+        
+        try {
+            // Find the chart image element
+            const chartWrapper = this.container.querySelector('.chart-wrapper');
+            if (!chartWrapper) {
+                console.error(`[${this.containerId}] Chart wrapper not found during download`);
+                return;
+            }
+            
+            const chartImage = chartWrapper.querySelector('.chart-image');
+            if (!chartImage) {
+                console.error(`[${this.containerId}] Chart image not found for download`);
+                return;
+            }
+            
+            // Get the image URL
+            const imageUrl = chartImage.src;
+            if (!imageUrl) {
+                console.error(`[${this.containerId}] No chart image source found for download`);
+                return;
+            }
+            
+            // Get the exact chart title directly from the DOM (will reflect current chart controls)
+            const chartTitleElement = this.container.querySelector('.chart-title');
+            const chartTitle = chartTitleElement ? chartTitleElement.textContent.trim() : 'Chart';
+            
+            // Format date for filename
+            const date = new Date();
+            const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+            
+            // Use the exact chart title for the filename with minimal character replacement
+            const filename = `${chartTitle.replace(/[\\/:*?"<>|]/g, '-')}.png`;
+            
+            // Create a canvas element to draw the image with a white background
+            fetch(imageUrl, {
+                // Add headers to prevent CORS issues
+                mode: 'cors',
+                cache: 'no-cache'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                return createImageBitmap(blob);
+            })
+            .then(imageBitmap => {
+                // Create a canvas with the same dimensions as the image
+                const canvas = document.createElement('canvas');
+                canvas.width = imageBitmap.width;
+                canvas.height = imageBitmap.height;
+                
+                // Get the canvas context and draw a white background
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw the image on top of the white background
+                ctx.drawImage(imageBitmap, 0, 0);
+                
+                // Convert the canvas to a blob
+                return new Promise(resolve => {
+                    canvas.toBlob(blob => {
+                        resolve(blob);
+                    }, 'image/png');
+                });
+            })
+            .then(blob => {
+                // Create a blob URL for the image with white background
+                const blobUrl = URL.createObjectURL(blob);
+                
+                // Create an anchor element for downloading
+                const downloadLink = document.createElement('a');
+                downloadLink.href = blobUrl;
+                downloadLink.download = filename;
+                downloadLink.style.display = 'none';
+                
+                // Prevent click event from bubbling to container and closing the expanded view
+                downloadLink.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                });
+                
+                // Add to DOM, trigger download, and clean up
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                
+                // Clean up
+                setTimeout(() => {
+                    if (document.body.contains(downloadLink)) {
+                        document.body.removeChild(downloadLink);
+                    }
+                    URL.revokeObjectURL(blobUrl); // Free up memory
+                }, 100);
+                
+                console.log(`[${this.containerId}] Chart image download initiated for: ${filename}`);
+            })
+            .catch(error => {
+                console.error(`[${this.containerId}] Error creating image with white background:`, error);
+                // Fallback to the original method if canvas approach fails
+                this.downloadChartImageFallback(imageUrl, chartTitle + '.png');
+            });
+        } catch (error) {
+            console.error(`[${this.containerId}] Error downloading chart image:`, error);
+        }
+    }
+
+    /**
+     * Fallback method for downloading chart images
+     * @param {string} imageUrl - URL of the image to download
+     * @param {string} filename - Desired filename for the download
+     */
+    downloadChartImageFallback(imageUrl, filename) {
+        console.log(`[${this.containerId}] Using fallback download method...`);
+        
+        try {
+            // Create an anchor element for downloading
+            const downloadLink = document.createElement('a');
+            downloadLink.href = imageUrl;
+            downloadLink.download = filename;
+            downloadLink.target = '_blank'; // This helps in some browsers
+            downloadLink.rel = 'noopener noreferrer';
+            downloadLink.style.display = 'none';
+            
+            // Add to DOM, trigger download, and clean up
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            
+            // Remove after a short delay
+            setTimeout(() => {
+                document.body.removeChild(downloadLink);
+            }, 100);
+            
+            console.log(`[${this.containerId}] Fallback download initiated for: ${filename}`);
+        } catch (error) {
+            console.error(`[${this.containerId}] Error in fallback download:`, error);
+            alert('Unable to download the chart image. Please try a different browser.');
+        }
     }
 }
