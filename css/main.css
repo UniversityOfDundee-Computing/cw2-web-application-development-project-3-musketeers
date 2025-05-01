@@ -11,7 +11,7 @@
     --surface: #F3F3F3; /* background for containers */
     --background: #FFFFFF; /* background color and for text on dark bg */
     --text-primary: #23221f; /* title color - button background */
-    --text-secondary: #76787b; /* text color for body and subtitles  */
+    --text-secondary: #787a7d; /* text color for body and subtitles  */
     --border-color: #E0E0E0; /* border color */
     --error-color: #AD4954; /* for errors */
     --success-color: #89B99A; /* for success */
