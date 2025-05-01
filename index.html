@@ -4,18 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Country Data Visualizer - Explore and analyze global country statistics through interactive visualizations">
-    <title>Country Data Visualizer</title>
+    <title>WorldIn</title>
     <style>
         /* Minimal styling for loading screen */
         body {
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', 'sans-serif';
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #0d0d2a;
+            /* background-color: #0d0d2a; */
+            background-image: linear-gradient(#506a99, #605b8b);
             color: white;
             text-align: center;
         }
@@ -25,8 +26,12 @@
         }
 
         h1 {
+            margin-bottom: 10px;
+            font-size: 3em;
+        }
+
+        .loading-container p {
             margin-bottom: 20px;
-            font-size: 2em;
         }
 
         .loading-spinner {
@@ -59,7 +64,8 @@
 </head>
 <body>
     <div class="loading-container">
-        <h1>Country Data Visualizer</h1>
+        <h1>WorldIn</h1>
+        <p>Interactive Country Explorer</p>
         <div class="loading-spinner"></div>
         <p class="redirect-text">Loading application...</p>
     </div>
