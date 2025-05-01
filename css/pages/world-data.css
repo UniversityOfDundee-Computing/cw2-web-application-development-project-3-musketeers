@@ -1078,3 +1078,30 @@ body:has(.chart-container.expanded) .chart-backdrop {
         font-size: 22px !important;
     }
 }
+
+/* Stats grid responsive adjustments for 640px-950px range */
+@media screen and (min-width: 640px) and (max-width: 950px) {
+    /* Adjust grid to 2 columns in this range */
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+      padding: 1rem;
+      gap: 1rem;
+    }
+    
+    /* Fix double padding issue on card-body */
+    .card-body {
+      padding: 0.75rem !important;
+      overflow: hidden !important;
+    }
+    
+    /* Make chart container full width */
+    #chartContainer9 {
+      width: 100%;
+    }
+    
+    /* Improve overflow handling for the stats grid */
+    #world-stats-container {
+      overflow-x: hidden;
+      width: 100%;
+    }
+  }
