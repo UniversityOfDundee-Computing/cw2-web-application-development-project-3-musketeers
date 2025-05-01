@@ -1,6 +1,4 @@
 // main.js
-import Globe from 'globe.gl';
-import { countryService } from '../../services/countryService';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const container = document.getElementById('globe-container');
@@ -13,13 +11,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   const world = Globe()(container)
-    .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-dark.jpg')
+    .globeImageUrl('./public/earth-dark.jpg') // Use local path instead of external URL
     .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
     .backgroundColor('rgba(0,0,0,0)')
     .pointOfView({ lat: 0, lng: 0, altitude: 2.5 });
 
+  // Set control options for better UX
   world.controls().autoRotate = true;
   world.controls().autoRotateSpeed = 0.3;
+  world.controls().enableDamping = true;
+  world.controls().dampingFactor = 0.1;
+  
+  // Center the globe in the container
+  resizeGlobe();
+  window.addEventListener('resize', resizeGlobe);
+  
+  function resizeGlobe() {
+    world.width(container.offsetWidth);
+    world.height(container.offsetHeight);
+  }
 
   try {
     const countries = await countryService.getAllCountries();
@@ -50,8 +60,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     console.log('Hover detection active');
 
-    const tooltip = document.getElementById('tooltip');
-
     // Manual hover detection using raycasting
     container.addEventListener('mousemove', (event) => {
       const intersect = world.intersect(event);
@@ -64,6 +72,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         tooltip.style.display = 'block';
       } else {
         tooltip.style.display = 'none';
+      }
+    });
+
+    // Add click event to navigate to selected country
+    container.addEventListener('click', (event) => {
+      const intersect = world.intersect(event);
+
+      if (intersect?.object?.__data) {
+        const point = intersect.object.__data;
+        const countryName = encodeURIComponent(point.name);
+        window.location.href = `./pages/selected.html?country=${countryName}`;
       }
     });
 

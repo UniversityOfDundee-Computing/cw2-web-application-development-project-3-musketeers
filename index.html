@@ -12,6 +12,8 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./css/pages/homepage.css" />
+    <script src="//unpkg.com/three"></script>
+    <script src="//unpkg.com/globe.gl"></script>
 
     <style>
       .loading-screen {
@@ -70,6 +72,8 @@
       <div class="loading-spinner"></div>
     </div>
 
+    <div id="loading"></div>
+    <div id="tooltip" style="position: absolute; display: none; background: rgba(0,0,0,0.7); color: white; padding: 5px; border-radius: 3px; font-size: 0.8em;"></div>
     <div
       id="globe-container"
       class="bg-container"
@@ -81,9 +85,9 @@
     <!-- Page Content Over the Globe -->
     <main id="content" class="page-overlay">
       <div class="hero-inner text-center text-white">
-        <h1 class="display-5 fw-bold">Country Data Visualizer</h1>
+        <h1 class="display-5 fw-bold">WorldIn</h1>
         <p class="lead">Explore countries around the world interactively!</p>
-        <a href="#explore" class="btn btn-primary btn-lg mt-3" id="start-exploring">Start Exploring</a>
+        <button class="btn btn-primary btn-lg mt-3" id="start-exploring">Start Exploring</button>
       </div>
     </main>
 
@@ -94,11 +98,10 @@
 
         <!-- Foreground content -->
         <div class="card-content position-relative text-center p-4 text-white">
-          <h2 class="h5 mb-4">Explore Data Options</h2>
+          <h2 class="h5 mb-4">Explore Options</h2>
           <div class="d-flex flex-wrap justify-content-center gap-3">
-            <a href="/pages/random.html" class="btn btn-outline-light">Random Country</a>
-            <a href="/pages/selected.html" class="btn btn-outline-light">Selected Country</a>
-            <a href="/pages/world-data.html" class="btn btn-outline-light">World Overview</a>
+            <a href="./pages/world-data.html" class="btn btn-outline-light">World Overview</a>
+            <a href="./pages/random.html" class="btn btn-outline-light">Surprise Me</a>
           </div>
         </div>
       </div>
@@ -120,12 +123,35 @@
         setTimeout(() => {
           const loadingScreen = document.getElementById('loading-screen');
           loadingScreen.style.opacity = '0';
-          setTimeout(() => (loadingScreen.style.display = 'none'), 1000);
+          setTimeout(() => {
+            loadingScreen.style.display = 'none';
+            
+            // Add event listener for Start Exploring button
+            const startExploreBtn = document.getElementById('start-exploring');
+            const exploreSection = document.getElementById('explore');
+            
+            startExploreBtn.addEventListener('click', function() {
+              // Add animation class to button
+              this.classList.add('btn-animate-click');
+              
+              // After a short delay, show the explore section with animation
+              setTimeout(() => {
+                exploreSection.classList.add('visible');
+                
+                // Smooth scroll to the section
+                exploreSection.scrollIntoView({ behavior: 'smooth' });
+                
+                // Remove animation class from button
+                this.classList.remove('btn-animate-click');
+              }, 300);
+            });
+          }, 1000);
         }, 1000);
       });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script type="module" src="./js/pages/homepage/homepage.js"></script>
+    <script src="js/services/countryService.js"></script>
+    <script src="js/pages/homepage/homepage.js"></script>
   </body>
 </html>
