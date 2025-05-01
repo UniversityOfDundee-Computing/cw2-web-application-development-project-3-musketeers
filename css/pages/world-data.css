@@ -36,26 +36,27 @@
     padding: 0.5rem;
 }
 
-/* Chart containers base styles - STANDARD FOR ALL CHART CONTAINERS */
+/* Chart containers base styles */
 .chart-container {
+    --chart-min-height: clamp(250px, 40vh, 400px);
+    --chart-padding: clamp(0.75rem, 2vw, 1.5rem);
+    --chart-aspect: 16/10;
+    
     position: relative;
-    /* background: #ffffff; */
     background: var(--surface, #eee);
-    /* border: 1px solid rgba(0, 0, 0, 0.125); */
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
-    padding: clamp(0.75rem, 2vw, 1.5rem) !important;
+    padding: var(--chart-padding);
     overflow: hidden;
-    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); */
-    /* margin: 0 0 1.5rem 0 !important; */
-    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
-    min-height: clamp(250px, 40vh, 400px); /* Dynamic height adjustment */
+    min-height: var(--chart-min-height);
+    aspect-ratio: var(--chart-aspect);
     display: flex;
-    flex-direction: column; /* Ensure proper vertical flow */
+    flex-direction: column;
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    transition: all 0.3s ease;
     z-index: 1;
-    max-width: 100%; /* Ensure chart container doesn't exceed viewport width */
+    max-width: 100%;
+    will-change: transform;
 }
 
 /* Consistent gradient overlay for all charts including world stats */
@@ -79,10 +80,13 @@
 
 /* Specific styling for regular chart containers */
 .col-md-4 .chart-container {
+    --chart-min-height: clamp(280px, 35vh, 400px);
+    --chart-aspect: 4/3;
+    
     display: grid;
     place-items: center;
-    aspect-ratio: 1/1;
-    min-height: clamp(320px, 40vh, 480px);
+    aspect-ratio: var(--chart-aspect);
+    min-height: var(--chart-min-height);
 }
 
 /* Special chart layouts - WORLD STATS CARD */
@@ -113,15 +117,19 @@
 
 /* Stats grid layout - fixed 4 columns */
 .stats-grid {
+    --grid-min-width: clamp(180px, 20vw, 240px);
+    --grid-gap: clamp(0.75rem, 1.5vw, 1.25rem);
+    --grid-padding: clamp(1rem, 2vw, 1.5rem);
+    
     display: grid;
-    grid-template-columns: repeat(4, minmax(200px, 1fr));
-    gap: 1.25rem;
+    grid-template-columns: repeat(auto-fit, minmax(var(--grid-min-width), 1fr));
+    gap: var(--grid-gap);
     width: 100%;
-    margin-top: 1rem;
+    margin-top: var(--grid-gap);
     background: var(--surface, #F3F3F3);
     border: 2px solid var(--primary-color);
     border-radius: var(--radius-lg);
-    padding: 1.5rem;
+    padding: var(--grid-padding);
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
@@ -325,40 +333,48 @@
 }
 
 /* Consistent styling for all chart titles */
-.chart-title {
-    margin-top: 0 !important;
-    margin-bottom: 0.75rem !important;
-    color: #1a202c;
-    font-size: clamp(1.1rem, 1.5vw, 1.25rem);
-    font-weight: 700;
-    letter-spacing: -0.01em;
-    padding: 0 !important;
+/* Typography System */
+:root {
+    --title-size: clamp(1.125rem, 1.25vw + 0.5rem, 1.35rem);
+    --desc-size: clamp(0.875rem, 0.75vw + 0.5rem, 1rem);
+    --subtitle-size: clamp(0.75rem, 0.5vw + 0.5rem, 0.875rem);
+    --title-line-height: 1.3;
+    --text-line-height: 1.5;
+    --content-spacing: clamp(0.75rem, 1.5vw, 1.25rem);
 }
 
-/* Consistent styling for all chart descriptions */
+.chart-title {
+    margin: 0 0 var(--content-spacing) 0;
+    color: var(--text-primary, #1a202c);
+    font-size: var(--title-size);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: var(--title-line-height);
+}
+
 .chart-description {
-    color: #4a5568;
-    font-size: clamp(0.875rem, 1vw, 0.95rem);
-    margin-bottom: 1rem !important;
+    color: var(--text-secondary, #4a5568);
+    font-size: var(--desc-size);
+    margin: 0 0 var(--content-spacing) 0;
     font-weight: 400;
-    opacity: 0.8;
-    padding: 0 !important;
+    line-height: var(--text-line-height);
+    opacity: 0.9;
     overflow-wrap: break-word;
-    word-wrap: break-word;
-    max-width: 100%;
+    max-width: 65ch;
 }
 
 /* Consistent card-body padding across all charts */
 .card-body {
+    --card-padding: clamp(0.75rem, 1.5vw, 1.25rem);
+    
     position: relative;
     z-index: 2;
-    padding: 0.75rem !important; /* Reduced padding */
-    overflow: visible !important;
+    padding: var(--card-padding);
+    overflow: visible;
     display: flex;
     flex-direction: column;
     flex: 1;
-    overflow: hidden;
-    padding: 1.25rem; /* Ensure consistent padding */
+    gap: var(--content-spacing);
 }
 
 /* Fix for the blurred card overlay issue */
@@ -396,21 +412,22 @@
 }
 
 /* Responsive adjustments */
-@media screen and (max-width: 1280px) {
-    .stats-grid {
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    }
-}
-
+/* Responsive layout adjustments */
 @media screen and (max-width: 1024px) {
+    :root {
+        --container-gap: clamp(1rem, 2vw, 1.5rem);
+        --container-padding: clamp(1rem, 2vw, 1.5rem);
+        --chart-padding: clamp(1rem, 1.5vw, 1.25rem);
+    }
+
     .container {
-        gap: clamp(1.25rem, 2vw, 2rem);
-        padding: clamp(1.25rem, 2vw, 2rem);
+        gap: var(--container-gap);
+        padding: var(--container-padding);
     }
     
     .chart-container {
-        aspect-ratio: 3/2;
-        padding: clamp(1.25rem, 2vw, 2rem);
+        aspect-ratio: 16/10;
+        padding: var(--chart-padding);
     }
     
     #chartContainer9 {
@@ -461,34 +478,44 @@
     }
 }
 
-/* Set up 2x2 grid layout for medium screens using Bootstrap's row and col classes */
-@media (max-width: 991px) and (min-width: 576px) {
+/* Tablet/Small Desktop Layout (1020px - 640px) */
+@media (max-width: 1020px) and (min-width: 640px) {
+    .chart-container {
+        --chart-min-height: clamp(220px, 30vh, 320px);
+        --chart-aspect: 3/2;
+    }
+
     .row.g-3 {
         display: flex;
         flex-wrap: wrap;
+        gap: var(--container-gap, 1rem);
     }
     
     .row.g-3 .col-md-4 {
-        width: 50% !important; /* Force 2 columns */
-        flex: 0 0 50% !important;
+        width: calc(50% - var(--container-gap, 1rem) / 2);
+        flex: 0 0 auto;
     }
     
-    /* Make chart containers more suitable for 2x2 layout */
     .col-md-4 .chart-container {
-        aspect-ratio: 4/3;
-        min-height: clamp(250px, 35vh, 350px);
+        --chart-aspect: 3/2;
+        min-height: var(--chart-min-height);
     }
 }
 
 @media screen and (max-width: 768px) {
+    :root {
+        --container-spacing: clamp(0.75rem, 1.5vw, 1rem);
+        --chart-min-height: clamp(250px, 35vh, 350px);
+    }
+
     .container {
-        gap: 1rem;
-        padding: 1rem;
+        gap: var(--container-spacing);
+        padding: var(--container-spacing);
     }
     
     .chart-container {
-        padding: 1.25rem;
-        min-height: clamp(250px, 35vh, 350px);
+        padding: var(--chart-padding);
+        min-height: var(--chart-min-height);
     }
     
     #chartContainer9 {
@@ -497,12 +524,13 @@
     }
     
     .chart-title {
-        font-size: 1.2rem;
+        font-size: var(--title-size);
+        margin-bottom: calc(var(--content-spacing) * 0.75);
     }
     
     .chart-description {
-        font-size: 0.85rem;
-        margin-bottom: 1rem;
+        font-size: var(--desc-size);
+        margin-bottom: var(--content-spacing);
     }
     
     .chart-container {
