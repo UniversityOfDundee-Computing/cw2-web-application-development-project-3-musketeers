@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WorldIn</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
     <!-- Bootstrap CSS -->
     <link
@@ -20,12 +21,24 @@
         left: 0;
         width: 100vw;
         height: 100vh;
-        background-color: #0d0d2a;
+        /* background-color: #0d0d2a; */
+        background-image: linear-gradient(#4062a0, #665faa);
         display: flex;
         justify-content: center;
         align-items: center;
         flex-direction: column;
         transition: opacity 1s ease;
+        color: white;
+      }
+
+      .loading-screen h1 {
+        font-family: 'Roboto';
+        font-weight: 500;
+        font-size: 3rem;
+      }
+
+      .loading-screen p {
+        font-size: 1.25rem;
       }
 
       .loading-spinner {
@@ -70,7 +83,7 @@
       <div class="hero-inner text-center text-white">
         <h1 class="display-5 fw-bold">Country Data Visualizer</h1>
         <p class="lead">Explore countries around the world interactively!</p>
-        <a href="#explore" class="btn btn-primary btn-lg mt-3">Start Exploring</a>
+        <a href="#explore" class="btn btn-primary btn-lg mt-3" id="start-exploring">Start Exploring</a>
       </div>
     </main>
 
