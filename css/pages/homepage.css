@@ -32,6 +32,9 @@ body {
   background-size: cover;
   background-position: center;
   overflow: visible;
+  display: flex;    /* Center the globe */
+  justify-content: center;
+  align-items: center;
 }
 
 
@@ -68,9 +71,7 @@ body {
 
 .hero-inner {
   position: relative;
-  padding-top: 15vh;
-  background: rgba(0, 0, 0, 0.4); /* semi-transparent for contrast */
-  padding: 4rem 1rem;
+  /* padding-bottom: 15vh;  */
   border-radius: 1rem;
   max-width: 800px;
   margin: 0 auto;
@@ -103,7 +104,17 @@ body {
 }
 
 #explore {
-  margin-top: 100px; /* try values like 4rem, 6rem, or 100px */
+  margin-top: 50px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease, visibility 0.8s;
+}
+
+#explore.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
 }
 
 .glow-card {
@@ -115,6 +126,27 @@ body {
   font-size: 0.9rem;
   pointer-events: none;
   white-space: nowrap;
+}
+
+/* Animation for the start exploring button */
+.btn-primary {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+}
+
+/* Animation for button clicks */
+.btn-animate-click {
+  animation: button-pulse 0.4s;
+}
+
+@keyframes button-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
 }
 
 
