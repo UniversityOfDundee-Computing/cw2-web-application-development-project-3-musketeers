@@ -202,6 +202,23 @@
         flex: 1;
     }
 
+    #randomizeBtn {
+        background: linear-gradient(135deg, var(--primary-light, #4da3ff), var(--primary-dark, #005bb5));
+        border: none;
+        font-weight: 500;
+        border-radius: var(--radius-md, 6px);
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+        color: var(--white);
+        margin: 0 0.75rem;
+    }
+    
+    #randomizeBtn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        background: linear-gradient(135deg, var(--primary-dark, #005bb5), var(--primary-light, #4da3ff));
+    }
+
     /* .country-overview {
         background: var(--surface);
         border-radius: var(--radius-xl);
