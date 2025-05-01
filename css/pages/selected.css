@@ -19,7 +19,8 @@
 
     .container {
         margin: 0;
-        padding: clamp(0.5rem, 2vw, 2rem);
+        /* padding: clamp(0.5rem, 2vw, 2rem); */
+        padding: 1.5rem 0.75rem;
         display: flex;
         flex-direction: column;
         gap: clamp(1rem, 2vw, 2rem);
@@ -32,7 +33,7 @@
         margin-left: 0 !important;
         margin-right: 0 !important;
       }
-    
+
     /* Top layout (map + info) */
     .top-section .row {
         display: flex;
@@ -40,7 +41,6 @@
         /* gap: 2rem; */
         align-items: stretch;
         width: 100%;
-        margin: 0;
     }
 
     /* .top-section {
@@ -344,6 +344,10 @@
         /* gap: 2rem; */
     }
 
+    .bottom-section .row .col-md-4 {
+        margin-top: 0;
+    }
+
     .top-section,
     .bottom-section {
         display: flex;
@@ -428,6 +432,10 @@
         /* Section grid adjustments */
         .visualizations-section {
             grid-template-columns: 1fr;
+        }
+
+        .bottom-section .col-md-4 {
+            margin-bottom: 1.5rem;
         }
 
         /* Adjust map and neighbor container padding */
