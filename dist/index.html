@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Country Data Visualizer - Explore and analyze global country statistics through interactive visualizations">
+    <title>Country Data Visualizer</title>
+    <style>
+        /* Minimal styling for loading screen */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #0d0d2a;
+            color: white;
+            text-align: center;
+        }
+
+        .loading-container {
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .redirect-text {
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            .loading-spinner {
+                animation: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-container">
+        <h1>Country Data Visualizer</h1>
+        <div class="loading-spinner"></div>
+        <p class="redirect-text">Loading application...</p>
+    </div>
+
+    <script>
+        // Redirect to world data page after a short delay
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                window.location.href = './pages/world-data.html';
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
