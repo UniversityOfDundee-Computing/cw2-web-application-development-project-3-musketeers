@@ -827,6 +827,10 @@
     overflow-x: hidden !important;
 }
 
+.chart-container.expanded {
+    border-radius: var(--radius-lg);
+}
+
 /* Fix for the chart's content overflow */
 .chart-content {
     width: 100%;
