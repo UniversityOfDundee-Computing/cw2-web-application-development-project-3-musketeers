@@ -1,6 +1,4 @@
 // main.js
-import Globe from 'globe.gl';
-import { countryService } from '../../services/countryService';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const container = document.getElementById('globe-container');
