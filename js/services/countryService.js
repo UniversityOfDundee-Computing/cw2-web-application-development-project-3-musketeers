@@ -103,4 +103,4 @@ class CountryService {
 }
 
 // Export a singleton instance
-window.countryService = new CountryService();
+export const countryService = new CountryService();
