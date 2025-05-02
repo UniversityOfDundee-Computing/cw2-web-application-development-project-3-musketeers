@@ -11,19 +11,19 @@
 - **World Dashboard**<br/>
   Displays global world statistics and 6 visual charts (e.g., population, currencies, languages).
   
-- **Country Explorer**
+- **Country Explorer**<br/>
   Select a country to view its full profile with quick facts (e.g. area, timezone, driving side), 3 comparative charts, and a Google Maps integration.
   
-- **“Surprise Me” Mode**
+- **“Surprise Me” Mode**<br/>
   Takes users to a random country and displays its data and charts (similar page content to the country explorer page).
 
-- **Expandable Chart Modals**
+- **Expandable Chart Modals**<br/>
   View full-screen charts with options to:
   - Change chart type
   - Sort/group data
   - Download chart as PNG
 
-- **Interactive 3D Globe**
+- **Interactive 3D Globe**<br/>
   Homepage with interactive globe and navigation buttons linking to all core features.
 
 ---
