@@ -1,6 +1,6 @@
 # 🌍 WorldIn – Country Data Visualizer
 
-https://www.youtube.com/watch?v=tDtCOIZDNwg
+[![Watch the video](https://img.youtube.com/vi/tDtCOIZDNwg/maxresdefault.jpg)](https://www.youtube.com/watch?v=tDtCOIZDNwg)
 
 ## Project Summary
 
