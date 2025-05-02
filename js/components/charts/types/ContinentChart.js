@@ -185,9 +185,6 @@ export class ContinentChart extends BaseChart {
             }));
         }
         
-        // Calculate total for percentages
-        const totalValue = continentData.reduce((sum, item) => sum + item.value, 0);
-        
         // Sort continents based on sort option
         switch (this.options.sort) {
             case 'asc':
@@ -204,7 +201,6 @@ export class ContinentChart extends BaseChart {
             labels: continentData.map(c => c.name),
             values: continentData.map(c => c.value),
             formatted: continentData.map(c => {
-                const percentage = ((c.value / totalValue) * 100).toFixed(2);
                 let metric = '';
                 
                 if (this.options.dataView === 'population') {
@@ -219,7 +215,6 @@ export class ContinentChart extends BaseChart {
                     continent: c.name,
                     value: c.value,
                     formatted: new Intl.NumberFormat().format(c.value),
-                    percentage: percentage,
                     population: c.population,
                     area: c.area,
                     countries: c.countries,
@@ -237,28 +232,20 @@ export class ContinentChart extends BaseChart {
     createChartConfig(data) {
         // Use the currently selected chart type instead of hardcoding
         const chartType = this.options.type || 'doughnut';
-        console.log(`[${this.containerId}] Creating continent chart with type: ${chartType}`);
 
         const baseColors = generateHueVariants(COLORS.primary, data.labels.length);
         const backgroundColors = baseColors.map(color => hexToRgba(color, 0.75));
         const borderColors = baseColors.map(color => darkenHexColor(color, 0.8));
         
-        // Set up label formatting based on percentage view option
+        // Set up label formatting
         const labelCallback = (context) => {
             const item = data.formatted[context.dataIndex];
             if (!item) return '';
-            
-            if (this.options.showPercentage) {
-                return `${item.percentage}%`;
-            } else {
-                return item.formatted;
-            }
+            return item.formatted;
         };
         
-        // Format data for display
-        const values = this.options.showPercentage 
-            ? data.formatted.map(item => parseFloat(item.percentage)) 
-            : data.values;
+        // Use raw values for display
+        const values = data.values;
         
         // Get title based on the current sort order
         const titleText = this.getTitleBasedOnSortOrder();
@@ -310,10 +297,8 @@ export class ContinentChart extends BaseChart {
                                 const item = data.formatted[context.dataIndex];
                                 if (!item) return 'No data';
                                 
-                                // Different tooltip based on data view
-                                const valueLabel = this.options.showPercentage 
-                                    ? `${item.percentage}%` 
-                                    : `${item.formatted} ${item.metric}`;
+                                // Display value with metric
+                                const valueLabel = `${item.formatted} ${item.metric}`;
                                     
                                 return [
                                     `${this.getDataViewLabel()}: ${valueLabel}`,
@@ -359,9 +344,6 @@ export class ContinentChart extends BaseChart {
                             weight: 'bold'
                         },
                         callback: value => {
-                            if (this.options.showPercentage) {
-                                return `${value}%`;
-                            }
                             return dataProcessing.formatNumber(value);
                         }
                     },
@@ -435,36 +417,6 @@ export class ContinentChart extends BaseChart {
         viewGroup.appendChild(viewSelect);
         leftControls.appendChild(viewGroup);
         
-        // Add percentage toggle with improved styling
-        const percentageGroup = document.createElement('div');
-        percentageGroup.className = 'form-group mb-0 ms-3'; // Add left margin for spacing
-        percentageGroup.style.display = 'flex';
-        percentageGroup.style.alignItems = 'center';
-        
-        const percentageCheck = document.createElement('div');
-        percentageCheck.className = 'form-check form-switch mb-0'; // Remove bottom margin
-        
-        const percentageInput = document.createElement('input');
-        percentageInput.className = 'form-check-input';
-        percentageInput.type = 'checkbox';
-        percentageInput.id = `${this.containerId}-percentage-toggle`;
-        percentageInput.setAttribute('role', 'switch');
-        percentageInput.checked = this.options.showPercentage || false;
-        
-        const percentageLabel = document.createElement('label');
-        percentageLabel.className = 'form-check-label ms-2 mb-0'; // Remove bottom margin
-        percentageLabel.htmlFor = `${this.containerId}-percentage-toggle`;
-        percentageLabel.textContent = 'Show Percentages';
-        
-        percentageInput.addEventListener('change', (e) => {
-            e.stopPropagation();
-            this.togglePercentageView(e.target.checked);
-        });
-        
-        percentageCheck.appendChild(percentageInput);
-        percentageCheck.appendChild(percentageLabel);
-        percentageGroup.appendChild(percentageCheck);
-        leftControls.appendChild(percentageGroup);
     }
 
     /**
@@ -472,7 +424,6 @@ export class ContinentChart extends BaseChart {
      * @param {string} view - Type of data to display
      */
     async changeDataView(view) {
-        console.log(`[${this.containerId}] Changing data view to: ${view}`);
         
         // Show loading overlay
         this.showLoading();
@@ -518,44 +469,6 @@ export class ContinentChart extends BaseChart {
         }
     }
 
-    /**
-     * Toggle between absolute values and percentages
-     * @param {boolean} showPercentage - Whether to show percentage values
-     */
-    async togglePercentageView(showPercentage) {
-        console.log(`[${this.containerId}] Toggling percentage view: ${showPercentage}`);
-        
-        // Show loading overlay
-        this.showLoading();
-        
-        try {
-            // Clean up existing chart before updating
-            this.cleanupExistingChart();
-            
-            // Store percentage view option
-            this.options.showPercentage = showPercentage;
-            
-            // No need to re-process data, just update the chart configuration
-            const chartConfig = this.createChartConfig(this.processedData);
-            
-            // Generate chart URL
-            const chartUrl = chartService.createChartUrl(chartConfig);
-            
-            // Update the chart
-            chartUtils.displayChart(
-                this.containerId,
-                chartUrl,
-                this.options.title || 'Chart'
-            );
-            
-            // Update descriptions
-            const descriptions = this.generateDescriptions(this.processedData);
-            this.updateChartDescriptions(descriptions);
-        } catch (error) {
-            console.error(`[${this.containerId}] Error toggling percentage view:`, error);
-            this.showError(`Failed to update percentage view: ${error.message}`);
-        }
-    }
 
     /**
      * Get an appropriate title based on current options and sort order
@@ -613,7 +526,6 @@ export class ContinentChart extends BaseChart {
      */
     async changeSortOrder(sortOrder) {
         if (['asc', 'desc'].includes(sortOrder)) {
-            console.log(`[${this.containerId}] Changing sort order to ${sortOrder}...`);
             
             // Show loading overlay
             this.showLoading();
@@ -659,7 +571,6 @@ export class ContinentChart extends BaseChart {
                     titleElement.textContent = this.options.title;
                 }
                 
-                console.log(`[${this.containerId}] Sort order changed successfully to ${sortOrder}.`);
             } catch (error) {
                 console.error(`[${this.containerId}] Error changing sort order:`, error);
                 this.showError(`Failed to change sort order: ${error.message}`);
@@ -673,7 +584,6 @@ export class ContinentChart extends BaseChart {
      */
     async changeChartType(newType) {
         if (this.supportedChartTypes.includes(newType)) {
-            console.log(`[${this.containerId}] Changing chart type to ${newType}...`);
             
             // Show loading overlay
             this.showLoading();
@@ -722,7 +632,6 @@ export class ContinentChart extends BaseChart {
                     titleElement.textContent = this.options.title;
                 }
                 
-                console.log(`[${this.containerId}] Chart type changed successfully to ${newType}.`);
             } catch (error) {
                 console.error(`[${this.containerId}] Error changing chart type:`, error);
                 this.showError(`Failed to change chart type: ${error.message}`);
@@ -736,7 +645,6 @@ export class ContinentChart extends BaseChart {
      */
     async changeDataLimit(limit) {
         if (!isNaN(limit) && limit > 0) {
-            console.log(`[${this.containerId}] Changing data limit to ${limit}...`);
             
             // Show loading overlay
             this.showLoading();
@@ -768,7 +676,6 @@ export class ContinentChart extends BaseChart {
                 const descriptions = this.generateDescriptions(this.processedData);
                 this.updateChartDescriptions(descriptions);
                 
-                console.log(`[${this.containerId}] Data limit changed successfully.`);
             } catch (error) {
                 console.error(`[${this.containerId}] Error changing data limit:`, error);
                 this.showError(`Failed to change data limit: ${error.message}`);
@@ -786,7 +693,6 @@ export class ContinentChart extends BaseChart {
         // Get current options
         const isAscending = this.options.sort === 'asc';
         const dataView = this.options.dataView || 'population';
-        const showingPercentage = this.options.showPercentage || false;
         const chartType = this.options.type || 'doughnut';
         
         // Get information about continents
@@ -843,9 +749,9 @@ export class ContinentChart extends BaseChart {
             
             // First insight: top continent
             if (dataView === 'population') {
-                insights.push(`${first.continent} is the ${viewSuperlative} continent with ${first.formatted} ${first.metric}, representing ${first.percentage}% of the world's population.`);
+                insights.push(`${first.continent} is the ${viewSuperlative} continent with ${first.formatted} ${first.metric}.`);
             } else if (dataView === 'area') {
-                insights.push(`${first.continent} has the ${viewSuperlative} landmass with ${first.formatted} ${first.metric}, representing ${first.percentage}% of the world's land area.`);
+                insights.push(`${first.continent} has the ${viewSuperlative} landmass with ${first.formatted} ${first.metric}.`);
             } else {
                 insights.push(`${first.continent} has the ${viewSuperlative} with ${first.formatted} ${first.metric}.`);
             }
@@ -894,11 +800,7 @@ export class ContinentChart extends BaseChart {
             detailedDesc += `, sorted from ${sortContext}`;
         }
         
-        if (showingPercentage) {
-            detailedDesc += `, with values shown as percentages of the total.`;
-        } else {
-            detailedDesc += `, with absolute values in ${metricUnit}.`;
-        }
+        detailedDesc += `, with values in ${metricUnit}.`;
         
         // Create short description
         const shortDesc = `Comparison of continental ${metricType} showing ${topContinent} with the ${viewSuperlative} value.`;

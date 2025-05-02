@@ -1,6 +1,5 @@
 // World Stats at a Glance
 (function() {
-    console.log('[chartContainer9] Initializing World Stats...');
     
     // Run immediately - don't wait for DOMContentLoaded
     // Find the required DOM elements
@@ -24,19 +23,18 @@
     
     // Log element status for debugging
     if (!statsGrid) {
-        console.error('[chartContainer9] Error: Stats grid element not found');
+        // console.error('[chartContainer9] Error: Stats grid element not found');
         return;
     }
     if (!loadingElement) {
-        console.error('[chartContainer9] Error: Loading indicator not found');
+        // console.error('[chartContainer9] Error: Loading indicator not found');
         return;
     }
     if (!statsWrapper) {
-        console.error('[chartContainer9] Error: Stats wrapper element not found');
+        // console.error('[chartContainer9] Error: Stats wrapper element not found');
         return;
     }
 
-    console.log('[chartContainer9] DOM elements found, preparing to fetch data...');
     
     // Create a variable for the timeout ID in the proper scope
     let globalTimeoutId = null;
@@ -138,15 +136,13 @@
         if (existingTimestamp) {
             existingTimestamp.remove();
         }
-        
-        console.log('[chartContainer9] Stats cards rendered successfully');
+
     }
     
     /**
      * Show error notification when fetch fails
      */
     function showErrorNotification() {
-        console.log('[chartContainer9] Showing error notification');
         
         // Hide the loading indicator immediately
         if (loadingElement) {
@@ -176,8 +172,6 @@
     function hideLoading() {
         if (!loadingElement) return;
         
-        console.log('[chartContainer9] Forcibly hiding loading indicator...');
-        
         // Calculate how long the loading has been visible
         const creationTime = parseInt(loadingElement.dataset.creationTime || '0');
         const currentTime = Date.now();
@@ -199,7 +193,6 @@
                 
                 // Verify it's actually hidden
                 if (getComputedStyle(loadingElement).display !== 'none') {
-                    console.warn('[chartContainer9] Loading still visible after initial hiding, forcing removal');
                     
                     // Force remove with direct parent manipulation
                     try {
@@ -212,16 +205,15 @@
                                 loadingInClone.remove();
                                 if (statsContainer.parentNode) {
                                     statsContainer.parentNode.replaceChild(clone, statsContainer);
-                                    console.log('[chartContainer9] Replaced entire container to force remove loading');
+                                    
                                 }
                             }
                         }
                     } catch (e) {
-                        console.error('[chartContainer9] Error during forced removal:', e);
+                        // console.error('[chartContainer9] Error during forced removal:', e);
                     }
                 }
-                
-                console.log('[chartContainer9] Loading indicator hidden completely');
+
             }, 300);
         }, remainingTime);
     }
@@ -230,7 +222,6 @@
      * Set a timeout to prevent infinite loading
      */
     globalTimeoutId = setTimeout(() => {
-        console.warn('[chartContainer9] API request timed out, showing error state');
         // Clear any existing refresh timer to prevent background retries
         if (refreshTimer) {
             clearInterval(refreshTimer);
@@ -250,11 +241,9 @@
         
         // Set up a new timer to periodically refresh the stats
         refreshTimer = setInterval(() => {
-            console.log('[chartContainer9] Auto-refreshing world stats...');
             fetchWorldStats();
         }, autoRefreshInterval);
         
-        console.log(`[chartContainer9] Auto-refresh set up with interval of ${autoRefreshInterval}ms`);
         
         // Add cleanup on page unload
         window.addEventListener('beforeunload', () => {
@@ -279,7 +268,6 @@
             loadingElement.dataset.creationTime = Date.now().toString();
         }
         
-        console.log('[chartContainer9] Starting API request...');
         
         try {
             // Make the API request with a timeout controller
@@ -299,8 +287,7 @@
             if (!response.ok) {
                 throw new Error(`Network response was not ok: ${response.status}`);
             }
-            
-            console.log('[chartContainer9] API response received successfully');
+
             const countries = await response.json();
             
             // Calculate global statistics
@@ -417,7 +404,7 @@
             });
             // *** END MODIFIED ***
 
-            console.log('[chartContainer9] Data processed successfully');
+
             
             // Clear the global timeout
             if (globalTimeoutId) {
@@ -437,7 +424,6 @@
             }
             
         } catch (error) {
-            console.error('[chartContainer9] Error fetching or processing data:', error);
             
             // Clear the global timeout to prevent duplicate error handling
             if (globalTimeoutId) {
