@@ -48,20 +48,20 @@
 
 ## **How It Works**
 
-1. **Homepage & Navigation**
+1. **Homepage & Navigation**<br/>
    Users arrive on an interactive 3D globe homepage with buttons to explore global or country-specific data.
 
-3. **World Data Dashboard**
+3. **World Data Dashboard**<br/>
    - The app fetches country data (population, area, languages, etc.) from the REST Countries API.
    - Global stats and charts are generated using QuickChart API and displayed as downloadable PNGs.
 
-4. **Country Selection**
+4. **Country Selection**<br/>
    Users select a country to view detailed info, supporting charts, and a link to Google Maps.
 
-5. **“Surprise Me” Feature**
+5. **“Surprise Me” Feature**<br/>
    Randomly selects and displays a country’s data and charts for spontaneous discovery.
 
-6. **Chart Interaction**
+6. **Chart Interaction**<br/>
    Clicking a chart opens a modal with options to change type, sort/group data, or download it, alongside detailed insights.
 
 ---
