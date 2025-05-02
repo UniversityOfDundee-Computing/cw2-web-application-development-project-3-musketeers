@@ -205,7 +205,6 @@ button.large {
 /* Footer styles */
 footer {
     text-align: center;
-    /* padding: var(--spacing-large); */
     padding: var(--space-6);
     background-color: var(--text-primary);
     color: var(--white);
@@ -216,34 +215,6 @@ footer {
 footer p {
     margin: 0.25rem 0;
 }
-
-/* Utility classes */
-/* Container styles */
-/* .container {
-    width: min(100% - 2rem, 1400px);
-    margin-inline: auto;
-    padding: var(--spacing-medium);
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
-    gap: clamp(1rem, 2vw, 2rem);
-} */
-
-/* Grid container modifiers */
-/* .container--narrow {
-    max-width: 1000px;
-} */
-/* 
-.container--wide {
-    max-width: 1600px;
-}
-
-.text-center {
-    text-align: center;
-}
-
-.hidden {
-    display: none;
-} */
 
 /* Responsive typography */
 @media (max-width: 768px) {
