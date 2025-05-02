@@ -49,7 +49,6 @@ export class IndependenceChart extends BaseChart {
     async processData(data) {
         // Safety check for data
         if (!Array.isArray(data) || data.length === 0) {
-            console.error('Invalid country data received for independence chart');
             return { labels: [], values: [], formatted: [] };
         }
         
@@ -262,8 +261,6 @@ export class IndependenceChart extends BaseChart {
      * @param {boolean} show - Whether to show example countries
      */
     async toggleExampleDisplay(show) {
-        console.log(`[${this.containerId}] Toggling example country display: ${show}`);
-        
         // Show loading overlay 
         this.showLoading();
         
@@ -280,7 +277,7 @@ export class IndependenceChart extends BaseChart {
             // If showing examples, modify the chart config to include sample countries in labels
             if (show && this.processedData && this.processedData.formatted) {
                 // For pie/doughnut charts, update the labels to include examples
-                if (chartConfig.type === 'pie' || chartConfig.type === 'doughnut') {
+                if (chartConfig.type === 'pie' || 'doughnut') {
                     chartConfig.data.labels = this.processedData.formatted.map(item => {
                         const examples = this.getSampleCountries(item.countries);
                         return `${item.status === "Independent" ? "Sovereign Nations" : "Dependent Territories"} (${examples})`;
@@ -317,7 +314,6 @@ export class IndependenceChart extends BaseChart {
             const descriptions = this.generateDescriptions(this.processedData);
             this.updateChartDescriptions(descriptions);
         } catch (error) {
-            console.error(`[${this.containerId}] Error toggling example display:`, error);
             this.showError(`Failed to update display: ${error.message}`);
         }
     }
@@ -328,8 +324,6 @@ export class IndependenceChart extends BaseChart {
      */
     async changeChartType(newType) {
         if (this.supportedChartTypes.includes(newType)) {
-            console.log(`[${this.containerId}] Changing chart type to ${newType}...`);
-            
             // Show loading overlay
             this.showLoading();
             
@@ -359,10 +353,7 @@ export class IndependenceChart extends BaseChart {
                 // Update descriptions
                 const descriptions = this.generateDescriptions(this.processedData);
                 this.updateChartDescriptions(descriptions);
-                
-                console.log(`[${this.containerId}] Chart type changed successfully to ${newType}.`);
             } catch (error) {
-                console.error(`[${this.containerId}] Error changing chart type:`, error);
                 this.showError(`Failed to change chart type: ${error.message}`);
             }
         }

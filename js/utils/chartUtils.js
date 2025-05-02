@@ -74,16 +74,13 @@ export const defaultChartOptions = {
  * @param {string} altText Alternative text for the image
  */
 export function displayChart(containerId, chartUrl, altText) {
-    console.log(`[${containerId}] displayChart called with URL:`, chartUrl);
     const container = document.getElementById(containerId);
     if (!container) {
-        console.error(`[${containerId}] Container element not found.`);
         return;
     }
 
     const wrapper = container.querySelector('.chart-wrapper');
     if (!wrapper) {
-        console.error(`[${containerId}] Chart wrapper element (.chart-wrapper) not found inside container.`);
         // Fallback: use container directly if wrapper is missing
         displayChartContent(container, chartUrl, altText);
         return;
@@ -152,12 +149,10 @@ export function hideLoadingIndicator(containerId, animate = true, minDisplayTime
  */
 function displayChartContent(targetElement, chartUrl, altText) {
     const containerId = targetElement.closest('.chart-container')?.id || 'unknown-container';
-    console.log(`[${containerId}] Creating image element for target:`, targetElement.tagName, targetElement.className);
     
     // First, fade out any existing chart images before removing them
     const existingImages = targetElement.querySelectorAll('.chart-image');
     if (existingImages.length > 0) {
-        console.log(`[${containerId}] Found ${existingImages.length} existing chart images to clean up.`);
         
         // Create a promise that resolves when all images have faded out or after a timeout
         const fadeOutPromise = new Promise((resolve) => {
@@ -165,7 +160,6 @@ function displayChartContent(targetElement, chartUrl, altText) {
             
             // Set a maximum timeout in case transitions fail
             const timeoutId = setTimeout(() => {
-                console.log(`[${containerId}] Fade-out timeout reached, proceeding with cleanup.`);
                 resolve();
             }, 300); // 300ms matches our CSS transition time
             
@@ -213,12 +207,10 @@ function displayChartContent(targetElement, chartUrl, altText) {
         const img = new Image();
 
         img.onload = () => {
-            console.log(`[${containerId}] Image loaded successfully.`);
             
             // Double-check for any remaining chart images (in case more were added during loading)
             const remainingImages = targetElement.querySelectorAll('.chart-image');
             if (remainingImages.length > 0) {
-                console.log(`[${containerId}] Found ${remainingImages.length} remaining chart images to remove.`);
                 remainingImages.forEach(existingImage => {
                     existingImage.remove();
                 });
@@ -281,7 +273,6 @@ function displayChartContent(targetElement, chartUrl, altText) {
             img.style.opacity = '1';
             img.style.transform = 'scale(1)';
             
-            console.log(`[${containerId}] Image appended to target element.`);
             
             // Remove existing timestamp if present
             const existingTimestamp = targetElement.querySelector('.chart-last-updated');
@@ -294,7 +285,6 @@ function displayChartContent(targetElement, chartUrl, altText) {
         };
 
         img.onerror = () => {
-            console.error(`[${containerId}] Failed to load image from URL:`, chartUrl);
             
             // Create error element
             const errorElement = document.createElement('div');
@@ -323,11 +313,9 @@ function displayChartContent(targetElement, chartUrl, altText) {
             
             // Append the error element
             targetElement.appendChild(errorElement);
-            console.log(`[${containerId}] Error message displayed in target element.`);
         };
 
         img.src = chartUrl;
-        console.log(`[${containerId}] Image src set. Browser will now attempt to load.`);
         img.alt = altText;
         img.style.maxWidth = "100%";
         img.style.height = "auto";
@@ -342,7 +330,6 @@ function displayChartContent(targetElement, chartUrl, altText) {
  * @param {string} message Error message to display
  */
 export function displayChartError(containerId, message) {
-    console.log(`[${containerId}] displayChartError called with message:`, message);
     const container = document.getElementById(containerId);
     if (!container) return;
 
@@ -382,10 +369,8 @@ export function displayChartError(containerId, message) {
  * @param {string} [message] Optional custom loading message
  */
 export function displayChartLoading(containerId, message = 'Loading chart...') {
-    console.log(`[${containerId}] displayChartLoading called with message: ${message}`);
     const container = document.getElementById(containerId);
     if (!container) {
-        console.error(`[${containerId}] Container element not found.`);
         return;
     }
 
@@ -397,7 +382,6 @@ export function displayChartLoading(containerId, message = 'Loading chart...') {
         (wrapper && wrapper.querySelector('.chart-loading'));
     
     if (existingLoadingIndicator) {
-        console.log(`[${containerId}] Found existing loading indicator, updating message.`);
         
         // Update the existing loading indicator with the enhanced design
         existingLoadingIndicator.style.opacity = '1';
@@ -421,7 +405,6 @@ export function displayChartLoading(containerId, message = 'Loading chart...') {
     }
     
     // Create a new loading element with enhanced professional design
-    console.log(`[${containerId}] Creating new professional loading indicator.`);
     const loadingElement = document.createElement('div');
     loadingElement.className = 'chart-loading';
     
@@ -465,8 +448,6 @@ export function displayChartLoading(containerId, message = 'Loading chart...') {
     // Fade in the loading indicator with a smoother curve
     loadingElement.style.transition = 'opacity 0.4s cubic-bezier(0.165, 0.84, 0.44, 1)';
     loadingElement.style.opacity = '1';
-    
-    console.log(`[${containerId}] Enhanced loading indicator appended and visible.`);
 }
 
 /**

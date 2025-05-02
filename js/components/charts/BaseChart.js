@@ -1,6 +1,24 @@
 /**
  * Base Chart Component
- * Provides common functionality for all chart types
+ * Provides common functionality and infrastructure for all chart types in the application.
+ * This abstract class implements core charting features including data fetching, processing,
+ * visualization, controls, descriptions generation, and event handling.
+ *
+ * @abstract
+ * @class
+ * @property {string} containerId - The DOM element ID where the chart will be rendered
+ * @property {Object} options - Chart configuration options
+ * @property {HTMLElement} container - The DOM element reference
+ * @property {string} chartType - Type of chart (bar, pie, etc.)
+ * @property {number} autoRefreshInterval - Interval for auto-refresh in milliseconds
+ * @property {Array} rawData - Original unprocessed data
+ * @property {Object} processedData - Data after processing for chart display
+ * @property {HTMLElement} chartControls - Chart control panel element
+ * @property {Array<string>} supportedChartTypes - List of supported chart types
+ * @property {string} defaultChartType - Default chart type if none specified
+ * @property {Object} chartInstance - Current chart instance
+ * @property {boolean} isLoading - Loading state flag
+ * @property {Array} timers - Collection of active timers
  */
 
 import { countryService } from '../../services/countryService.js';
@@ -47,7 +65,6 @@ export class BaseChart {
      * 5. Display the chart
      */
     async initialize() {
-        console.log(`[${this.containerId}] Initializing chart...`);
         try {
             // Check if loading indicator already exists in the HTML
             const container = document.getElementById(this.containerId);
@@ -56,81 +73,62 @@ export class BaseChart {
             
             if (!existingLoadingIndicator) {
                 // Only show loading state if not already present in the HTML
-                console.log(`[${this.containerId}] Displaying loading state.`);
                 chartUtils.displayChartLoading(this.containerId);
             } else {
-                console.log(`[${this.containerId}] Using existing loading indicator in HTML.`);
             }
 
             // 1. First API Call: Fetch country data
-            console.log(`[${this.containerId}] Fetching data...`);
             this.rawData = await this.fetchData();
-            console.log(`[${this.containerId}] Data fetched successfully.`, this.rawData ? this.rawData.length : 0, 'items');
 
             // 2. Process and validate the data
-            console.log(`[${this.containerId}] Processing data...`);
             this.processedData = await this.processData(this.rawData);
-            console.log(`[${this.containerId}] Data processed successfully.`, this.processedData);
             
             // Validate processed data
             if (!this.validateProcessedData(this.processedData)) {
-                console.error(`[${this.containerId}] Invalid processed data format.`, this.processedData);
                 throw new Error('Invalid data format after processing');
             }
-            console.log(`[${this.containerId}] Processed data validated.`);
 
             // 3. Create chart configuration
-            console.log(`[${this.containerId}] Creating chart config...`);
             const chartConfig = this.createChartConfig(this.processedData);
-            console.log(`[${this.containerId}] Chart config created.`, chartConfig);
 
             // Validate chart configuration
             if (!this.validateChartConfig(chartConfig)) {
-                console.error(`[${this.containerId}] Invalid chart configuration.`, chartConfig);
                 throw new Error('Invalid chart configuration');
             }
-            console.log(`[${this.containerId}] Chart config validated.`);
 
             // 4. Generate dynamic descriptions based on the processed data
-            console.log(`[${this.containerId}] Generating dynamic descriptions...`);
             const descriptions = this.generateDescriptions(this.processedData);
-            console.log(`[${this.containerId}] Descriptions generated:`, descriptions);
 
             // 5. Update chart descriptions in the DOM before displaying the chart
-            console.log(`[${this.containerId}] Updating chart descriptions...`);
             this.updateChartDescriptions(descriptions);
-            console.log(`[${this.containerId}] Chart descriptions updated.`);
 
             // 5.5 Create chart controls (but don't add them to DOM yet - will be added on expand)
-            console.log(`[${this.containerId}] Creating chart controls...`);
             this.createChartControls();
-            console.log(`[${this.containerId}] Chart controls created.`);
 
             // 6. Second API Call: Generate chart URL
-            console.log(`[${this.containerId}] Generating chart URL...`);
             const chartUrl = chartService.createChartUrl(chartConfig);
-            console.log(`[${this.containerId}] Chart URL generated:`, chartUrl);
             
             // 7. Display the chart
-            console.log(`[${this.containerId}] Displaying chart...`);
             chartUtils.displayChart(
                 this.containerId,
                 chartUrl,
                 this.options.title || 'Chart'
             );
-            console.log(`[${this.containerId}] Chart display initiated.`);
             
             // 8. Set up auto-refresh for live updates
             this.setupAutoRefresh();
 
         } catch (error) {
-            console.error(`[${this.containerId}] Error initializing chart:`, error);
             chartUtils.displayChartError(this.containerId, `Failed to load chart: ${error.message}`);
         }
     }
 
     /**
-     * Set up observer to watch for expanded state changes
+     * Set up observer to watch for expanded state changes in the chart container.
+     * Uses MutationObserver to detect when the chart is expanded or collapsed
+     * and triggers appropriate UI updates.
+     *
+     * @private
      */
     setupExpandedStateObserver() {
         // Create a MutationObserver to watch for class changes on the container
@@ -155,7 +153,6 @@ export class BaseChart {
      * Handle chart expanded state
      */
     onChartExpanded() {
-        console.log(`[${this.containerId}] Chart expanded. Adding controls.`);
         // Add controls when chart is expanded
         this.addChartControls();
         
@@ -182,7 +179,6 @@ export class BaseChart {
      * Handle chart collapsed state
      */
     onChartCollapsed() {
-        console.log(`[${this.containerId}] Chart collapsed. Removing controls.`);
         // Remove controls when chart is collapsed
         this.removeChartControls();
     }
@@ -227,7 +223,6 @@ export class BaseChart {
             
             // Make sure we're using the current chart type
             const currentChartType = this.options.type || this.defaultChartType;
-            console.log(`[${this.containerId}] Creating chart controls with current type: ${currentChartType}`);
             
             this.supportedChartTypes.forEach(type => {
                 const option = document.createElement('option');
@@ -236,7 +231,6 @@ export class BaseChart {
                 // Check against the current type to select the right option
                 if (type === currentChartType) {
                     option.selected = true;
-                    console.log(`[${this.containerId}] Setting selected option to: ${type}`);
                 }
                 chartTypeSelect.appendChild(option);
             });
@@ -387,7 +381,6 @@ export class BaseChart {
      */
     async changeChartType(newType) {
         if (this.supportedChartTypes.includes(newType)) {
-            console.log(`[${this.containerId}] Changing chart type to ${newType}...`);
             
             // First remove existing images so loading indicator is visible
             const container = document.getElementById(this.containerId);
@@ -443,9 +436,7 @@ export class BaseChart {
                 const descriptions = this.generateDescriptions(this.processedData);
                 this.updateChartDescriptions(descriptions);
                 
-                console.log(`[${this.containerId}] Chart type changed successfully to ${newType}.`);
             } catch (error) {
-                console.error(`[${this.containerId}] Error changing chart type:`, error);
                 chartUtils.displayChartError(this.containerId, `Failed to change chart type: ${error.message}`);
             }
         }
@@ -536,7 +527,6 @@ export class BaseChart {
      */
     async changeDataLimit(limit) {
         if (!isNaN(limit) && limit > 0) {
-            console.log(`[${this.containerId}] Changing data limit to ${limit}...`);
             
             // First remove existing images so loading indicator is visible
             const container = document.getElementById(this.containerId);
@@ -579,9 +569,7 @@ export class BaseChart {
                 const descriptions = this.generateDescriptions(this.processedData);
                 this.updateChartDescriptions(descriptions);
                 
-                console.log(`[${this.containerId}] Data limit changed successfully.`);
             } catch (error) {
-                console.error(`[${this.containerId}] Error changing data limit:`, error);
                 chartUtils.displayChartError(this.containerId, `Failed to change data limit: ${error.message}`);
             }
         }
@@ -650,7 +638,6 @@ export class BaseChart {
      */
     async changeSortOrder(sortOrder) {
         if (['asc', 'desc'].includes(sortOrder)) {
-            console.log(`[${this.containerId}] Changing sort order to ${sortOrder}...`);
             
             // First remove existing images so loading indicator is visible
             const container = document.getElementById(this.containerId);
@@ -716,9 +703,7 @@ export class BaseChart {
                 
                 this.updateChartDescriptions(descriptions);
                 
-                console.log(`[${this.containerId}] Sort order changed successfully to ${sortOrder}.`);
             } catch (error) {
-                console.error(`[${this.containerId}] Error changing sort order:`, error);
                 chartUtils.displayChartError(this.containerId, `Failed to change sort order: ${error.message}`);
             }
         }
@@ -735,7 +720,6 @@ export class BaseChart {
         
         // Set up a new timer to periodically refresh the chart
         this.refreshTimer = setInterval(async () => {
-            console.log(`[${this.containerId}] Auto-refreshing chart data...`);
             try {
                 // Fetch fresh data
                 const freshData = await this.fetchData();
@@ -750,8 +734,6 @@ export class BaseChart {
                 // Update descriptions in the DOM
                 this.updateChartDescriptions(descriptions);
                 
-                console.log(`[${this.containerId}] Chart descriptions auto-refreshed.`);
-                
                 // Create new chart configuration and update the chart if needed
                 const chartConfig = this.createChartConfig(this.processedData);
                 const chartUrl = chartService.createChartUrl(chartConfig);
@@ -764,19 +746,16 @@ export class BaseChart {
                 );
                 
             } catch (error) {
-                console.error(`[${this.containerId}] Error during auto-refresh:`, error);
                 // Don't show error to user, just log it - auto-refresh should be non-intrusive
             }
         }, this.autoRefreshInterval);
         
-        console.log(`[${this.containerId}] Auto-refresh set up with interval of ${this.autoRefreshInterval}ms`);
     }
     
     /**
      * Clean up resources when the chart is no longer needed
      */
     destroy() {
-        console.log(`[${this.containerId}] Destroying chart`);
         this.clearTimers();
         this.destroyChartInstance();
         
@@ -874,7 +853,6 @@ export class BaseChart {
                     };
             }
         } catch (error) {
-            console.error(`Error generating descriptions: ${error.message}`);
             return defaultDesc;
         }
     }
@@ -1516,7 +1494,6 @@ export class BaseChart {
                 this.options.title || 'Chart'
             );
         } catch (error) {
-            console.error('Error updating chart:', error);
             chartUtils.displayChartError(this.containerId, 'Failed to update chart');
         }
     }
@@ -1540,7 +1517,6 @@ export class BaseChart {
      * Clean up chart instance properly
      */
     destroyChartInstance() {
-        console.log(`[${this.containerId}] Destroying chart instance`);
         
         // If we have a chart instance, properly dispose of it
         if (this.chartInstance) {
@@ -1564,24 +1540,20 @@ export class BaseChart {
      * This should be called before rendering a new chart
      */
     cleanupExistingChart() {
-        console.log(`[${this.containerId}] Cleaning up existing chart elements...`);
         
         if (!this.container) {
-            console.error(`[${this.containerId}] Container not found during cleanup`);
             return;
         }
         
         // Find the chart wrapper
         const chartWrapper = this.container.querySelector('.chart-wrapper');
         if (!chartWrapper) {
-            console.error(`[${this.containerId}] Chart wrapper not found during cleanup`);
             return;
         }
         
         // Remove any existing chart images with a fade-out effect
         const existingImages = chartWrapper.querySelectorAll('.chart-image');
         if (existingImages.length > 0) {
-            console.log(`[${this.containerId}] Removing ${existingImages.length} existing chart images`);
             existingImages.forEach(image => {
                 // Apply fade-out transition
                 image.style.transition = 'opacity 0.3s ease';
@@ -1599,7 +1571,6 @@ export class BaseChart {
         // Remove any existing error messages
         const existingErrors = chartWrapper.querySelectorAll('.chart-error');
         if (existingErrors.length > 0) {
-            console.log(`[${this.containerId}] Removing ${existingErrors.length} existing error messages`);
             existingErrors.forEach(error => {
                 error.remove();
             });
@@ -1608,7 +1579,6 @@ export class BaseChart {
         // Remove any existing loading indicators
         const existingLoading = chartWrapper.querySelectorAll('.chart-loading');
         if (existingLoading.length > 0) {
-            console.log(`[${this.containerId}] Removing ${existingLoading.length} existing loading indicators`);
             existingLoading.forEach(loading => {
                 loading.remove();
             });
@@ -1616,14 +1586,12 @@ export class BaseChart {
         
         // If we have a chart instance, properly dispose of it
         if (this.chartInstance) {
-            console.log(`[${this.containerId}] Destroying chart instance`);
             if (typeof this.chartInstance.destroy === 'function') {
                 this.chartInstance.destroy();
             }
             this.chartInstance = null;
         }
         
-        console.log(`[${this.containerId}] Chart cleanup completed`);
     }
 
     /**
@@ -1653,7 +1621,6 @@ export class BaseChart {
     showLoading(message = 'Loading chart...') {
         if (!this.container) return;
         
-        console.log(`[${this.containerId}] Showing loading animation`);
         this.isLoading = true;
         
         // Use the chartUtils method to show loading
@@ -1666,7 +1633,6 @@ export class BaseChart {
     hideLoading() {
         if (!this.container) return;
         
-        console.log(`[${this.containerId}] Hiding loading animation`);
         this.isLoading = false;
         
         // Use the improved helper function from chartUtils
@@ -1680,43 +1646,11 @@ export class BaseChart {
     showError(message) {
         if (!this.container) return;
         
-        console.error(`[${this.containerId}] Chart error: ${message}`);
         
         // Use the chartUtils method to show an error
         chartUtils.displayChartError(this.containerId, message);
     }
     
-    /**
-     * Clean up existing chart resources to prepare for update
-     * This should be called before updating a chart to prevent memory leaks
-     */
-    cleanupExistingChart() {
-        // Remove any existing chart instance
-        if (this.chartInstance) {
-            console.log(`[${this.containerId}] Destroying existing chart instance`);
-            this.chartInstance.destroy();
-            this.chartInstance = null;
-        }
-        
-        // Remove any existing chart images
-        const chartImages = this.container.querySelectorAll('.chart-image');
-        if (chartImages.length > 0) {
-            console.log(`[${this.containerId}] Removing ${chartImages.length} chart images`);
-            chartImages.forEach(img => {
-                img.style.transition = 'opacity 0.2s ease-out';
-                img.style.opacity = '0';
-                
-                setTimeout(() => {
-                    if (img.parentNode) {
-                        img.parentNode.removeChild(img);
-                    }
-                }, 200);
-            });
-        }
-        
-        // Clear any associated timers
-        this.clearTimers();
-    }
     
     /**
      * Clear all timers associated with this chart
@@ -1739,26 +1673,22 @@ export class BaseChart {
      * Download the current chart image
      */
     downloadChartImage() {
-        console.log(`[${this.containerId}] Downloading chart image...`);
         
         try {
             // Find the chart image element
             const chartWrapper = this.container.querySelector('.chart-wrapper');
             if (!chartWrapper) {
-                console.error(`[${this.containerId}] Chart wrapper not found during download`);
                 return;
             }
             
             const chartImage = chartWrapper.querySelector('.chart-image');
             if (!chartImage) {
-                console.error(`[${this.containerId}] Chart image not found for download`);
                 return;
             }
             
             // Get the image URL
             const imageUrl = chartImage.src;
             if (!imageUrl) {
-                console.error(`[${this.containerId}] No chart image source found for download`);
                 return;
             }
             
@@ -1837,15 +1767,12 @@ export class BaseChart {
                     URL.revokeObjectURL(blobUrl); // Free up memory
                 }, 100);
                 
-                console.log(`[${this.containerId}] Chart image download initiated for: ${filename}`);
             })
             .catch(error => {
-                console.error(`[${this.containerId}] Error creating image with white background:`, error);
                 // Fallback to the original method if canvas approach fails
                 this.downloadChartImageFallback(imageUrl, chartTitle + '.png');
             });
         } catch (error) {
-            console.error(`[${this.containerId}] Error downloading chart image:`, error);
         }
     }
 
@@ -1855,7 +1782,6 @@ export class BaseChart {
      * @param {string} filename - Desired filename for the download
      */
     downloadChartImageFallback(imageUrl, filename) {
-        console.log(`[${this.containerId}] Using fallback download method...`);
         
         try {
             // Create an anchor element for downloading
@@ -1875,9 +1801,7 @@ export class BaseChart {
                 document.body.removeChild(downloadLink);
             }, 100);
             
-            console.log(`[${this.containerId}] Fallback download initiated for: ${filename}`);
         } catch (error) {
-            console.error(`[${this.containerId}] Error in fallback download:`, error);
             alert('Unable to download the chart image. Please try a different browser.');
         }
     }

@@ -1,6 +1,13 @@
 /**
  * Navigation Component
- * Handles site-wide navigation functionality
+ * Handles site-wide navigation functionality including country selection dropdown
+ * and navigation between different pages of the application.
+ *
+ * @class
+ * @property {HTMLElement} countryDropdown - Dropdown menu for country selection
+ * @property {HTMLElement} homeBtn - Button to navigate to homepage
+ * @property {HTMLElement} globeBtn - Button to navigate to globe view
+ * @property {HTMLElement} selectedCountryName - Display element for selected country
  */
 
 import { countryService } from "../services/countryService.js";
@@ -18,7 +25,11 @@ export class Navigation {
     }
 
     /**
-     * Initialize navigation functionality
+     * Initialize navigation functionality by setting up country display
+     * and populating the country dropdown if it exists.
+     *
+     * @async
+     * @throws {Error} If initialization fails
      */
     async initialize() {
         try {
@@ -30,12 +41,16 @@ export class Navigation {
                 await this.populateCountryDropdown();
             }
         } catch (error) {
-            console.error('Error initializing navigation:', error);
+            // console.error('Error initializing navigation:', error);
         }
     }
 
     /**
-     * Display the currently selected country name in the dropdown button
+     * Display the currently selected country name in the dropdown button.
+     * Only executes on the selected.html page and updates the button text
+     * with the country name from URL parameters.
+     *
+     * @throws {Error} If country display fails
      */
     displaySelectedCountry() {
         try {
@@ -48,12 +63,17 @@ export class Navigation {
                 }
             }
         } catch (error) {
-            console.error('Error displaying selected country:', error);
+            // console.error('Error displaying selected country:', error);
         }
     }
 
     /**
-     * Populate the country dropdown with all available countries
+     * Populate the country dropdown with all available countries.
+     * Countries are sorted alphabetically and displayed as clickable links.
+     * The currently selected country is highlighted in the dropdown.
+     *
+     * @async
+     * @throws {Error} If country data fetching or population fails
      */
     async populateCountryDropdown() {
         try {
@@ -81,7 +101,6 @@ export class Navigation {
                 this.countryDropdown.appendChild(option);
             });
         } catch (error) {
-            console.error('Error populating country dropdown:', error);
             // Add error message to dropdown
             const errorOption = document.createElement('li');
             errorOption.classList.add('dropdown-item', 'text-danger');
