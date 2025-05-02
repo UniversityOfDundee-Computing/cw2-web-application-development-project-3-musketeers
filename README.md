@@ -8,22 +8,22 @@
 
 ## Core Features
 
-- **World Dashboard**
+- **World Dashboard**<br/>
   Displays global world statistics and 6 visual charts (e.g., population, currencies, languages).
   
-- **Country Explorer**
+- **Country Explorer**<br/>
   Select a country to view its full profile with quick facts (e.g. area, timezone, driving side), 3 comparative charts, and a Google Maps integration.
   
-- **“Surprise Me” Mode**
+- **“Surprise Me” Mode**<br/>
   Takes users to a random country and displays its data and charts (similar page content to the country explorer page).
 
-- **Expandable Chart Modals**
+- **Expandable Chart Modals**<br/>
   View full-screen charts with options to:
   - Change chart type
   - Sort/group data
   - Download chart as PNG
 
-- **Interactive 3D Globe**
+- **Interactive 3D Globe**<br/>
   Homepage with interactive globe and navigation buttons linking to all core features.
 
 ---
@@ -40,8 +40,6 @@
   - `QuickChart API` – converts data into image-based charts (PNG format).
 
 - **Development Tools**:  
-  `VS Code`, `GitHub`, `Google Maps`, `Async JS`,
-
   - `GitHub & GitHub Projects` – Used for version control, project board, issue tracking, and team collaboration.
   - `VS Code` – Used for development environment with built-in Git support.
   - `Async JavaScript` – Enables asynchronous API requests and smooth UI updates without blocking the page.
@@ -50,20 +48,20 @@
 
 ## **How It Works**
 
-1. **Homepage & Navigation**
+1. **Homepage & Navigation**<br/>
    Users arrive on an interactive 3D globe homepage with buttons to explore global or country-specific data.
 
-3. **World Data Dashboard**
+3. **World Data Dashboard**<br/>
    - The app fetches country data (population, area, languages, etc.) from the REST Countries API.
    - Global stats and charts are generated using QuickChart API and displayed as downloadable PNGs.
 
-4. **Country Selection**
+4. **Country Selection**<br/>
    Users select a country to view detailed info, supporting charts, and a link to Google Maps.
 
-5. **“Surprise Me” Feature**
+5. **“Surprise Me” Feature**<br/>
    Randomly selects and displays a country’s data and charts for spontaneous discovery.
 
-6. **Chart Interaction**
+6. **Chart Interaction**<br/>
    Clicking a chart opens a modal with options to change type, sort/group data, or download it, alongside detailed insights.
 
 ---
@@ -75,5 +73,3 @@
 - Balanced technical constraints with UX design to deliver a functional educational tool.
 - Many useful APIs lacked CORS support or required authentication, limiting integration in our frontend-only architecture.
 - QuickChart only provides static images, restricting chart interactivity and dynamic user engagement (e.g. tooltips on hover).
-
-> **WorldIn** showcases how web technologies and open data can come together to build powerful, accessible data tools—without requiring a backend.
