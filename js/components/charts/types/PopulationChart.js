@@ -121,7 +121,6 @@ export class PopulationChart extends BaseChart {
     async processData(data) {
         // Safety check for data
         if (!Array.isArray(data) || data.length === 0) {
-            console.error('Invalid country data received');
             return { labels: [], values: [], formatted: [] };
         }
 
@@ -493,8 +492,6 @@ export class PopulationChart extends BaseChart {
      * @param {string} filter - Filter type
      */
     async filterPopulation(filter) {
-        console.log(`[${this.containerId}] Filtering population by: ${filter}`);
-        
         // Show loading overlay
         this.showLoading('Filtering population data...');
         
@@ -536,7 +533,6 @@ export class PopulationChart extends BaseChart {
             // Hide the loading indicator
             this.hideLoading();
         } catch (error) {
-            console.error(`[${this.containerId}] Error filtering population:`, error);
             this.showError(`Failed to filter population data: ${error.message}`);
         }
     }
@@ -546,8 +542,6 @@ export class PopulationChart extends BaseChart {
      * @param {boolean} showDensity - Whether to show population density
      */
     async toggleDensity(showDensity) {
-        console.log(`[${this.containerId}] Toggling density view: ${showDensity}`);
-        
         // Show loading overlay
         this.showLoading('Updating density view...');
         
@@ -568,7 +562,7 @@ export class PopulationChart extends BaseChart {
             const chartUrl = chartService.createChartUrl(chartConfig);
             
             // Update the chart - update UI title
-            const uiTitle = showDensity ? 'Global Population Density' : 'Global Population Distribution';
+            const uiTitle = showingDensity ? 'Global Population Density' : 'Global Population Distribution';
             
             chartUtils.displayChart(
                 this.containerId,
@@ -589,44 +583,8 @@ export class PopulationChart extends BaseChart {
             // Hide the loading indicator
             this.hideLoading();
         } catch (error) {
-            console.error(`[${this.containerId}] Error toggling density view:`, error);
             this.showError(`Failed to toggle density view: ${error.message}`);
         }
-    }
-
-    /**
-     * Get an appropriate title for the chart image based on current options and sort order
-     * @returns {string} Chart title
-     */
-    getTitleBasedOnSortOrder() {
-        const sortOrder = this.options.sort || 'desc';
-        const showingDensity = this.options.showDensity || false;
-        const popFilter = this.options.populationFilter || 'all';
-        
-        // Base title parts
-        let baseTitle = '';
-        let filterPart = '';
-        let sortPart = '';
-        
-        // Set base title based on density toggle
-        if (showingDensity) {
-            baseTitle = 'Population Density';
-        } else {
-            baseTitle = 'Population Distribution';
-        }
-        
-        // Add filter context
-        if (popFilter === 'highpop') {
-            filterPart = ' - High Pop. Countries';
-        } else if (popFilter === 'lowpop') {
-            filterPart = ' - Low Pop. Countries';
-        }
-        
-        // Add sort order context
-        sortPart = sortOrder === 'asc' ? ' (Lowest to Highest)' : ' (Highest to Lowest)';
-        
-        // For chart image title, include sort order
-        return `${baseTitle}${filterPart}${sortPart}`;
     }
 
     /**
@@ -635,8 +593,6 @@ export class PopulationChart extends BaseChart {
      */
     async changeSortOrder(sortOrder) {
         if (['asc', 'desc'].includes(sortOrder)) {
-            console.log(`[${this.containerId}] Changing sort order to ${sortOrder}...`);
-            
             // Show loading overlay
             this.showLoading('Updating sort order...');
             
@@ -682,10 +638,7 @@ export class PopulationChart extends BaseChart {
                 
                 // Hide the loading indicator
                 this.hideLoading();
-                
-                console.log(`[${this.containerId}] Sort order changed successfully to ${sortOrder}.`);
             } catch (error) {
-                console.error(`[${this.containerId}] Error changing sort order:`, error);
                 this.showError(`Failed to change sort order: ${error.message}`);
             }
         }
@@ -697,8 +650,6 @@ export class PopulationChart extends BaseChart {
      */
     async changeChartType(newType) {
         if (this.supportedChartTypes.includes(newType)) {
-            console.log(`[${this.containerId}] Changing chart type to ${newType}...`);
-            
             // Show loading overlay
             this.showLoading(`Changing to ${newType} chart...`);
             
@@ -741,10 +692,7 @@ export class PopulationChart extends BaseChart {
                 
                 // Hide the loading indicator
                 this.hideLoading();
-                
-                console.log(`[${this.containerId}] Chart type changed successfully to ${newType}.`);
             } catch (error) {
-                console.error(`[${this.containerId}] Error changing chart type:`, error);
                 this.showError(`Failed to change chart type: ${error.message}`);
             }
         }
@@ -756,8 +704,6 @@ export class PopulationChart extends BaseChart {
      */
     async changeDataLimit(limit) {
         if (!isNaN(limit) && limit > 0) {
-            console.log(`[${this.containerId}] Changing data limit to ${limit}...`);
-            
             // Show loading overlay
             this.showLoading('Updating data limit...');
             
@@ -792,10 +738,199 @@ export class PopulationChart extends BaseChart {
                 
                 // Hide the loading indicator
                 this.hideLoading();
-                
-                console.log(`[${this.containerId}] Data limit changed successfully.`);
             } catch (error) {
-                console.error(`[${this.containerId}] Error changing data limit:`, error);
+                this.showError(`Failed to change data limit: ${error.message}`);
+            }
+        }
+    }
+
+    /**
+     * Get an appropriate title for the chart image based on current options and sort order
+     * @returns {string} Chart title
+     */
+    getTitleBasedOnSortOrder() {
+        const sortOrder = this.options.sort || 'desc';
+        const showingDensity = this.options.showDensity || false;
+        const popFilter = this.options.populationFilter || 'all';
+        
+        // Base title parts
+        let baseTitle = '';
+        let filterPart = '';
+        let sortPart = '';
+        
+        // Set base title based on density toggle
+        if (showingDensity) {
+            baseTitle = 'Population Density';
+        } else {
+            baseTitle = 'Population Distribution';
+        }
+        
+        // Add filter context
+        if (popFilter === 'highpop') {
+            filterPart = ' - High Pop. Countries';
+        } else if (popFilter === 'lowpop') {
+            filterPart = ' - Low Pop. Countries';
+        }
+        
+        // Add sort order context
+        sortPart = sortOrder === 'asc' ? ' (Lowest to Highest)' : ' (Highest to Lowest)';
+        
+        // For chart image title, include sort order
+        return `${baseTitle}${filterPart}${sortPart}`;
+    }
+
+    /**
+     * Override the base class method to ensure sort order is reflected in chart image title only
+     * @param {string} sortOrder - Sort order ('asc', 'desc', or 'alpha')
+     */
+    async changeSortOrder(sortOrder) {
+        if (['asc', 'desc'].includes(sortOrder)) {
+            // Show loading overlay
+            this.showLoading('Updating sort order...');
+            
+            try {
+                // Clean up existing chart before updating
+                this.cleanupExistingChart();
+                
+                // Update options
+                this.options.sort = sortOrder;
+                
+                // Re-process data with new sort order
+                if (this.rawData) {
+                    this.processedData = await this.processData(this.rawData);
+                }
+                
+                // Re-create chart configuration with updated chart image title
+                const chartConfig = this.createChartConfig(this.processedData);
+                
+                // Ensure we're using the correct chart type
+                chartConfig.type = this.options.type;
+                
+                // Generate chart URL
+                const chartUrl = chartService.createChartUrl(chartConfig);
+                
+                // Update the chart
+                const uiTitle = this.options.showDensity ? 'Global Population Density' : 'Global Population Distribution';
+                
+                chartUtils.displayChart(
+                    this.containerId,
+                    chartUrl,
+                    uiTitle
+                );
+                
+                // Apply the same title to the DOM element
+                const titleElement = this.container.querySelector('.chart-title');
+                if (titleElement) {
+                    titleElement.textContent = uiTitle;
+                }
+                
+                // Generate dynamic data-driven descriptions
+                const descriptions = this.generateDescriptions(this.processedData);
+                this.updateChartDescriptions(descriptions);
+                
+                // Hide the loading indicator
+                this.hideLoading();
+            } catch (error) {
+                this.showError(`Failed to change sort order: ${error.message}`);
+            }
+        }
+    }
+
+    /**
+     * Override the base class method to ensure proper cleanup and loading states
+     * @param {string} newType - New chart type ('bar', 'pie', etc.)
+     */
+    async changeChartType(newType) {
+        if (this.supportedChartTypes.includes(newType)) {
+            // Show loading overlay
+            this.showLoading(`Changing to ${newType} chart...`);
+            
+            try {
+                // Clean up existing chart before updating
+                this.cleanupExistingChart();
+                
+                // Update options
+                this.options.type = newType;
+                
+                // Store the original title to preserve it after chart type change
+                const originalTitle = this.options.title;
+                
+                // Re-process data to ensure correct formatting for the new chart type
+                if (this.rawData) {
+                    this.processedData = await this.processData(this.rawData);
+                }
+                
+                // Create new chart configuration that explicitly uses the new chart type
+                const chartConfig = this.createChartConfig(this.processedData);
+                
+                // Force the chart type to be the selected type
+                chartConfig.type = newType;
+                
+                // Generate chart URL
+                const chartUrl = chartService.createChartUrl(chartConfig);
+                
+                // Update the chart
+                const uiTitle = this.options.showDensity ? 'Global Population Density' : 'Global Population Distribution';
+                
+                chartUtils.displayChart(
+                    this.containerId,
+                    chartUrl,
+                    uiTitle
+                );
+                
+                // Update descriptions
+                const descriptions = this.generateDescriptions(this.processedData);
+                this.updateChartDescriptions(descriptions);
+                
+                // Hide the loading indicator
+                this.hideLoading();
+            } catch (error) {
+                this.showError(`Failed to change chart type: ${error.message}`);
+            }
+        }
+    }
+
+    /**
+     * Override the base class method to ensure proper cleanup and loading states
+     * @param {number} limit - Number of items to display
+     */
+    async changeDataLimit(limit) {
+        if (!isNaN(limit) && limit > 0) {
+            // Show loading overlay
+            this.showLoading('Updating data limit...');
+            
+            try {
+                // Clean up existing chart before updating
+                this.cleanupExistingChart();
+                
+                // Update options
+                this.options.limit = limit;
+                
+                // Re-process data with new limit
+                this.processedData = await this.processData(this.rawData);
+                
+                // Create new chart configuration
+                const chartConfig = this.createChartConfig(this.processedData);
+                
+                // Generate chart URL
+                const chartUrl = chartService.createChartUrl(chartConfig);
+                
+                // Update the chart
+                const uiTitle = this.options.showDensity ? 'Global Population Density' : 'Global Population Distribution';
+                
+                chartUtils.displayChart(
+                    this.containerId,
+                    chartUrl,
+                    uiTitle
+                );
+                
+                // Update descriptions
+                const descriptions = this.generateDescriptions(this.processedData);
+                this.updateChartDescriptions(descriptions);
+                
+                // Hide the loading indicator
+                this.hideLoading();
+            } catch (error) {
                 this.showError(`Failed to change data limit: ${error.message}`);
             }
         }

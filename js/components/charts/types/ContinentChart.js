@@ -232,7 +232,6 @@ export class ContinentChart extends BaseChart {
     createChartConfig(data) {
         // Use the currently selected chart type instead of hardcoding
         const chartType = this.options.type || 'doughnut';
-        console.log(`[${this.containerId}] Creating continent chart with type: ${chartType}`);
 
         const baseColors = generateHueVariants(COLORS.primary, data.labels.length);
         const backgroundColors = baseColors.map(color => hexToRgba(color, 0.75));
@@ -425,7 +424,6 @@ export class ContinentChart extends BaseChart {
      * @param {string} view - Type of data to display
      */
     async changeDataView(view) {
-        console.log(`[${this.containerId}] Changing data view to: ${view}`);
         
         // Show loading overlay
         this.showLoading();
@@ -528,7 +526,6 @@ export class ContinentChart extends BaseChart {
      */
     async changeSortOrder(sortOrder) {
         if (['asc', 'desc'].includes(sortOrder)) {
-            console.log(`[${this.containerId}] Changing sort order to ${sortOrder}...`);
             
             // Show loading overlay
             this.showLoading();
@@ -574,7 +571,6 @@ export class ContinentChart extends BaseChart {
                     titleElement.textContent = this.options.title;
                 }
                 
-                console.log(`[${this.containerId}] Sort order changed successfully to ${sortOrder}.`);
             } catch (error) {
                 console.error(`[${this.containerId}] Error changing sort order:`, error);
                 this.showError(`Failed to change sort order: ${error.message}`);
@@ -588,7 +584,6 @@ export class ContinentChart extends BaseChart {
      */
     async changeChartType(newType) {
         if (this.supportedChartTypes.includes(newType)) {
-            console.log(`[${this.containerId}] Changing chart type to ${newType}...`);
             
             // Show loading overlay
             this.showLoading();
@@ -637,7 +632,6 @@ export class ContinentChart extends BaseChart {
                     titleElement.textContent = this.options.title;
                 }
                 
-                console.log(`[${this.containerId}] Chart type changed successfully to ${newType}.`);
             } catch (error) {
                 console.error(`[${this.containerId}] Error changing chart type:`, error);
                 this.showError(`Failed to change chart type: ${error.message}`);
@@ -651,7 +645,6 @@ export class ContinentChart extends BaseChart {
      */
     async changeDataLimit(limit) {
         if (!isNaN(limit) && limit > 0) {
-            console.log(`[${this.containerId}] Changing data limit to ${limit}...`);
             
             // Show loading overlay
             this.showLoading();
@@ -683,7 +676,6 @@ export class ContinentChart extends BaseChart {
                 const descriptions = this.generateDescriptions(this.processedData);
                 this.updateChartDescriptions(descriptions);
                 
-                console.log(`[${this.containerId}] Data limit changed successfully.`);
             } catch (error) {
                 console.error(`[${this.containerId}] Error changing data limit:`, error);
                 this.showError(`Failed to change data limit: ${error.message}`);

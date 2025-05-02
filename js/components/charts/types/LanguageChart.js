@@ -124,7 +124,6 @@ export class LanguageChart extends BaseChart {
     async processData(data) {
         // Safety check for data
         if (!Array.isArray(data) || data.length === 0) {
-            console.error('Invalid country data received for language chart');
             return { labels: [], values: [], formatted: [] };
         }
 
@@ -450,8 +449,6 @@ export class LanguageChart extends BaseChart {
      * @param {string} continent - Continent to filter by
      */
     async filterByContinent(continent) {
-        console.log(`[${this.containerId}] Filtering by continent: ${continent}`);
-        
         // Show loading overlay
         this.showLoading();
         
@@ -488,7 +485,6 @@ export class LanguageChart extends BaseChart {
             // Update the chart title in the DOM
             this.updateDOMTitle();
         } catch (error) {
-            console.error(`[${this.containerId}] Error filtering by continent:`, error);
             this.showError(`Failed to filter by continent: ${error.message}`);
         }
     }
@@ -500,8 +496,6 @@ export class LanguageChart extends BaseChart {
      * @param {boolean} sortByPopulation - Whether to sort by population
      */
     async togglePopulationSorting(sortByPopulation) {
-        console.log(`[${this.containerId}] Toggling population sorting: ${sortByPopulation}`);
-        
         // Show loading overlay
         this.showLoading();
         
@@ -538,7 +532,6 @@ export class LanguageChart extends BaseChart {
             // Update the chart title in the DOM
             this.updateDOMTitle();
         } catch (error) {
-            console.error(`[${this.containerId}] Error toggling population sorting:`, error);
             this.showError(`Failed to toggle population sorting: ${error.message}`);
         }
     }
@@ -754,7 +747,7 @@ export class LanguageChart extends BaseChart {
     getChartSettings() {
         return {
             continentFilter: this.options.continentFilter || 'all',
-            // groupByFamily: this.options.groupByFamily || false, // Always true now
+            // groupByFamily: this.options.groupByFamily || false; // Always true now
             sortByPopulation: this.options.sortByPopulation || false,
             sortOrder: this.options.sort || 'desc',
             chartType: this.options.type || 'horizontalBar'

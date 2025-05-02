@@ -65,7 +65,6 @@ export class BordersChart extends BaseChart {
     async processData(data) {
         // Safety check for data
         if (!Array.isArray(data) || data.length === 0) {
-            console.error('Invalid country data received for borders chart');
             return { labels: [], values: [], formatted: [] };
         }
         
@@ -100,19 +99,12 @@ export class BordersChart extends BaseChart {
                 borderingCountries: borders || []
             });
         });
-
-        // Log for debugging
-        console.log(`[${this.containerId}] Filtered to ${countryBorders.length} countries for range: ${this.options.borderRange}`);
         
         // Check if we have any data after filtering
         if (countryBorders.length === 0) {
-            console.warn(`[${this.containerId}] No countries match the current filter criteria.`);
-            
             // For "no-borders" option, we might not be correctly identifying island countries
             // Add a fallback mechanism
             if (this.options.borderRange === 'no-borders') {
-                console.log(`[${this.containerId}] Trying alternative approach for island countries...`);
-                
                 // Try a different approach to find island countries
                 data.forEach(country => {
                     if (!country.name) return;
@@ -130,8 +122,6 @@ export class BordersChart extends BaseChart {
                         });
                     }
                 });
-                
-                console.log(`[${this.containerId}] Found ${countryBorders.length} island countries with alternative approach.`);
             }
         }
         
@@ -496,8 +486,6 @@ export class BordersChart extends BaseChart {
      * @param {string} range - The border count range to filter by
      */
     async changeBorderRange(range) {
-        console.log(`[${this.containerId}] Changing border range to: ${range}`);
-        
         // Show loading overlay
         this.showLoading();
         
@@ -562,19 +550,15 @@ export class BordersChart extends BaseChart {
                 titleElement.textContent = this.options.title;
             }
         } catch (error) {
-            console.error(`[${this.containerId}] Error changing border range:`, error);
             this.showError(`Failed to change border range: ${error.message}`);
         }
     }
-
 
     /**
      * Toggle between border count and border density
      * @param {boolean} showDensity - Whether to show border density
      */
     async toggleBorderDensity(showDensity) {
-        console.log(`[${this.containerId}] Toggling border density: ${showDensity}`);
-        
         // Show loading overlay
         this.showLoading();
         
@@ -616,7 +600,6 @@ export class BordersChart extends BaseChart {
                 titleElement.textContent = this.options.title;
             }
         } catch (error) {
-            console.error(`[${this.containerId}] Error toggling border density:`, error);
             this.showError(`Failed to toggle border density: ${error.message}`);
         }
     }
@@ -626,8 +609,6 @@ export class BordersChart extends BaseChart {
      * @param {string} sortOrder - Sort order ('asc', 'desc', or 'alpha')
      */
     async changeSortOrder(sortOrder) {
-        console.log(`[${this.containerId}] Changing sort order to: ${sortOrder}`);
-        
         // Show loading overlay
         this.showLoading();
         
@@ -677,7 +658,6 @@ export class BordersChart extends BaseChart {
                 titleElement.textContent = this.options.title;
             }
         } catch (error) {
-            console.error(`[${this.containerId}] Error changing sort order:`, error);
             this.showError(`Failed to change sort order: ${error.message}`);
         }
     }
@@ -687,8 +667,6 @@ export class BordersChart extends BaseChart {
      * @param {number} limit - The number of items to display
      */
     async changeItemLimit(limit) {
-        console.log(`[${this.containerId}] Changing item limit to: ${limit}`);
-        
         // Show loading overlay
         this.showLoading();
         
@@ -741,7 +719,6 @@ export class BordersChart extends BaseChart {
                 titleElement.textContent = this.options.title;
             }
         } catch (error) {
-            console.error(`[${this.containerId}] Error changing item limit:`, error);
             this.showError(`Failed to change item limit: ${error.message}`);
         }
     }
@@ -975,7 +952,6 @@ export class BordersChart extends BaseChart {
                 titleElement.textContent = this.options.title;
             }
         } catch (error) {
-            console.error(`[${this.containerId}] Error updating chart:`, error);
             this.showError(`Failed to update chart: ${error.message}`);
         }
     }

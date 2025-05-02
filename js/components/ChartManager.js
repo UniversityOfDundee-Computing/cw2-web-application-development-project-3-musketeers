@@ -26,7 +26,6 @@ export class ChartManager {
         // Enhanced descriptions will store API-enhanced versions
         this.enhancedDescriptions = {};
         
-        console.log('ChartManager initialized');
         this.setupEventListeners();
         this.fetchAPIData();
         this.findChartInstances();
@@ -50,14 +49,11 @@ export class ChartManager {
                 
                 if (worldDataPageVariable && worldDataPageVariable.charts) {
                     this.chartInstances = worldDataPageVariable.charts;
-                    console.log('Found chart instances:', this.chartInstances.size);
                     // Now that we have the chart instances, update descriptions with live data
                     this.updateDescriptionsWithLiveData();
-                } else {
-                    console.warn('Could not find chart instances in WorldDataPage');
                 }
             } catch (error) {
-                console.error('Error finding chart instances:', error);
+                // Error finding chart instances
             }
         }, 1500); // Give some time for charts to be initialized
     }
@@ -67,29 +63,22 @@ export class ChartManager {
      */
     updateDescriptionsWithLiveData() {
         if (!this.chartInstances || this.chartInstances.size === 0) {
-            console.warn('No chart instances available for updating descriptions');
             return;
         }
-        
-        console.log('Updating descriptions with live chart data...');
         
         // For each chart instance, update its description with actual data
         this.chartInstances.forEach((chartInstance, chartId) => {
             try {
                 const type = this.getChartTypeFromId(chartId);
                 if (!type || !this.baseDescriptions[type]) {
-                    console.warn(`No base description found for chart type: ${type}`);
                     return;
                 }
                 
                 // Get processed data from chart instance
                 const processedData = chartInstance.processedData;
                 if (!processedData) {
-                    console.warn(`No processed data found for chart ${chartId}`);
                     return;
                 }
-                
-                console.log(`Generating live description for ${chartId} (${type})`, processedData);
                 
                 // Generate description based on chart type and live data
                 let liveDescription = this.generateLiveDescription(type, processedData, chartInstance);
@@ -97,10 +86,9 @@ export class ChartManager {
                 // Update enhanced descriptions
                 if (liveDescription) {
                     this.enhancedDescriptions[type] = liveDescription;
-                    console.log(`Updated description for ${type}:`, liveDescription);
                 }
             } catch (error) {
-                console.error(`Error updating description for ${chartId}:`, error);
+                // Error updating description
             }
         });
     }
@@ -194,7 +182,6 @@ export class ChartManager {
             
             return description;
         } catch (error) {
-            console.error(`Error generating live description for ${type}:`, error);
             return this.enhancedDescriptions[type] || baseDescription;
         }
     }
@@ -231,7 +218,6 @@ export class ChartManager {
             }
         }
         
-        console.warn(`Could not determine chart type for ID: ${chartId}`);
         return null;
     }
     
@@ -242,12 +228,10 @@ export class ChartManager {
         try {
             const countries = await countryService.getAllCountries();
             this.apiData = countries;
-            console.log('API data fetched for chart descriptions. Countries:', countries.length);
             
             // Process the data and enhance descriptions
             this.enhanceDescriptionsWithAPIData();
         } catch (error) {
-            console.error('Failed to fetch API data for chart descriptions:', error);
             // Fall back to base descriptions if API fails
             this.enhancedDescriptions = { ...this.baseDescriptions };
         }
@@ -333,9 +317,7 @@ export class ChartManager {
             const topBorderCount = borderCounts.length > 0 ? borderCounts[0].count : 0;
             this.enhancedDescriptions.borders = `${this.baseDescriptions.borders}, with ${topBorderCountry} having the most at ${topBorderCount} neighboring countries.`;
             
-            console.log('Chart descriptions enhanced with API data');
         } catch (error) {
-            console.error('Error enhancing chart descriptions with API data:', error);
             // Fall back to base descriptions if processing fails
             this.enhancedDescriptions = { ...this.baseDescriptions };
         }
@@ -348,18 +330,14 @@ export class ChartManager {
         const setupChart = (chart) => {
             // *** ADDED: Check if this is the world stats container and skip if so ***
             if (chart.id === 'chartContainer9') {
-                console.log('Skipping event listeners for world stats container:', chart.id);
                 return; // Don't attach hover/click listeners to the world stats card
             }
             // *** END ADDED ***
 
             if (chart.dataset.initialized) return;
 
-            console.log('Setting up event listeners for chart:', chart.id);
-
             // Mouse events - only keep hover effect, not description display
             chart.addEventListener('mouseenter', () => {
-                console.log('Mouse entered chart:', chart.id);
                 // Only add hover class, don't show description
                 if (this.activeChart !== chart) {
                     chart.classList.add('hover');
@@ -367,12 +345,10 @@ export class ChartManager {
             });
             
             chart.addEventListener('mouseleave', () => {
-                console.log('Mouse left chart:', chart.id);
                 chart.classList.remove('hover');
             });
             
             chart.addEventListener('click', (e) => {
-                console.log('Chart clicked:', chart.id);
                 // Don't handle click if the close button was clicked
                 if (e.target.closest('.chart-close-btn')) {
                     e.stopPropagation();
@@ -403,12 +379,10 @@ export class ChartManager {
             });
 
             chart.dataset.initialized = 'true';
-            console.log('Chart setup complete:', chart.id);
         };
 
         // Set up initial charts
         const charts = document.querySelectorAll('.chart-container');
-        console.log('Found', charts.length, 'charts to initialize');
         charts.forEach(setupChart);
 
         // Watch for new charts being added
@@ -458,12 +432,10 @@ export class ChartManager {
     handleClick(chart) {
         // *** ADDED: Prevent click handling for world stats container ***
         if (chart.id === 'chartContainer9') {
-            console.log('Ignoring click for world stats container:', chart.id);
             return; // Do nothing if the world stats card is clicked
         }
         // *** END ADDED ***
 
-        console.log('Handling click for chart:', chart.id);
         if (this.activeChart === chart) {
             this.clearExpandedState();
         } else {
@@ -637,7 +609,6 @@ export class ChartManager {
      * Updated to use descriptions and insights based on live chart data
      */
     showDetailedAnalysis(chart) {
-        console.log('Showing detailed analysis for chart:', chart.id);
         const type = this.getChartType(chart);
         
         // Try to get real-time data for this specific chart
@@ -649,7 +620,6 @@ export class ChartManager {
         if (this.chartInstances && this.chartInstances.has(chartId)) {
             const chartInstance = this.chartInstances.get(chartId);
             if (chartInstance && chartInstance.processedData) {
-                console.log(`Generating real-time description for ${chartId} from live data:`, chartInstance.processedData);
                 const liveDescription = this.generateLiveDescription(type, chartInstance.processedData, chartInstance);
                 if (liveDescription) {
                     description = liveDescription;
@@ -660,35 +630,16 @@ export class ChartManager {
             }
         }
         
-        console.log('Chart type:', type, 'Description:', description);
-        
         // Analysis is already in the HTML, we just need to ensure it's visible
         const analysisDiv = chart.querySelector('.chart-detail-analysis');
         if (!analysisDiv) {
-            console.error('Analysis div not found in chart:', chart.id);
             return;
         }
-        
-        // Log the dimensions to diagnose any overflow issues
-        const chartRect = chart.getBoundingClientRect();
-        const analysisDivRect = analysisDiv.getBoundingClientRect();
-        
-        console.log('Chart dimensions:', {
-            width: chartRect.width,
-            height: chartRect.height
-        });
-        
-        console.log('Analysis div dimensions:', {
-            width: analysisDivRect.width,
-            height: analysisDivRect.height
-        });
         
         // Update the description paragraph with API-enhanced data
         const descParagraph = analysisDiv.querySelector('p');
         if (descParagraph) {
             descParagraph.textContent = description;
-        } else {
-            console.warn('Description paragraph not found in analysis div for chart:', chart.id);
         }
         
         // Update the key insights with dynamically generated ones
@@ -732,7 +683,6 @@ export class ChartManager {
      * Generate dynamic insights based on chart type and data
      */
     generateDynamicInsights(type, data) {
-        console.log(`Generating insights for ${type} with data:`, data);
         const insights = [];
         
         try {
@@ -937,10 +887,9 @@ export class ChartManager {
                     insights.push(`Last updated: ${new Date().toLocaleString()}`);
             }
         } catch (error) {
-            console.error(`Error generating insights for ${type}:`, error);
             insights.push(`This chart shows ${type} data from the REST Countries API.`);
             insights.push(`The chart contains ${data.labels ? data.labels.length : 0} data points.`);
-            insights.push(`Data is current as of ${new Date().toLocaleString()}.`);
+            insights.push(`Data is current as of ${new Date().toLocaleDateString()}.`);
         }
         
         return insights;
@@ -950,8 +899,6 @@ export class ChartManager {
      * Hide detailed analysis
      */
     hideDetailedAnalysis(chart) {
-        console.log('Hiding detailed analysis for chart:', chart.id);
-        
         const analysisDiv = chart.querySelector('.chart-detail-analysis');
         if (!analysisDiv) return;
         
@@ -1010,7 +957,6 @@ export class ChartManager {
         if (title.includes('border')) return 'borders';
         if (title.includes('language')) return 'language';
         
-        console.warn(`Could not determine chart type for chart with ID: ${chart.id}`);
         return 'default';
     }
 

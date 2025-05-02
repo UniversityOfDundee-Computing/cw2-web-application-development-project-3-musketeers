@@ -120,7 +120,6 @@ export class CurrencyChart extends BaseChart {
     async processData(data) {
         // Safety check for data
         if (!Array.isArray(data) || data.length === 0) {
-            console.error('Invalid country data received for currency chart');
             return { labels: [], values: [], formatted: [] };
         }
         
@@ -508,8 +507,6 @@ export class CurrencyChart extends BaseChart {
      * @param {string} view - Type of currency view to display
      */
     async changeCurrencyView(view) {
-        console.log(`[${this.containerId}] Changing currency view to: ${view}`);
-        
         // Show loading overlay
         this.showLoading();
         
@@ -556,7 +553,6 @@ export class CurrencyChart extends BaseChart {
                 titleElement.textContent = this.options.title;
             }
         } catch (error) {
-            console.error(`[${this.containerId}] Error changing currency view:`, error);
             this.showError(`Failed to change currency view: ${error.message}`);
         }
     }
@@ -566,8 +562,6 @@ export class CurrencyChart extends BaseChart {
      * @param {string} region - Region to filter by
      */
     async filterByRegion(region) {
-        console.log(`[${this.containerId}] Filtering by region: ${region}`);
-        
         // Show loading overlay
         this.showLoading();
         
@@ -618,7 +612,6 @@ export class CurrencyChart extends BaseChart {
                 titleElement.textContent = this.options.title;
             }
         } catch (error) {
-            console.error(`[${this.containerId}] Error filtering by region:`, error);
             this.showError(`Failed to filter by region: ${error.message}`);
         }
     }
@@ -628,8 +621,6 @@ export class CurrencyChart extends BaseChart {
      * @param {boolean} show - Whether to show symbols
      */
     async toggleSymbols(show) {
-        console.log(`[${this.containerId}] Toggling currency symbols: ${show}`);
-        
         // Show loading overlay
         this.showLoading();
         
@@ -653,7 +644,6 @@ export class CurrencyChart extends BaseChart {
                 this.options.title || 'Chart'
             );
         } catch (error) {
-            console.error(`[${this.containerId}] Error toggling symbols:`, error);
             this.showError(`Failed to toggle currency symbols: ${error.message}`);
         }
     }
@@ -733,8 +723,6 @@ export class CurrencyChart extends BaseChart {
      */
     async changeChartType(chartType) {
         if (this.options.supportedChartTypes.includes(chartType)) {
-            console.log(`[${this.containerId}] Changing chart type to ${chartType}...`);
-            
             // Show loading overlay
             this.showLoading();
             
@@ -762,9 +750,7 @@ export class CurrencyChart extends BaseChart {
                 const descriptions = this.generateDescriptions(this.processedData);
                 this.updateChartDescriptions(descriptions);
                 
-                console.log(`[${this.containerId}] Chart type changed successfully to ${chartType}.`);
             } catch (error) {
-                console.error(`[${this.containerId}] Error changing chart type:`, error);
                 this.showError(`Failed to change chart type: ${error.message}`);
             }
         }
