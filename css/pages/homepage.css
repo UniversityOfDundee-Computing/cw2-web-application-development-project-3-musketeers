@@ -19,16 +19,16 @@ body {
   top: 0;
   left: 0;
   z-index: 1;
-  overflow: visible; /* ✅ allows labels to show */
+  overflow: visible; 
 }
 
 #globe-container {
-  position: fixed;  /* 👈 this keeps it in the background */
+  position: fixed;  /* this keeps it in the background */
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 0;       /* 👈 push globe behind everything */
+  z-index: 0;       /* push globe behind everything */
   background-size: cover;
   background-position: center;
   overflow: visible;
