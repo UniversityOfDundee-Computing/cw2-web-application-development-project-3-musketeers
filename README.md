@@ -8,7 +8,7 @@
 
 ## Core Features
 
-- **World Dashboard**
+- **World Dashboard**< br / >
   Displays global world statistics and 6 visual charts (e.g., population, currencies, languages).
   
 - **Country Explorer**
