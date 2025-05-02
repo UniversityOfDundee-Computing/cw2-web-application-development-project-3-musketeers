@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   const world = Globe()(container)
-    .globeImageUrl('./earth-dark.jpg') // Fix path with leading slash
+    .globeImageUrl('./public/earth-dark.jpg') // Fix path with leading slash
     .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
     .backgroundColor('rgba(0,0,0,0)')
     .pointOfView({ lat: 0, lng: 0, altitude: 2.5 });
