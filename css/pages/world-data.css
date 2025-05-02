@@ -4,9 +4,8 @@
  */
 
 /* Page specific container modifications */
-/* Override container for world data page */
 .container {
-    max-width: 1800px; /* Wider container for premium data visualizations */
+    max-width: 1800px; /* Wider container for data visualizations */
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
     gap: clamp(1.75rem, 3vw, 3rem);
     padding: clamp(1.5rem, 3vw, 3rem);
@@ -18,7 +17,7 @@
     margin: 0 auto;
 }
 
-/* Add proper spacing to chart grid */
+/* proper spacing to chart grid */
 .row.g-2 {
     margin: 0 -0.5rem;
 }
@@ -184,10 +183,9 @@
     position: relative;
     overflow: hidden;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); */
 }
 
-/* Add a subtle gradient to stat cards */
+/* subtle gradient to stat cards */
 .stat-card::before {
     content: '';
     position: absolute;
@@ -329,7 +327,7 @@
     width: auto !important;
     max-width: 100% !important;
     display: block !important;
-    object-fit: contain !important; /* Keep image aspect ratio while fitting in container */
+    object-fit: contain !important;
     animation: chartUpdate 0.3s ease-out forwards;
 }
 
@@ -412,7 +410,6 @@
     visibility: visible;
 }
 
-/* Responsive adjustments */
 /* Responsive layout adjustments */
 @media screen and (max-width: 1024px) {
     :root {
@@ -791,25 +788,6 @@
     padding-top: 0 !important;
 }
 
-/* .chart-container.expanded .chart-detail-analysis {
-    grid-column: 2;
-    display: flex;
-    flex-direction: column;
-    padding: 1rem;
-    background-color: rgba(248, 250, 252, 0.9);
-    border-radius: 8px;
-    border-left: 1px solid rgba(0, 0, 0, 0.1);
-    transform: none;
-    opacity: 1;
-    visibility: visible;
-    position: relative;
-    height: auto;
-    max-height: calc(90vh - 3rem);
-    overflow-y: auto;
-} */
-
-
-
 /* Expanded Chart View Mobile Optimization */
 @media (max-width: 768px) {
     .chart-container.expanded {
@@ -842,7 +820,7 @@
     cursor: pointer;
     transition: all 0.4s cubic-bezier(0.215, 0.610, 0.355, 1.000);
     z-index: 1;
-    max-width: 100%; /* Ensure chart container doesn't exceed viewport width */
+    max-width: 100%;
     margin: 0 !important;
 }
 
@@ -909,7 +887,7 @@
     word-wrap: break-word;
     max-width: 100%;
     line-height: 1.4;
-    max-height: 2.8em; /* Limit height to ~2 lines */
+    max-height: 2.8em;
     overflow: hidden;
 }
 
@@ -919,7 +897,7 @@
     height: auto;
     display: block;
     transition: all 0.4s cubic-bezier(0.215, 0.610, 0.355, 1.000);
-    object-fit: contain; /* Ensure image maintains aspect ratio */
+    object-fit: contain;
 }
 
 /* Modal-like overlay when a chart is expanded */
@@ -996,7 +974,6 @@ body:has(.chart-container.expanded) .chart-backdrop {
     border-radius: 50% !important;
     background-color: var(--white) !important;
     border: 1px solid var(--border-color);
-    /* background-color: rgba(0, 0, 0, 0.6) !important; */
     color: var(--primary-color) !important;
     display: flex !important;
     align-items: center !important;
@@ -1015,7 +992,7 @@ body:has(.chart-container.expanded) .chart-backdrop {
     pointer-events: auto !important;
 }
 
-/* Adjust container when a chart is expanded - blur OTHER charts */
+/* Adjust container when a chart is expanded */
 .container:has(.chart-container.expanded) .chart-container:not(.expanded) {
     filter: blur(4px);
     pointer-events: none;
@@ -1110,14 +1087,12 @@ body:has(.chart-container.expanded) .chart-backdrop {
 
 /* Stats grid responsive adjustments for 640px-950px range */
 @media screen and (min-width: 640px) and (max-width: 950px) {
-    /* Adjust grid to 2 columns in this range */
     .stats-grid {
       grid-template-columns: repeat(2, 1fr);
       padding: 1rem;
       gap: 1rem;
     }
     
-    /* Fix double padding issue on card-body */
     .card-body {
       padding: 0.75rem !important;
       overflow: hidden !important;
