@@ -73,5 +73,3 @@
 - Balanced technical constraints with UX design to deliver a functional educational tool.
 - Many useful APIs lacked CORS support or required authentication, limiting integration in our frontend-only architecture.
 - QuickChart only provides static images, restricting chart interactivity and dynamic user engagement (e.g. tooltips on hover).
-
-> **WorldIn** showcases how web technologies and open data can come together to build powerful, accessible data tools—without requiring a backend.
