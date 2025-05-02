@@ -15,6 +15,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  // Apply background image from data attribute
+  if (container.dataset.bgImage) {
+    container.style.backgroundImage = `url('${container.dataset.bgImage}')`;
+  }
+
   const world = Globe()(container)
     .globeImageUrl('/public/earth-dark.jpg') // Fix path with leading slash
     .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')

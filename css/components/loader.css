@@ -1,0 +1,75 @@
+/* Loading screen styles */
+.loading-screen {
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: linear-gradient(#4062a0, #665faa);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  transition: opacity 1s ease;
+  color: white;
+}
+
+.loading-screen h1 {
+  font-family: 'Roboto';
+  font-weight: 500;
+  font-size: 3rem;
+}
+
+.loading-screen p {
+  font-size: 1.25rem;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-top: 20px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Tooltip styles */
+#tooltip {
+  position: absolute;
+  display: none;
+  background: rgba(0,0,0,0.7);
+  color: white;
+  padding: 5px;
+  border-radius: 3px;
+  font-size: 0.8em;
+}
+
+/* Globe overlay styles */
+#globe-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Background container style */
+.bg-container {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
