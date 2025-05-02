@@ -40,8 +40,6 @@
   - `QuickChart API` – converts data into image-based charts (PNG format).
 
 - **Development Tools**:  
-  `VS Code`, `GitHub`, `Google Maps`, `Async JS`,
-
   - `GitHub & GitHub Projects` – Used for version control, project board, issue tracking, and team collaboration.
   - `VS Code` – Used for development environment with built-in Git support.
   - `Async JavaScript` – Enables asynchronous API requests and smooth UI updates without blocking the page.
