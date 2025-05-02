@@ -23,15 +23,15 @@
     
     // Log element status for debugging
     if (!statsGrid) {
-        console.error('[chartContainer9] Error: Stats grid element not found');
+        // console.error('[chartContainer9] Error: Stats grid element not found');
         return;
     }
     if (!loadingElement) {
-        console.error('[chartContainer9] Error: Loading indicator not found');
+        // console.error('[chartContainer9] Error: Loading indicator not found');
         return;
     }
     if (!statsWrapper) {
-        console.error('[chartContainer9] Error: Stats wrapper element not found');
+        // console.error('[chartContainer9] Error: Stats wrapper element not found');
         return;
     }
 
@@ -210,7 +210,7 @@
                             }
                         }
                     } catch (e) {
-                        console.error('[chartContainer9] Error during forced removal:', e);
+                        // console.error('[chartContainer9] Error during forced removal:', e);
                     }
                 }
 

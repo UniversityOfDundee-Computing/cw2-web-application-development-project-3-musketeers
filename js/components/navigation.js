@@ -41,7 +41,7 @@ export class Navigation {
                 await this.populateCountryDropdown();
             }
         } catch (error) {
-            console.error('Error initializing navigation:', error);
+            // console.error('Error initializing navigation:', error);
         }
     }
 
@@ -63,7 +63,7 @@ export class Navigation {
                 }
             }
         } catch (error) {
-            console.error('Error displaying selected country:', error);
+            // console.error('Error displaying selected country:', error);
         }
     }
 
@@ -101,7 +101,6 @@ export class Navigation {
                 this.countryDropdown.appendChild(option);
             });
         } catch (error) {
-            console.error('Error populating country dropdown:', error);
             // Add error message to dropdown
             const errorOption = document.createElement('li');
             errorOption.classList.add('dropdown-item', 'text-danger');

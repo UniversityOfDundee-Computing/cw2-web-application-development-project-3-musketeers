@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const tooltip = document.getElementById('tooltip');
 
   if (!container) {
-    console.error('Globe container not found!');
+    // console.error('Globe container not found!');
     return;
   }
 
@@ -133,7 +133,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       loading.style.display = 'none';
     }
   } catch (error) {
-    console.error('Failed to load country data:', error);
     if (loading) loading.style.display = 'none';
   }
 });

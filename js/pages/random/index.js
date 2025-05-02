@@ -136,7 +136,6 @@ class RandomCountryPage {
             await this.handleRandomize();
 
         } catch (error) {
-            console.error('Error initializing random country page:', error);
             this.handleError(error);
         }
     }
@@ -166,7 +165,6 @@ class RandomCountryPage {
             ]);
 
         } catch (error) {
-            console.error('Error getting random country:', error);
             this.handleError(error);
         } finally {
             this.randomizeBtn.disabled = false;
@@ -241,7 +239,6 @@ class RandomCountryPage {
                 this.createAreaChart(country, allCountries)
             ]);
         } catch (error) {
-            console.error('Error creating charts:', error);
             this.handleError(error);
         }
     }

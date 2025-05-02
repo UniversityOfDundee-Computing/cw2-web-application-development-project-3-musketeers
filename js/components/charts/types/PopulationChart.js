@@ -562,7 +562,7 @@ export class PopulationChart extends BaseChart {
             const chartUrl = chartService.createChartUrl(chartConfig);
             
             // Update the chart - update UI title
-            const uiTitle = showingDensity ? 'Global Population Density' : 'Global Population Distribution';
+            const uiTitle = showDensity ? 'Global Population Density' : 'Global Population Distribution';
             
             chartUtils.displayChart(
                 this.containerId,
